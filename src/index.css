@@ -1,0 +1,159 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* Add our custom styles below */
+
+#root {
+  /* Keep existing root styles, maybe add max-width if desired */
+  max-width: 600px; /* Limit width for better readability */
+  margin: 2rem auto; /* Center on page */
+  padding: 2rem;
+  /* Remove text-align: center if we want left alignment */
+  /* text-align: center; */
+}
+
+form {
+  display: flex;
+  gap: 0.5rem; /* Space between input and button */
+  margin-bottom: 1.5rem;
+}
+
+form input[type="text"] {
+  flex-grow: 1; /* Allow input to take available space */
+  padding: 0.6em 1em;
+  border-radius: 8px;
+  border: 1px solid gray; /* Add subtle border */
+  font-size: 1em;
+}
+
+/* Adjust button padding if needed, Vite's default is okay */
+
+/* List Styling */
+ul {
+  list-style-type: none; /* Remove default bullets */
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: rgba(128, 128, 128, 0.1); /* Subtle background */
+  border-radius: 4px;
+}
+
+li span {
+ flex-grow: 1; /* Allow text to take space */
+ margin: 0 0.75rem !important; /* Override inline style if needed */
+}
+
+li input[type="checkbox"] {
+  margin-right: 0.5rem;
+  /* Optionally increase size/style checkbox */
+  width: 1.2em;
+  height: 1.2em;
+  cursor: pointer;
+}
+
+/* Specific button styling for delete */
+li button {
+  background: none;
+  border: none;
+  color: #ff4d4d; /* Reddish color for delete */
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0.2em 0.5em; /* Smaller padding */
+  margin-left: 0.5rem !important; /* Override inline style */
+  min-width: 30px; /* Ensure minimum tap area */
+}
+
+li button:hover {
+  color: #cc0000;
+  border-color: transparent; /* Remove hover border */
+}
+
+h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.5em; /* Slightly smaller than H1 */
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.3em;
+}
+
+/* Styling for completed section */
+div > h2 + ul {
+  /* Style the list immediately following the 'Completed' h2 */
+  opacity: 0.7;
+}
+
+div > h2 + ul li {
+  background-color: rgba(128, 128, 128, 0.05); /* Even subtler background */
+}
