@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+// MUI Imports
+import IconButton from '@mui/material/IconButton';
+import MicIcon from '@mui/icons-material/Mic';
+import StopIcon from '@mui/icons-material/Stop';
 
 // Get the correct SpeechRecognition object based on browser vendor prefixes
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -123,11 +127,12 @@ function VoiceInput({ onAddItem }) {
   }
 
   return (
-    <div style={{ marginTop: '1.5rem', borderTop: '1px solid #ccc', paddingTop: '1rem' }}>
+    <div style={{ marginTop: '1.5rem', /*borderTop: '1px solid #ccc',*/ paddingTop: '1rem' }}>
       <h4>Add Item by Voice (Swedish)</h4>
-      <button onClick={handleToggleListen} disabled={!isSupported}>
-        {isListening ? '🛑 Stop Listening' : '🎤 Start Listening'}
-      </button>
+      {/* Use IconButton */}
+      <IconButton onClick={handleToggleListen} disabled={!isSupported} title={isListening ? 'Stop Listening' : 'Start Listening'}>
+        {isListening ? <StopIcon /> : <MicIcon />}
+      </IconButton>
       {isListening && <p style={{ fontStyle: 'italic' }}>Listening...</p>}
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}
       {transcript && (

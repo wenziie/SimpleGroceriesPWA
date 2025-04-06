@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route } from 'react-router-dom'; // Import routing components
 import './App.css'
 import AddItemForm from './components/AddItemForm'
 import GroceryList from './components/GroceryList'
@@ -6,6 +7,9 @@ import AddRecipeForm from './components/AddRecipeForm'
 import RecipeList from './components/RecipeList'
 import VoiceInput from './components/VoiceInput' // Re-enable import
 import ReminderSetter from './components/ReminderSetter' // Re-enable import
+import Layout from './components/Layout'
+import GroceryPage from './pages/GroceryPage'
+import RecipesPage from './pages/RecipesPage'
 
 const LOCAL_STORAGE_KEY_ITEMS = 'simple-groceries-pwa.items'
 const LOCAL_STORAGE_KEY_RECIPES = 'simple-groceries-pwa.recipes'
@@ -28,6 +32,19 @@ function App() {
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY_ITEMS, JSON.stringify(items))
   }, [items])
+
+  // Load recipes from localStorage
+  useEffect(() => {
+    const storedRecipes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECIPES))
+    if (storedRecipes) {
+      setRecipes(storedRecipes)
+    }
+  }, [])
+
+  // Save recipes to localStorage
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY_RECIPES, JSON.stringify(recipes))
+  }, [recipes])
 
   // --- Effect to handle shared URL on load ---
   useEffect(() => {
@@ -69,19 +86,13 @@ function App() {
     setItems(prevItems => prevItems.filter(item => !item.completed))
   }
 
-  // --- Recipe Logic ---
-  // Load recipes from localStorage
-  useEffect(() => {
-    const storedRecipes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECIPES))
-    if (storedRecipes) {
-      setRecipes(storedRecipes)
+  // Function to clear ALL items
+  const clearAllItems = () => {
+    // Optional: Add confirmation prompt
+    if (window.confirm('Är du säker på att du vill tömma hela listan?')) {
+        setItems([]); // Set items to empty array
     }
-  }, [])
-
-  // Save recipes to localStorage
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY_RECIPES, JSON.stringify(recipes))
-  }, [recipes])
+  };
 
   // Function to add a new recipe
   const addRecipe = (url) => {
@@ -126,29 +137,29 @@ function App() {
   };
 
   return (
-    <>
-      <h1>Simple Groceries PWA</h1>
-      {/* Only render core grocery components */}
-      <AddItemForm onAddItem={addItem} />
-      <VoiceInput onAddItem={addItem} />
-      <GroceryList
-        items={items}
-        onToggleComplete={toggleComplete}
-        onDeleteItem={deleteItem}
-        onClearCompleted={clearCompletedItems}
-      />
-      <ReminderSetter />
-
-      {/* Recipe Section Re-enabled*/}
-      <AddRecipeForm onAddRecipe={addRecipe} />
-      <RecipeList
-        recipes={recipes}
-        onDeleteRecipe={deleteRecipe}
-        onAddIngredients={addIngredientsFromRecipe}
-      />
-      
-
-    </>
+    <Routes>
+      <Route path="/" element={<Layout />}> { /* Layout wraps the pages */}
+        {/* Index route defaults to GroceryPage */}
+        <Route index element={
+          <GroceryPage 
+            items={items} 
+            addItem={addItem} 
+            toggleComplete={toggleComplete}
+            deleteItem={deleteItem}
+            clearCompletedItems={clearCompletedItems}
+            clearAllItems={clearAllItems}
+          />
+        } />
+        <Route path="recipes" element={
+          <RecipesPage 
+            recipes={recipes}
+            addRecipe={addRecipe}
+            deleteRecipe={deleteRecipe}
+            addIngredientsFromRecipe={addIngredientsFromRecipe}
+          />
+        } />
+      </Route>
+    </Routes>
   )
 }
 

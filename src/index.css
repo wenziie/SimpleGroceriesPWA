@@ -4,8 +4,17 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgba(255, 255, 255, 0.87); /* Default text color (dark mode) */
+  background-color: #242424; /* Default background (dark mode) */
+  --background-color: #242424; /* Explicitly define for dark mode */
+
+  /* Navbar colors (dark mode defaults) */
+  --navbar-bg: #1a1a1a;
+  --navbar-text-color: rgba(255, 255, 255, 0.87);
+  --navbar-inactive-color: #9e9e9e; /* Define inactive grey color (adjust as needed) */
+  --primary-color: #43CB37; /* Update primary color */
+  --link-active-color: var(--primary-color); /* Use primary color for active link */
+  --primary-button-icon-color: black; /* Default icon color on primary bg (dark mode) */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -56,8 +65,16 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: #213547; /* Default text color (light mode) */
+    background-color: #ffffff; /* Default background (light mode) */
+    --background-color: #ffffff; /* Explicitly define for light mode */
+
+    /* Navbar colors (light mode overrides) */
+    --navbar-bg: #f0f0f0;
+    --navbar-text-color: #213547;
+    --navbar-inactive-color: #757575; /* Define inactive grey color (adjust as needed) */
+    --link-active-color: var(--primary-color); /* Use primary color for active link */
+    --primary-button-icon-color: white; /* Icon color on primary bg (light mode) */
   }
   a:hover {
     color: #747bff;
@@ -144,7 +161,6 @@ h2 {
   margin-top: 2rem;
   margin-bottom: 0.5rem;
   font-size: 1.5em; /* Slightly smaller than H1 */
-  border-bottom: 1px solid #ccc;
   padding-bottom: 0.3em;
 }
 

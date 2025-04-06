@@ -78,7 +78,7 @@ function ReminderSetter() {
   }
 
   return (
-    <div style={{ marginTop: '1.5rem', borderTop: '1px solid #ccc', paddingTop: '1rem' }}>
+    <div style={{ marginTop: '1.5rem', /*borderTop: '1px solid #ccc',*/ paddingTop: '1rem' }}>
       <h4>Set Reminder (In-App)</h4>
       <p style={{ fontSize: '0.8em', fontStyle: 'italic' }}>Note: These reminders only work while the app tab is open.</p>
       <div>
