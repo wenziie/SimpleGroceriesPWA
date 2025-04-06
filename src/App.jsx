@@ -5,6 +5,7 @@ import GroceryList from './components/GroceryList'
 import AddRecipeForm from './components/AddRecipeForm'
 import RecipeList from './components/RecipeList'
 import VoiceInput from './components/VoiceInput'
+import ReminderSetter from './components/ReminderSetter'
 
 const LOCAL_STORAGE_KEY_ITEMS = 'simple-groceries-pwa.items'
 const LOCAL_STORAGE_KEY_RECIPES = 'simple-groceries-pwa.recipes'
@@ -138,14 +139,16 @@ function App() {
   return (
     <>
       <h1>Simple Groceries PWA</h1>
+      {/* Grocery Section */}
       <AddItemForm onAddItem={addItem} />
-      <VoiceInput onAddItem={addItem} />
+      {/* <VoiceInput onAddItem={addItem} /> // Temporarily comment out */}
       <GroceryList
         items={items}
         onToggleComplete={toggleComplete}
         onDeleteItem={deleteItem}
         onClearCompleted={clearCompletedItems}
       />
+      <ReminderSetter />
 
       {/* Recipe Section */}
       <AddRecipeForm onAddRecipe={addRecipe} />
