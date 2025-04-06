@@ -2,19 +2,19 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import AddItemForm from './components/AddItemForm'
 import GroceryList from './components/GroceryList'
-// import AddRecipeForm from './components/AddRecipeForm' // Disabled
-// import RecipeList from './components/RecipeList' // Disabled
-// import VoiceInput from './components/VoiceInput' // Disabled
-// import ReminderSetter from './components/ReminderSetter' // Disabled
+import AddRecipeForm from './components/AddRecipeForm'
+import RecipeList from './components/RecipeList'
+import VoiceInput from './components/VoiceInput' // Re-enable import
+import ReminderSetter from './components/ReminderSetter' // Re-enable import
 
 const LOCAL_STORAGE_KEY_ITEMS = 'simple-groceries-pwa.items'
-// const LOCAL_STORAGE_KEY_RECIPES = 'simple-groceries-pwa.recipes' // Disabled
+const LOCAL_STORAGE_KEY_RECIPES = 'simple-groceries-pwa.recipes'
 
 function App() {
   // State for grocery items
   const [items, setItems] = useState([])
-  // State for recipes - Disabled
-  // const [recipes, setRecipes] = useState([]) 
+  // State for recipes
+  const [recipes, setRecipes] = useState([])
 
   // Load items from localStorage on initial render
   useEffect(() => {
@@ -29,8 +29,7 @@ function App() {
     localStorage.setItem(LOCAL_STORAGE_KEY_ITEMS, JSON.stringify(items))
   }, [items])
 
-  // --- Effect to handle shared URL on load --- Disabled
-  /*
+  // --- Effect to handle shared URL on load ---
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const sharedUrl = queryParams.get('url');
@@ -39,7 +38,6 @@ function App() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []); 
-  */
 
   // Function to add a new item
   const addItem = (name) => {
@@ -71,8 +69,7 @@ function App() {
     setItems(prevItems => prevItems.filter(item => !item.completed))
   }
 
-  // --- Recipe Logic --- Disabled
-  /*
+  // --- Recipe Logic ---
   // Load recipes from localStorage
   useEffect(() => {
     const storedRecipes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECIPES))
@@ -127,31 +124,29 @@ function App() {
       setItems(prevItems => [...prevItems, ...newItems]);
     }
   };
-  */
 
   return (
     <>
       <h1>Simple Groceries PWA</h1>
       {/* Only render core grocery components */}
       <AddItemForm onAddItem={addItem} />
-      {/* <VoiceInput onAddItem={addItem} /> */}
+      <VoiceInput onAddItem={addItem} />
       <GroceryList
         items={items}
         onToggleComplete={toggleComplete}
         onDeleteItem={deleteItem}
         onClearCompleted={clearCompletedItems}
       />
-      {/* <ReminderSetter /> */}
+      <ReminderSetter />
 
-      {/* Recipe Section Disabled*/}
-      {/*
+      {/* Recipe Section Re-enabled*/}
       <AddRecipeForm onAddRecipe={addRecipe} />
       <RecipeList
         recipes={recipes}
         onDeleteRecipe={deleteRecipe}
         onAddIngredients={addIngredientsFromRecipe}
       />
-      */}
+      
 
     </>
   )
