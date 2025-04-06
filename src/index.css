@@ -15,6 +15,7 @@
   --primary-color: #43CB37; /* Update primary color */
   --link-active-color: var(--primary-color); /* Use primary color for active link */
   --primary-button-icon-color: black; /* Default icon color on primary bg (dark mode) */
+  accent-color: var(--primary-color); /* Set accent color for checkboxes etc */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -75,6 +76,7 @@ button:focus-visible {
     --navbar-inactive-color: #757575; /* Define inactive grey color (adjust as needed) */
     --link-active-color: var(--primary-color); /* Use primary color for active link */
     --primary-button-icon-color: white; /* Icon color on primary bg (light mode) */
+    accent-color: var(--primary-color); /* Set accent color for checkboxes etc */
   }
   a:hover {
     color: #747bff;

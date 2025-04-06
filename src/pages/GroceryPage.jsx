@@ -3,6 +3,7 @@ import GroceryList from '../components/GroceryList';
 import AddItemForm from '../components/AddItemForm';
 import VoiceInput from '../components/VoiceInput';
 import ReminderSetter from '../components/ReminderSetter';
+import ConfirmationModal from '../components/ConfirmationModal';
 // MUI Imports
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box'; // For Modal content styling
@@ -32,12 +33,15 @@ function GroceryPage({
   addItem, 
   toggleComplete, 
   deleteItem, 
-  clearAllItems 
+  clearAllItems, 
+  editItem
 }) {
   // State remains the same - controls modal visibility
   const [showAddItem, setShowAddItem] = useState(false);
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [showReminders, setShowReminders] = useState(false);
+  // State for the new clear confirmation modal
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Handlers to open modals
   const handleOpenAddItem = () => setShowAddItem(true);
@@ -46,6 +50,15 @@ function GroceryPage({
   const handleCloseVoiceInput = () => setShowVoiceInput(false);
   const handleOpenReminders = () => setShowReminders(true);
   const handleCloseReminders = () => setShowReminders(false);
+
+  // Handlers for the new clear confirmation modal
+  const handleOpenClearConfirm = () => setShowClearConfirm(true);
+  const handleCloseClearConfirm = () => setShowClearConfirm(false);
+  
+  const handleConfirmClear = () => {
+    clearAllItems(); // Call the original clear function
+    handleCloseClearConfirm(); // Close the modal
+  };
 
   // Update handler to close modal on add
   const handleAddItemAndClose = (name) => {
@@ -73,8 +86,9 @@ function GroceryPage({
       >
         {/* Left Action */}
         <button 
-          onClick={clearAllItems} 
+          onClick={handleOpenClearConfirm}
           style={{ color: 'red', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+          disabled={items.length === 0}
         >
           Töm lista
         </button> 
@@ -151,12 +165,25 @@ function GroceryPage({
         </Box>
       </Modal>
 
+      {/* --- Confirmation Modals --- */}
+      {/* Clear List Confirmation Modal */}
+      <ConfirmationModal
+        open={showClearConfirm}
+        onClose={handleCloseClearConfirm}
+        onConfirm={handleConfirmClear}
+        title="Bekräfta tömning"
+        message="Är du säker på att du vill tömma hela listan?"
+        confirmText="Ja, töm listan"
+        cancelText="Avbryt"
+        confirmColor="error" // Use red for destructive action
+      />
+
       {/* Grocery List */}
       <GroceryList 
         items={items} 
         onToggleComplete={toggleComplete} 
         onDeleteItem={deleteItem} 
-        // onClearCompleted prop no longer needed here
+        onEditItem={editItem}
       />
     </div>
   );

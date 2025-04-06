@@ -86,6 +86,17 @@ function App() {
     setItems(prevItems => prevItems.filter(item => !item.completed))
   }
 
+  // Function to edit an item's name
+  const editItem = (id, newName) => {
+    const trimmedName = newName.trim();
+    if (!trimmedName) return; // Don't allow empty names
+    setItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id ? { ...item, name: trimmedName } : item
+      )
+    );
+  };
+
   // Function to clear ALL items
   const clearAllItems = () => {
     // Optional: Add confirmation prompt
@@ -148,6 +159,7 @@ function App() {
             deleteItem={deleteItem}
             clearCompletedItems={clearCompletedItems}
             clearAllItems={clearAllItems}
+            editItem={editItem}
           />
         } />
         <Route path="recipes" element={
