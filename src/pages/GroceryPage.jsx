@@ -5,79 +5,100 @@ import VoiceInput from '../components/VoiceInput';
 import ReminderSetter from '../components/ReminderSetter';
 // MUI Imports
 import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box'; // For Modal content styling
+import Modal from '@mui/material/Modal'; // Modal component
 import AddIcon from '@mui/icons-material/Add';
 import MicIcon from '@mui/icons-material/Mic';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import CloseIcon from '@mui/icons-material/Close'; // Icon for closing modal
+
+// Basic style for modal content box
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '80%', // Adjust width as needed
+  maxWidth: 500,
+  bgcolor: 'var(--background-color, white)', // Use background variable
+  border: '1px solid #ccc',
+  boxShadow: 24, // MUI shadow intensity
+  p: 4, // Padding
+  borderRadius: '8px'
+};
 
 function GroceryPage({ 
   items, 
   addItem, 
   toggleComplete, 
   deleteItem, 
-  clearCompletedItems, 
-  clearAllItems
+  clearAllItems 
 }) {
+  // State remains the same - controls modal visibility
   const [showAddItem, setShowAddItem] = useState(false);
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [showReminders, setShowReminders] = useState(false);
 
-  // Handler to add item and potentially close the form/modal
-  const handleAddItem = (name) => {
+  // Handlers to open modals
+  const handleOpenAddItem = () => setShowAddItem(true);
+  const handleCloseAddItem = () => setShowAddItem(false);
+  const handleOpenVoiceInput = () => setShowVoiceInput(true);
+  const handleCloseVoiceInput = () => setShowVoiceInput(false);
+  const handleOpenReminders = () => setShowReminders(true);
+  const handleCloseReminders = () => setShowReminders(false);
+
+  // Update handler to close modal on add
+  const handleAddItemAndClose = (name) => {
     addItem(name);
-    // Optionally close form after adding: setShowAddItem(false);
+    handleCloseAddItem(); // Close modal after adding
   }
 
   return (
     <div>
-      {/* Header Actions - Apply sticky styles */}
+      {/* Header Actions - Update onClick to open modals */}
       <div 
         style={{
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          marginBottom: '1rem',
-          // Sticky styles
+          width: '100%',
+          maxWidth: '600px',
+          margin: '0 auto',
           position: 'sticky',
           top: 0,
-          zIndex: 10, // Ensure it stays on top
-          paddingTop: '1rem', // Add padding for spacing
-          paddingBottom: '0.5rem'
+          backgroundColor: 'var(--background-color, white)',
+          zIndex: 10,
+          padding: '1rem 0 0.5rem 0'
         }}
       >
         {/* Left Action */}
         <button 
           onClick={clearAllItems} 
-          style={{ 
-            color: 'red', 
-            background: 'none', 
-            border: 'none', 
-            padding: 0,
-            cursor: 'pointer'
-          }}
+          style={{ color: 'red', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
         >
           Töm lista
-        </button>
+        </button> 
         
-        {/* Right Actions (MUI Icons) */}
+        {/* Right Actions (MUI Icons) - Update onClick */}
         <div>
           <IconButton 
-            onClick={() => setShowAddItem(!showAddItem)} 
+            onClick={handleOpenAddItem} 
             title="Add Item"
             style={{ backgroundColor: '#43CB37', borderRadius: '50%', marginRight: '0.5rem' }}
           >
             <AddIcon style={{ color: 'var(--primary-button-icon-color)' }} />
           </IconButton>
           <IconButton 
-            onClick={() => setShowVoiceInput(!showVoiceInput)} 
+            onClick={handleOpenVoiceInput} 
             title="Add by Voice"
             style={{ backgroundColor: '#43CB37', borderRadius: '50%', marginRight: '0.5rem' }}
           >
             <MicIcon style={{ color: 'var(--primary-button-icon-color)' }} />
           </IconButton>
           <IconButton 
-            onClick={() => setShowReminders(!showReminders)} 
+            onClick={handleOpenReminders} 
             title="Set Reminder"
-            disabled={items.length === 0}
+            disabled={items.length === 0} 
             style={{ color: items.length > 0 ? 'var(--primary-color)' : 'grey' }}
           >
             <NotificationsIcon />
@@ -85,18 +106,57 @@ function GroceryPage({
         </div>
       </div>
 
-      {/* Conditional Rendering of Input Components */}
-      {showAddItem && <AddItemForm onAddItem={handleAddItem} />}
-      {showVoiceInput && <VoiceInput onAddItem={addItem} />}
-      {showReminders && <ReminderSetter />}
+      {/* --- Modals --- */}
+      {/* Add Item Modal */}
+      <Modal
+        open={showAddItem}
+        onClose={handleCloseAddItem}
+        aria-labelledby="add-item-modal-title"
+      >
+        <Box sx={modalStyle}>
+          <IconButton onClick={handleCloseAddItem} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
+            <CloseIcon />
+          </IconButton>
+          <h4 id="add-item-modal-title">Lägg till artikel</h4>
+          <AddItemForm onAddItem={handleAddItemAndClose} />
+        </Box>
+      </Modal>
+
+      {/* Voice Input Modal */}
+      <Modal
+        open={showVoiceInput}
+        onClose={handleCloseVoiceInput}
+        aria-labelledby="voice-input-modal-title"
+      >
+        <Box sx={modalStyle}>
+           <IconButton onClick={handleCloseVoiceInput} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
+            <CloseIcon />
+          </IconButton>
+           {/* Note: VoiceInput needs onAddItem prop */}
+          <VoiceInput onAddItem={addItem} /> 
+        </Box>
+      </Modal>
+
+      {/* Reminder Modal */}
+      <Modal
+        open={showReminders}
+        onClose={handleCloseReminders}
+        aria-labelledby="reminder-modal-title"
+      >
+        <Box sx={modalStyle}>
+           <IconButton onClick={handleCloseReminders} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
+            <CloseIcon />
+          </IconButton>
+          <ReminderSetter />
+        </Box>
+      </Modal>
 
       {/* Grocery List */}
       <GroceryList 
         items={items} 
         onToggleComplete={toggleComplete} 
         onDeleteItem={deleteItem} 
-        onClearCompleted={clearCompletedItems} // Pass down again for internal button?
-        // Note: Clear completed button might be better placed ONLY in the header now
+        // onClearCompleted prop no longer needed here
       />
     </div>
   );
