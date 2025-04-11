@@ -210,7 +210,7 @@ function GroceryPage({
            open={showReminders}
            onClose={handleCloseReminders}
            aria-labelledby="reminder-dialog-title"
-           PaperProps={{ // Target the inner Paper component
+           PaperProps={{
              sx: {
                mx: { xs: 2, sm: 'auto' }, 
                width: { xs: 'calc(100% - 32px)', sm: 'auto' }, 
@@ -218,7 +218,7 @@ function GroceryPage({
            }}
          >
            <DialogTitle id="reminder-dialog-title">
-             Set Reminder
+             Sätt påminnelse
              <IconButton
                aria-label="close"
                onClick={handleCloseReminders}
