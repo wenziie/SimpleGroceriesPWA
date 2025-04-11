@@ -8,6 +8,10 @@ import time # Import time for logging duration
 class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
+        # --- Add deliberate error for testing --- 
+        raise Exception("DELIBERATE TEST ERROR - Check Vercel Logs")
+        # ----------------------------------------
+        
         start_time = time.time()
         print("--- Function Start ---", flush=True)
         
