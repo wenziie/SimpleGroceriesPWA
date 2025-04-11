@@ -69,7 +69,6 @@ const lightTheme = createTheme({
     MuiAppBar: {
        styleOverrides: {
          root: {
-           boxShadow: 'none', // Often flatter in M3
            backgroundColor: 'background.paper', // Use paper color
            color: 'text.primary' // Ensure text color contrasts
          }
