@@ -44,10 +44,12 @@ function RecipesPage({
   const handleAddRecipeAndClose = async (url) => {
     await addRecipe(url); // Wait for addRecipe to potentially complete
     handleCloseAddRecipe(); // Close modal
-    // Scroll content to top after adding
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Scroll content to top after adding, with a small delay
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 50); // Add a small delay (e.g., 50ms) to allow DOM update
   }
 
   // Effect to watch for the parsing failure flag from App.jsx
