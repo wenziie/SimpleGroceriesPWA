@@ -93,7 +93,7 @@ def clean_ingredient_text(text):
     return cleaned
 
 def scrape_ingredients_fallback(html_content, url):
-    """Fallback HTML scraping for specific sites."""
+    """Fallback HTML scraping for specific sites and generic patterns."""
     print(f"Attempting fallback HTML scraping for {url}", flush=True)
     soup = BeautifulSoup(html_content, 'html.parser')
     ingredients = []
@@ -102,6 +102,7 @@ def scrape_ingredients_fallback(html_content, url):
     hostname = urllib.parse.urlparse(url).hostname
 
     try:
+        # --- Specific Site Checks ---
         if 'ica.se' in hostname:
             # ICA: Often uses <div class=\"ingredients\"><ul><li>...</li></ul></div>
             # Or sometimes <div class=\"recipe-ingredients-list\">...</div>
@@ -147,6 +148,46 @@ def scrape_ingredients_fallback(html_content, url):
                 ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
                 print(f"Arla Scraper: Found {len(ingredients)} potential ingredients.", flush=True)
                 scraped_successfully = len(ingredients) > 0
+
+        # --- Generic Blog Fallback (if specific checks failed) ---
+        if not scraped_successfully:
+            print("Specific site scraping failed or N/A, trying generic fallback...", flush=True)
+            
+            # Strategy 1: Find heading + next list
+            found_heading_list = False
+            for heading in soup.find_all(['h2', 'h3', 'h4'], string=re.compile(r'ingredient|ingredienser', re.IGNORECASE)):
+                print(f"Generic Fallback: Found potential heading: {heading.get_text(strip=True)}", flush=True)
+                next_list = heading.find_next_sibling(['ul', 'ol'])
+                if next_list:
+                    print("Generic Fallback: Found list following heading.", flush=True)
+                    items = next_list.find_all('li')
+                    ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
+                    if ingredients:
+                        print(f"Generic Fallback (Heading Strategy): Found {len(ingredients)} potential ingredients.", flush=True)
+                        scraped_successfully = True
+                        found_heading_list = True
+                        break # Stop searching once a list is found this way
+            
+            # Strategy 2: Find div with class name (if strategy 1 failed)
+            if not found_heading_list:
+                 print("Generic Fallback (Heading Strategy) failed, trying div class strategy...", flush=True)
+                 # Find divs with class names containing 'ingredient'
+                 ingredient_divs = soup.find_all('div', class_=re.compile(r'ingredient', re.IGNORECASE))
+                 if not ingredient_divs:
+                     # Fallback for common recipe card plugin class names
+                     ingredient_divs = soup.find_all('div', class_=re.compile(r'tasty-recipes-ingredients|wprm-recipe-ingredients', re.IGNORECASE))
+
+                 for div in ingredient_divs:
+                     # Look for list items or paragraph items directly within these divs
+                     items = div.find_all(['li', 'p'], recursive=False) # Less recursion initially
+                     if not items: 
+                         items = div.find_all('li') # Try deeper if no direct children
+                     
+                     ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
+                     if ingredients:
+                         print(f"Generic Fallback (Div Class Strategy): Found {len(ingredients)} potential ingredients in div: {div.get('class')}", flush=True)
+                         scraped_successfully = True
+                         break # Stop searching once ingredients are found in a div
 
     except Exception as e:
         print(f"Error during fallback scraping for {url}: {e}", flush=True)
