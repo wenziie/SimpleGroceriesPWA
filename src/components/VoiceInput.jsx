@@ -137,9 +137,8 @@ function VoiceInput({ onAddItem }) {
       // Restart listening after a short delay
       setTimeout(() => {
          // Check if the component might have been unmounted during the delay
-         // A more robust check could use a ref, but this is a basic guard.
-         // We also check if isListening is false, meaning nothing else tried to start/stop.
-         if (document.contains(document.getElementById('voice-input-container')) && !isListening) { // Assuming parent has id 'voice-input-container'
+         // AND check if a recognition session isn't already active (ref is null)
+         if (document.contains(document.getElementById('voice-input-container')) && !recognitionRef.current) { 
             startListening();
          }
       }, 250); // 250ms delay, adjust if needed
