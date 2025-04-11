@@ -70,12 +70,10 @@ button:focus-visible {
 /* Add our custom styles below */
 
 #root {
-  /* Keep existing root styles, maybe add max-width if desired */
-  max-width: 600px; /* Limit width for better readability */
-  margin: 2rem auto; /* Center on page */
-  padding: 2rem;
-  /* Remove text-align: center if we want left alignment */
-  /* text-align: center; */
+  /* Remove width/padding constraints */
+  /* max-width: 600px; */ 
+  margin: 0 auto; /* Keep centering if desired, or remove */
+  /* padding: 2rem; */
 }
 
 form {
