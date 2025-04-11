@@ -65,7 +65,7 @@ function RecipesPage({
       <AppBar 
         position="fixed" // CHANGE to fixed
         color="inherit" // Use theme background, not primary/secondary color
-        elevation={1} // Subtle elevation
+        elevation={3} // INCREASE ELEVATION TO MATCH BOTTOM NAV
         sx={{ 
             bgcolor: 'background.paper', // Ensure paper background
             zIndex: 1100 // Ensure above content

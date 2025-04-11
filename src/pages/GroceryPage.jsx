@@ -84,7 +84,7 @@ function GroceryPage({
       <AppBar 
         position="fixed" // CHANGE to fixed
         color="inherit" 
-        elevation={1} 
+        elevation={3} // INCREASE ELEVATION TO MATCH BOTTOM NAV
         sx={{ 
            bgcolor: 'background.paper',
            zIndex: 1100 // Ensure above content
@@ -98,6 +98,8 @@ function GroceryPage({
              size="small"
              startIcon={<DeleteSweepIcon />} // Add an icon
              disabled={items.length === 0}
+             // Add sx for consistent look if needed
+             sx={{ textTransform: 'none' }} 
            >
               Töm lista
            </Button> 
@@ -145,35 +147,11 @@ function GroceryPage({
         </Toolbar>
       </AppBar>
 
-      {/* Sticky Title Header - POSITION FIXED */}
-      <AppBar 
-        position="fixed" // CHANGE to fixed
-        color="inherit"
-        elevation={0} 
-        sx={{ 
-          // Calculate top based on default AppBar height (adjust if theme changes it)
-          top: 56, // MUI default dense is 48, regular is 64. Check actual height or use theme
-          // top: theme => `calc(${theme.mixins.toolbar.minHeight}px)`, // More robust if theme changes
-          zIndex: 1090, // Below main action bar
-          bgcolor: 'background.paper',
-          borderBottom: '1px solid',
-          borderColor: 'divider'
-        }}
-      >
-        <Toolbar variant="dense"> {/* Use dense for less height */}
-          <Typography variant="h6" component="h2" sx={{ color: 'text.primary' }}>
-            Inköpslista
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      
-      {/* Add Padding Top to account for BOTH fixed AppBars */}
+      {/* Adjust Padding Top for only ONE fixed AppBar */}
       <Box sx={{ 
-         // Need padding equal to combined height of both AppBars
-         // Approx 64px + 48px = 112px. Use theme calculation if possible
-         // Example: pt: theme => `calc(${theme.mixins.toolbar[theme.breakpoints.up('sm')]?.minHeight || 64}px + ${theme.mixins.toolbar.minHeight}px)`
-         pt: '112px' // Use fixed value for now, adjust if needed
-       }}> 
+         // Approx 64px. Use theme calculation if possible
+         pt: '64px' // ADJUST PADDING
+        }}> 
          {/* --- Modals --- */}
          {/* Refactor Add Item Modal to Dialog */}
          <Dialog
