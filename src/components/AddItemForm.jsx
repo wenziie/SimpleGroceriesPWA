@@ -21,23 +21,34 @@ function AddItemForm({ onAddItem }) {
   };
 
   return (
-    // Use Box instead of form for layout, handle submit on button
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 /* Add margin top */ }}>
+    // Use Box with explicit flex column layout
+    <Box 
+      component="form" 
+      onSubmit={handleSubmit} 
+      sx={{ 
+        mt: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: 2 // Add gap between input and button (theme spacing unit * 2)
+      }}
+    >
       <TextField
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         placeholder="Lägg till artiklar (en per rad)"
-        multiline // Use multiline TextField instead of textarea
+        multiline 
         rows={4}
         required
-        fullWidth // Take full width
-        variant="outlined" // Standard outlined style
-        sx={{ mb: 2 /* Add margin bottom */ }}
+        fullWidth 
+        variant="outlined" 
+        // Remove mb as gap is handled by the parent Box
+        // sx={{ mb: 2 }} 
       />
       <Button 
         type="submit" 
         variant="contained" 
-        disabled={!inputValue.trim()} // Disable if input is empty
+        fullWidth // Add fullWidth back for vertical layout
+        disabled={!inputValue.trim()}
       >
         Lägg till
       </Button>
