@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Import useState/useEffect
+import React, { useState, useEffect, useRef } from 'react'; // Import useState/useEffect and useRef
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 // MUI Imports
 import Box from '@mui/material/Box';
@@ -14,6 +14,8 @@ function Layout() {
   const navigate = useNavigate();
   // State to track the current navigation value
   const [value, setValue] = useState(location.pathname); // Initialize with current path
+  // Create a ref for the scrollable container
+  const scrollContainerRef = useRef(null);
 
   // Update state if the path changes (e.g., browser back/forward)
   useEffect(() => {
@@ -29,17 +31,19 @@ function Layout() {
     // Use Box for overall flex container, revert to minHeight
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
       
-      {/* Main Content Area - Make this independently scrollable */}
-      <Box component="main" sx={{ 
-         flexGrow: 1, 
-         overflowY: 'auto', 
-         // Adjust pb to account for default nav height (56px) + safe area
-         pb: `calc(56px + env(safe-area-inset-bottom, 0px))` 
-       }}>
-         {/* REMOVE Container - Let page content handle its own width/padding */}
-         {/* <Container sx={{ py: 3 }}> */}
-           <Outlet />
-         {/* </Container> */}
+      {/* Main Content Area - Attach the ref here */}
+      <Box 
+         ref={scrollContainerRef} // Attach the ref
+         component="main" 
+         sx={{ 
+           flexGrow: 1, 
+           overflowY: 'auto', 
+           // Adjust pb to account for default nav height (56px) + safe area
+           pb: `calc(56px + env(safe-area-inset-bottom, 0px))` 
+         }}
+      >
+        {/* Pass the ref to the Outlet's component */}
+        <Outlet context={{ scrollContainerRef }} />
       </Box>
 
       {/* Bottom Navigation - Position fixed at the bottom */}
