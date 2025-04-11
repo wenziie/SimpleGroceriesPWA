@@ -123,6 +123,13 @@ function VoiceInput({ onAddItem }) {
     };
   }, []);
 
+  // Effect to start listening automatically on mount
+  useEffect(() => {
+    console.log("[VoiceInput] Component mounted, starting listening automatically.");
+    startListening();
+    // No cleanup needed here, as the separate unmount effect handles stopping.
+  }, []); // Empty dependency array ensures this runs only once on mount
+
   const handleToggleListen = () => {
     // Manual toggle uses the main stop/start functions
     if (isListening) {
