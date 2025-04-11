@@ -199,27 +199,45 @@ def scrape_ingredients_fallback(html_content, url):
                      # 3. Check if it's a relevant ingredient div/paragraph
                      is_relevant_element = False
                      if element.name in ['div', 'p']:
-                          if element.get('class') and re.search(r'ingredient', " ".join(element.get('class', [])), re.IGNORECASE):
-                               # Avoid double-counting if it contains a list we already processed by checking children
-                               if not element.find(['ul', 'ol'], recursive=False):
-                                    is_relevant_element = True
+                         # Check class name for ingredient keyword
+                         if element.get('class') and re.search(r'ingredient', " ".join(element.get('class', [])), re.IGNORECASE):
+                              # Avoid double-counting if it contains a list we already processed by checking children
+                              if not element.find(['ul', 'ol'], recursive=False):
+                                   is_relevant_element = True
+                         # Also check if it's a paragraph directly following an ingredient list/heading (common pattern)
+                         elif element.name == 'p':
+                             prev_sibling = element.find_previous_sibling()
+                             if prev_sibling and (prev_sibling.name in ['ul', 'ol'] or (prev_sibling.name in ['h4','h5','h6'] and not instruction_keywords.search(prev_sibling.get_text()))):
+                                 if not element.find(['ul', 'ol'], recursive=False):
+                                     is_relevant_element = True
 
                      if is_relevant_element:
-                          text = clean_ingredient_text(element.get_text())
-                          if text:
-                               print(f"Generic Fallback: Found relevant element in card: {element.get('class')} - Text: {text[:50]}...", flush=True)
-                               ingredients_in_card.append(text)
-                          else: # Check for nested items if the div itself is empty but contains ingredients
-                               nested_items = element.find_all(['li', 'p'])
-                               ingredients_in_card.extend([clean_ingredient_text(item.get_text()) for item in nested_items if item.get_text(strip=True)])
+                         # Get text and attempt to split by lines
+                         raw_text = element.get_text('\n', strip=True) # Use newline separator, strip whitespace
+                         lines = [line.strip() for line in raw_text.split('\n') if line.strip()] # Split and filter empty
+                         
+                         if len(lines) > 1:
+                              # Multiple lines found, treat each as potential ingredient
+                              print(f"Generic Fallback: Found relevant multi-line element in card: {element.name}.{element.get('class')}, processing {len(lines)} lines.", flush=True)
+                              for line in lines:
+                                   cleaned_line = clean_ingredient_text(line)
+                                   # Basic filter for potential subheadings (e.g., "For the sauce:")
+                                   if cleaned_line and not cleaned_line.endswith(':'): 
+                                       ingredients_in_card.append(cleaned_line)
+                         elif len(lines) == 1:
+                              # Single line, treat as one ingredient
+                              cleaned_line = clean_ingredient_text(lines[0])
+                              if cleaned_line:
+                                   print(f"Generic Fallback: Found relevant single-line element in card: {element.name}.{element.get('class')} - Text: {cleaned_line[:50]}...", flush=True)
+                                   ingredients_in_card.append(cleaned_line)
 
                  # Use the accumulated ingredients if any were found in the card
                  if ingredients_in_card:
-                      # Remove duplicates while preserving order (for Python 3.7+)
-                      ingredients = list(dict.fromkeys(ingredients_in_card))
-                      print(f"Generic Fallback (Recipe Card Combined Strategy): Found {len(ingredients)} total ingredients.", flush=True)
-                      scraped_successfully = True
-                     
+                     # Remove duplicates while preserving order (for Python 3.7+)
+                     ingredients = list(dict.fromkeys(ingredients_in_card))
+                     print(f"Generic Fallback (Recipe Card Combined Strategy): Found {len(ingredients)} total ingredients.", flush=True)
+                     scraped_successfully = True
+                    
             # --- Strategies 1 & 2 (Heading or Div Class across whole page) ---
             # --- Only run if recipe card strategy failed                   ---
             if not scraped_successfully:
