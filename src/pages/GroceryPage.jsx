@@ -80,44 +80,43 @@ function GroceryPage({
 
   return (
     <Box> { /* Wrap page content in Box */ }
-      {/* Refactor Header Actions using AppBar - POSITION FIXED */}
+      {/* Consolidate Title and Actions into ONE AppBar */}
       <AppBar 
-        position="fixed" // CHANGE to fixed
+        position="fixed"
         color="inherit" 
-        elevation={3} // INCREASE ELEVATION TO MATCH BOTTOM NAV
-        sx={{ 
-           bgcolor: 'background.paper',
-           zIndex: 1100 // Ensure above content
-        }}
+        elevation={3} 
+        sx={{ bgcolor: 'background.paper', zIndex: 1100 }}
       >
+        {/* Use default Toolbar height */}
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-           {/* Left Action - Use MUI Button */}
-           <Button 
-             onClick={handleOpenClearConfirm}
-             color="error" // Use error color for destructive action
-             size="small"
-             startIcon={<DeleteSweepIcon />} // Add an icon
-             disabled={items.length === 0}
-             // Add sx for consistent look if needed
-             sx={{ textTransform: 'none' }} 
-           >
-              Töm lista
-           </Button> 
+          {/* Title on the Left */}
+          <Typography variant="h6" component="h1" sx={{ color: 'text.primary' }}>
+            Inköpslista
+          </Typography>
            
-           {/* Right Actions Group */}
+           {/* Actions on the Right */}
            <Box>
+             {/* Clear Button */}
+             <Button 
+               onClick={handleOpenClearConfirm}
+               color="error" 
+               size="small"
+               startIcon={<DeleteSweepIcon />} 
+               disabled={items.length === 0}
+               sx={{ textTransform: 'none', mr: 1 }} // Add margin 
+             >
+               Töm lista
+             </Button> 
+             {/* Action Icons */}
              <IconButton 
                onClick={handleOpenAddItem} 
                title="Add Item"
-               // Use sx prop for better theme integration
                sx={{ 
-                  bgcolor: 'primary.main', 
-                  color: 'primary.contrastText', // Use contrast text color
-                  mr: 1, // Add margin right using theme spacing
-                  '&:hover': { // Darken on hover
-                    bgcolor: 'primary.dark', 
-                  }
-                }}
+                 bgcolor: 'primary.main', 
+                 color: 'primary.contrastText', 
+                 mr: 1, 
+                 '&:hover': { bgcolor: 'primary.dark' }
+               }}
              >
                <AddIcon /> 
              </IconButton>
@@ -125,12 +124,10 @@ function GroceryPage({
                onClick={handleOpenVoiceInput} 
                title="Add by Voice"
                sx={{ 
-                  bgcolor: 'primary.main', 
-                  color: 'primary.contrastText', 
-                  mr: 1, 
-                  '&:hover': { 
-                    bgcolor: 'primary.dark', 
-                  }
+                 bgcolor: 'primary.main', 
+                 color: 'primary.contrastText', 
+                 mr: 1, 
+                 '&:hover': { bgcolor: 'primary.dark' }
                }}
              >
                <MicIcon /> 
@@ -139,7 +136,7 @@ function GroceryPage({
                onClick={handleOpenReminders} 
                title="Set Reminder"
                disabled={items.length === 0} 
-               color={items.length > 0 ? 'primary' : 'default'} // Use default instead of inherit
+               color={items.length > 0 ? 'primary' : 'default'} 
              >
                <NotificationsIcon />
              </IconButton>
@@ -147,28 +144,10 @@ function GroceryPage({
         </Toolbar>
       </AppBar>
 
-      {/* Re-add Sticky Title Header - POSITION FIXED, MATCH ELEVATION */}
-      <AppBar 
-        position="fixed"
-        color="inherit"
-        elevation={3} // Match other bars
-        sx={{ 
-          top: 56, // Adjust based on main AppBar height (default dense is 48, regular is 64)
-          zIndex: 1090, // Below main action bar
-          bgcolor: 'background.paper',
-          // Remove border styles
-        }}
-      >
-        <Toolbar variant="dense"> {/* Use dense for less height */}
-          <Typography variant="h6" component="h2" sx={{ color: 'text.primary' }}>
-            Inköpslista
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
-      {/* Adjust Padding Top for BOTH fixed AppBars again */}
+      {/* Adjust Padding Top for only ONE fixed AppBar */}
       <Box sx={{ 
-         pt: '112px' // ADJUST PADDING BACK (approx 64 + 48)
+         // Approx 64px. Use theme calculation if possible
+         pt: '64px' // ADJUST PADDING
         }}> 
          {/* --- Modals --- */}
          {/* Refactor Add Item Modal to Dialog */}
