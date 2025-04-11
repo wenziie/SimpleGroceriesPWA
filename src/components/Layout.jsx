@@ -43,11 +43,13 @@ function Layout() {
         justifyContent: 'space-around',
         alignItems: 'center',
         padding: '5px 0',
-        backgroundColor: 'var(--navbar-bg)',
+        // backgroundColor: 'var(--navbar-bg)', // REMOVE THIS
         // Make navbar sticky
         position: 'sticky',
         bottom: 0,
-        width: '100%' // Ensure it spans the full width
+        width: '100%', // Ensure it spans the full width
+        borderTop: '1px solid', // Add a top border for separation
+        borderColor: 'divider' // Use theme divider color
       }}>
         <Link to="/" style={getLinkStyle('/')}>
           <ShoppingCartIcon />

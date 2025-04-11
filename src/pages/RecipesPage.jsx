@@ -75,7 +75,6 @@ function RecipesPage({
           margin: '0 auto',
           position: 'sticky',
           top: 0,
-          backgroundColor: 'var(--background-color, white)',
           zIndex: 10,
           padding: '1rem 0 0.5rem 0'
         }}
