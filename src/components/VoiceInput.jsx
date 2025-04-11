@@ -32,6 +32,7 @@ function VoiceInput({ onAddItem }) {
     recognition.onresult = (event) => {
       // IMPORTANT: Only process results if this instance is still the active one
       if (recognitionRef.current !== recognition) {
+        console.log("[VoiceInput] onresult: Ignoring result from inactive instance.");
         return; // Ignore results from old/stopped instances
       }
 
@@ -51,8 +52,9 @@ function VoiceInput({ onAddItem }) {
     };
 
     recognition.onerror = (event) => {
-       // IMPORTANT: Only process errors if this instance is still the active one
+      // IMPORTANT: Only process errors if this instance is still the active one
       if (recognitionRef.current !== recognition) {
+         console.log("[VoiceInput] onerror: Ignoring error from inactive instance.");
         return; // Ignore errors from old/stopped instances
       }
       console.error("[VoiceInput] onerror:", event.error, event.message);
@@ -64,19 +66,22 @@ function VoiceInput({ onAddItem }) {
       } else if (event.error === 'not-allowed') {
         errorMessage = 'Åtkomst till mikrofonen nekades.';
       } else if (event.error === 'aborted') {
-        // If aborted, only show error if it wasn't deliberately stopped
-        errorMessage = null; // Assume deliberate stop if ref is already null
+        errorMessage = null; // Assume deliberate stop
       } 
       if (errorMessage) setError(errorMessage);
+      // Ensure state is updated on error
       setIsListening(false); 
       recognitionRef.current = null; 
     };
 
     recognition.onend = () => {
-      // Only update state if this instance was the active one when it ended
+      console.log("[VoiceInput] onend: Fired.");
+      // This event fires when recognition stops naturally or programmatically.
+      // Ensure the state reflects that listening has stopped.
+      setIsListening(false); 
+      // If the ref still points to this instance (e.g., natural stop), clear it.
       if (recognitionRef.current === recognition) {
-         setIsListening(false); 
-         recognitionRef.current = null; // Ensure ref is cleared if it ended naturally
+         recognitionRef.current = null;
       }
     };
 
@@ -98,20 +103,23 @@ function VoiceInput({ onAddItem }) {
     if (recognitionRef.current) {
       const currentRecognition = recognitionRef.current; 
       recognitionRef.current = null; // Clear the ref *before* calling stop
+      setIsListening(false); // Set state immediately *before* calling stop
       try {
-          // Attempt to stop. Note: onend might fire AFTER this.
+          console.log("[VoiceInput] stopListening: Calling stop() on instance.");
           currentRecognition.stop(); 
       } catch (err) {
            console.error("[VoiceInput] stopListening: Error calling stop():", err);
-           // Ensure listening state is false even if stop throws
-           setIsListening(false); 
+           // State is already set to false
       }
-    } 
+    } else {
+        console.log("[VoiceInput] stopListening: No active instance to stop.");
+    }
   };
 
   // Effect for cleanup on unmount
   useEffect(() => {
     return () => {
+      console.log("[VoiceInput] cleanup: Component unmounting.");
       stopListening();
     };
   }, []);
@@ -125,15 +133,20 @@ function VoiceInput({ onAddItem }) {
   };
 
   const handleAddItem = () => {
+    console.log("[VoiceInput] handleAddItem: Called. Current transcript:", transcript);
     // Immediately stop any active recognition when Add is clicked
     stopListening(); 
 
     const itemToAdd = transcript.trim();
     if (itemToAdd) {
+      console.log("[VoiceInput] handleAddItem: Adding item:", itemToAdd);
       onAddItem(itemToAdd); // Call the callback to add the item
       // Clear the displayed transcript *after* stopping and getting the value
+      console.log("[VoiceInput] handleAddItem: Clearing transcript state.");
       setTranscript(''); 
-    } 
+    } else {
+       console.log("[VoiceInput] handleAddItem: No item to add.");
+    }
   };
 
   if (!isSupported) {
