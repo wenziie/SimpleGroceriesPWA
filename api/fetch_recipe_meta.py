@@ -1,9 +1,9 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import requests
-from bs4 import BeautifulSoup
 import urllib.parse
-import time # Import time for logging duration
+import time
+import os # Import os to potentially access environment variables later if needed
 
 class handler(BaseHTTPRequestHandler):
 
@@ -38,75 +38,67 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({'error': 'Invalid or missing URL'}).encode('utf-8'))
             return
 
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
+        # Construct Microlink API URL
+        # We might need to add '&palette' or '&audio', '&video' later if needed
+        microlink_api_url = f"https://api.microlink.io/?url={urllib.parse.quote(url)}"
+        print(f"Calling Microlink API: {microlink_api_url}", flush=True)
+        
+        # Optional: Prepare headers if API key is needed later
+        # headers = {
+        #     'Authorization': f'Bearer {os.environ.get("MICROLINK_API_KEY")}'
+        # }
+        headers = {} # No headers needed for basic request for now
 
         try:
-            print(f"Fetching URL: {url}", flush=True)
+            # Call Microlink API
             fetch_start = time.time()
-            response = requests.get(url, headers=headers, timeout=10)
+            response = requests.get(microlink_api_url, headers=headers, timeout=15) # Increased timeout slightly for external API
             fetch_end = time.time()
-            print(f"Fetched URL in {fetch_end - fetch_start:.2f} seconds. Status: {response.status_code}", flush=True)
-            response.raise_for_status()
+            print(f"Microlink API call took {fetch_end - fetch_start:.2f} seconds. Status: {response.status_code}", flush=True)
+            response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
 
-            print("Parsing HTML...", flush=True)
-            parse_start = time.time()
-            soup = BeautifulSoup(response.content, 'lxml')
-            parse_end = time.time()
-            print(f"Parsed HTML in {parse_end - parse_start:.2f} seconds", flush=True)
+            # Parse the JSON response from Microlink
+            metadata = response.json()
 
-            # Try fetching Open Graph title first
-            og_title = soup.find('meta', property='og:title')
-            title = og_title['content'] if og_title else None
-
-            # Fallback to <title> tag
-            if not title:
-                title_tag = soup.find('title')
-                if title_tag:
-                    title = title_tag.string.strip()
-
-            # Try fetching Open Graph image
-            og_image = soup.find('meta', property='og:image')
-            image_url = og_image['content'] if og_image else None
-            
-            # Fallback: Look for high-resolution link rel image (less common)
-            if not image_url:
-                link_image = soup.find('link', rel='image_src')
-                if link_image:
-                    image_url = link_image['href']
-            
-             # Make image URL absolute if it's relative
-            if image_url:
-                 image_url = urllib.parse.urljoin(url, image_url)
-                 print(f"Found image URL: {image_url}", flush=True)
-            else:
-                 print("No image URL found", flush=True)
-
-            # If still no title, use the original URL as fallback
-            if not title:
-                title = url
-                print(f"No title found, using URL as title", flush=True)
-            else:
-                 print(f"Found title: {title}", flush=True)
+            # Extract data (Microlink uses slightly different field names)
+            # Check data.status == 'success'?
+            if metadata.get('status') == 'success':
+                api_data = metadata.get('data', {})
+                title = api_data.get('title', url) # Fallback to original URL if title missing
+                # Microlink often provides image URL in image.url
+                image_info = api_data.get('image')
+                image_url = image_info.get('url') if image_info else None
                 
-            result = {'title': title, 'imageUrl': image_url}
-            print(f"Sending success response: {result}", flush=True)
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(result).encode('utf-8'))
+                print(f"Microlink success. Title: {title}, Image URL: {image_url}", flush=True)
+                result = {'title': title, 'imageUrl': image_url}
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(result).encode('utf-8'))
+            else:
+                # Microlink reported failure
+                error_message = metadata.get('message', 'Microlink failed to process URL')
+                print(f"ERROR: Microlink API failed for {url}. Message: {error_message}", flush=True)
+                # Return original URL as title, no image
+                result = {'title': url, 'imageUrl': None}
+                self.send_response(200) # Send 200 but with fallback data
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(result).encode('utf-8'))
 
         except requests.exceptions.RequestException as e:
-            print(f"ERROR fetching URL {url}: {e}", flush=True)
+            # Error calling Microlink API itself
+            print(f"ERROR calling Microlink API for {url}: {e}", flush=True)
             result = {'title': url, 'imageUrl': None}
-            print(f"Sending fallback response due to fetch error: {result}", flush=True)
-            self.send_response(200)
+            print(f"Sending fallback response due to Microlink API call error: {result}", flush=True)
+            self.send_response(200) 
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(result).encode('utf-8'))
         except Exception as e:
-             print(f"ERROR processing URL {url}: {e}", flush=True)
+             # Unexpected error during processing
+             print(f"ERROR processing Microlink response for {url}: {e}", flush=True)
              print(f"Sending 500 response due to unexpected error", flush=True)
              self.send_response(500)
              self.send_header('Content-type', 'application/json')
