@@ -95,8 +95,8 @@ function RecipesPage({
       {/* Add Padding Top to account for the fixed AppBar */}
       <Box sx={{ 
          // Approx 64px. Use theme calculation if possible
-         // Example: pt: theme => `${theme.mixins.toolbar[theme.breakpoints.up('sm')]?.minHeight || 64}px`
-         pt: '64px' // Use fixed value for now, adjust if needed
+         pt: '64px', // Use fixed value for now, adjust if needed
+         px: 2 // Add horizontal padding (theme spacing unit * 2)
         }}> 
 
          {/* Add Recipe Dialog (replaces Modal) */}

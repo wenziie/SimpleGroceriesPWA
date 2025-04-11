@@ -31,10 +31,10 @@ function Layout() {
       
       {/* Main Content Area - Make this independently scrollable */}
       <Box component="main" sx={{ flexGrow: 1, overflowY: 'auto', pb: 7 /* Add padding-bottom for BottomNav height */ }}>
-         {/* Container still useful for max-width and centering */}
-         <Container sx={{ py: 3 }}> 
+         {/* REMOVE Container - Let page content handle its own width/padding */}
+         {/* <Container sx={{ py: 3 }}> */}
            <Outlet />
-         </Container>
+         {/* </Container> */}
       </Box>
 
       {/* Bottom Navigation - Position fixed at the bottom */}
