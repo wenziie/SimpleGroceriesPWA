@@ -133,15 +133,15 @@ function VoiceInput({ onAddItem }) {
     if (itemToAdd) {
       // Stop the current recognition instance directly
       if (recognitionRef.current) {
+        const instanceToStop = recognitionRef.current; // Get ref to the instance
+        recognitionRef.current = null; // Nullify the ref *before* calling stop
         try {
-          recognitionRef.current.stop();
+          instanceToStop.stop();
           // Don't call setIsListening(false) here to avoid UI flicker
-          // Don't null the ref here; let onend or startListening handle it
         } catch (err) {
           console.error("[VoiceInput] handleAddItem: Error stopping recognition:", err);
-          // Force cleanup if stop failed?
-          recognitionRef.current = null;
-          setIsListening(false);
+          // If stop failed, ensure state is false (already nulled ref)
+          setIsListening(false); 
         }
       }
 
@@ -152,9 +152,8 @@ function VoiceInput({ onAddItem }) {
       // Restart listening after a short delay
       setTimeout(() => {
          const container = document.getElementById('voice-input-container');
-         // Check mount status. Ref might be the old stopped instance or null.
-         // startListening will handle creating/setting the new ref and state.
-         if (container && document.contains(container)) { 
+         // Check mount status. Ref should be null here.
+         if (container && document.contains(container) && !recognitionRef.current) { 
             startListening();
          } 
       }, 250); // 250ms delay, adjust if needed
