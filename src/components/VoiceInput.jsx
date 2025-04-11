@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import IconButton from '@mui/material/IconButton';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
+import Button from '@mui/material/Button'; // Use MUI Button
 
 // Get the correct SpeechRecognition object based on browser vendor prefixes
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -20,32 +21,48 @@ function VoiceInput({ onAddItem }) {
       // Create the recognition instance but don't start it yet
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.lang = 'sv-SE'; // Set language to Swedish
-      recognitionRef.current.interimResults = true; // Get results as they come
-      recognitionRef.current.continuous = true; // Keep listening until stopped
+      recognitionRef.current.interimResults = true; // Keep interim for feedback
+      // Set continuous to false - stop after pause
+      recognitionRef.current.continuous = false; 
 
       // Event Handlers for the recognition instance
       recognitionRef.current.onresult = (event) => {
-        let currentTranscript = '';
+        let interimTranscript = '';
+        let finalTranscript = '';
+
         for (let i = event.resultIndex; i < event.results.length; ++i) {
-          currentTranscript += event.results[i][0].transcript;
+          const transcriptPiece = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcriptPiece;
+          } else {
+            interimTranscript += transcriptPiece;
+          }
         }
-        setTranscript(prev => prev + currentTranscript); // Append results for continuous
-        setError(null); // Clear previous errors on new results
+        // Update state with interim or final results
+        // Prioritize final results if available
+        setTranscript(finalTranscript || interimTranscript);
+        setError(null); // Clear error on new results
       };
 
       recognitionRef.current.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
-        setError(`Speech recognition error: ${event.error}`);
-        setIsListening(false);
+        let errorMessage = `Speech recognition error: ${event.error}`;
+        // Provide more user-friendly messages for common errors
+        if (event.error === 'no-speech') {
+          errorMessage = 'Ingen tal upptäcktes. Försök igen.';
+        } else if (event.error === 'audio-capture') {
+          errorMessage = 'Kunde inte komma åt mikrofonen. Kontrollera behörigheter.';
+        } else if (event.error === 'not-allowed') {
+          errorMessage = 'Åtkomst till mikrofonen nekades.';
+        }
+        setError(errorMessage);
+        setIsListening(false); // Ensure listening stops on error
       };
 
       recognitionRef.current.onend = () => {
         console.log("Speech recognition ended.");
-        // Only set isListening false if it wasn't manually stopped
-        // For continuous=true, it might stop automatically sometimes (e.g., silence)
-        // We might need logic here to restart it if needed, but let's keep it simple first
+        // Recognition ended (either manually or automatically after speech)
         setIsListening(false); 
-        // Reset transcript after stopping? Maybe not for continuous addition.
       };
 
     } else {
@@ -59,25 +76,23 @@ function VoiceInput({ onAddItem }) {
         recognitionRef.current.stop();
       }
     };
-  }, []); // Run only once on mount to set up
+  }, []); // Empty dependency array - setup runs once
 
   const handleToggleListen = () => {
     if (!isSupported || !recognitionRef.current) return;
 
     if (isListening) {
       console.log("Stopping recognition manually...");
-      recognitionRef.current.stop();
-      setIsListening(false);
-      // Don't clear transcript here, let user add it
+      recognitionRef.current.stop(); // Will trigger onend, setting isListening=false
+      // Transcript remains until added or next listen starts
     } else {
       try {
         console.log("Starting recognition...");
-        setTranscript(''); // Clear previous transcript before starting new session
+        setTranscript(''); // Clear previous transcript before starting
         setError(null);
         recognitionRef.current.start();
         setIsListening(true);
       } catch (err) {
-        // Handle potential errors during start (e.g., already started)
         console.error("Error starting recognition:", err);
         setError("Could not start voice recognition.");
         setIsListening(false);
@@ -85,40 +100,13 @@ function VoiceInput({ onAddItem }) {
     }
   };
 
-  const handleAddAndNext = () => {
+  // Rename button/handler to reflect single addition
+  const handleAddItem = () => {
     const itemToAdd = transcript.trim();
     if (itemToAdd) {
       onAddItem(itemToAdd);
-      setTranscript(''); // Clear transcript for the next item
-      
-      // If recognition stopped, restart it immediately
-      if (!isListening && recognitionRef.current) {
-        try {
-          console.log("Restarting recognition for next item...");
-          recognitionRef.current.start();
-          setIsListening(true);
-        } catch (err) {
-            console.error("Error restarting recognition:", err);
-            setError("Could not restart voice recognition.");
-            setIsListening(false);
-        }
-      } else if (isListening && recognitionRef.current) {
-         // If it was still listening, stopping and immediately restarting 
-         // can sometimes help clear buffers or reset state reliably.
-         console.log("Quick restart for next item...");
-         recognitionRef.current.stop(); // onend will set isListening = false
-         // A very short delay might be needed before restarting
-         setTimeout(() => {
-            try {
-              recognitionRef.current.start();
-              setIsListening(true); // Set it back immediately
-            } catch (err) {
-              console.error("Error restarting recognition:", err);
-              setError("Could not restart voice recognition.");
-              setIsListening(false);
-            }
-         }, 100); // 100ms delay
-      }
+      setTranscript(''); // Clear transcript after adding
+      // No need to restart recognition, user clicks Mic again
     }
   };
 
@@ -127,20 +115,20 @@ function VoiceInput({ onAddItem }) {
   }
 
   return (
-    <div style={{ marginTop: '1.5rem', /*borderTop: '1px solid #ccc',*/ paddingTop: '1rem' }}>
-      <h4>Add Item by Voice (Swedish)</h4>
-      {/* Use IconButton */}
-      <IconButton onClick={handleToggleListen} disabled={!isSupported} title={isListening ? 'Stop Listening' : 'Start Listening'}>
+    <div style={{ marginTop: '1.5rem', paddingTop: '1rem', textAlign: 'center' }}>
+      <h4>Lägg till med röst</h4>
+      <IconButton onClick={handleToggleListen} title={isListening ? 'Sluta lyssna' : 'Börja lyssna'} size="large" style={{ color: isListening ? 'red' : 'var(--primary-color)' }}>
         {isListening ? <StopIcon /> : <MicIcon />}
       </IconButton>
-      {isListening && <p style={{ fontStyle: 'italic' }}>Listening...</p>}
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+      {isListening && <p style={{ fontStyle: 'italic' }}>Lyssnar...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       {transcript && (
-        <div style={{ margin: '0.5rem 0' }}>
-          <p>Heard: <strong>{transcript}</strong></p>
-          <button onClick={handleAddAndNext} disabled={!transcript.trim() || !isListening}>
-            Lägg till & nästa ("Add & Next")
-          </button>
+        <div style={{ margin: '1rem 0' }}>
+          <p>Hörde: <strong>{transcript}</strong></p>
+          {/* Use MUI Button and update text/handler */}
+          <Button variant="contained" onClick={handleAddItem} disabled={!transcript.trim()}>
+            Lägg till artikel
+          </Button>
         </div>
       )}
     </div>
