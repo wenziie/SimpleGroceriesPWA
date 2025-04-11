@@ -15,7 +15,11 @@ def extract_json_ld(html_content, url):
     print(f\"Attempting JSON-LD extraction for {url}\", flush=True)
     try:
         # Use extruct to find all JSON-LD blocks
+        print(\"--- HTML Content Snippet for Extruct ---", flush=True)
+        print(html_content[:2000], flush=True) # Log beginning of HTML
+        print(\"---------------------------------------\", flush=True)
         metadata = extruct.extract(html_content, base_url=url, syntaxes=['json-ld'], uniform=True)
+        print(f\"Extruct result: {metadata}\", flush=True)
         
         if not metadata or 'json-ld' not in metadata or not metadata['json-ld']:
              print(\"No JSON-LD metadata found.\", flush=True)
@@ -47,6 +51,7 @@ def get_image_url(recipe_data, source_url):
     if not recipe_data or not isinstance(recipe_data, dict):
         return None
 
+    print(f\"Attempting to get image from JSON-LD data: {recipe_data.get('image')}\", flush=True)
     image_info = recipe_data.get('image')
     
     if not image_info:
@@ -75,6 +80,7 @@ def get_ingredients_from_json_ld(recipe_data):
     if not recipe_data or not isinstance(recipe_data, dict):
         return []
         
+    print(f\"Attempting to get ingredients from JSON-LD field 'recipeIngredient': {recipe_data.get('recipeIngredient')}\", flush=True)
     ingredients = recipe_data.get('recipeIngredient', [])
     if isinstance(ingredients, list) and all(isinstance(i, str) for i in ingredients):
          print(f\"Found {len(ingredients)} ingredients via JSON-LD recipeIngredient.\", flush=True)
@@ -97,13 +103,14 @@ def scrape_ingredients_fallback(html_content, url):
     print(f\"Attempting fallback HTML scraping for {url}\", flush=True)
     soup = BeautifulSoup(html_content, 'html.parser')
     ingredients = []
+    scraped_successfully = False
     
     hostname = urllib.parse.urlparse(url).hostname
 
     try:
         if 'ica.se' in hostname:
-            # ICA: Often uses <div class="ingredients"><ul><li>...</li></ul></div>
-            # Or sometimes <div class="recipe-ingredients-list">...</div>
+            # ICA: Often uses <div class=\"ingredients\"><ul><li>...</li></ul></div>
+            # Or sometimes <div class=\"recipe-ingredients-list\">...</div>
             ingredient_section = soup.find('div', class_='ingredients') or soup.find('div', class_='recipe-ingredients-list')
             if ingredient_section:
                  items = ingredient_section.find_all('li')
@@ -111,9 +118,10 @@ def scrape_ingredients_fallback(html_content, url):
                     items = ingredient_section.find_all('div', recursive=False) # Non-recursive to avoid nesting issues
                  ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
                  print(f\"ICA Scraper: Found {len(ingredients)} potential ingredients.\", flush=True)
+                 scraped_successfully = len(ingredients) > 0
                  
         elif 'koket.se' in hostname:
-             # Koket: Often uses <div class="recipe-ingredients"> or similar classes, with spans/divs inside
+             # Koket: Often uses <div class=\"recipe-ingredients\"> or similar classes, with spans/divs inside
              # Look for specific data attributes or structured lists
              ingredient_section = soup.find('div', attrs={'data-recipe-ingredient-list': True}) # More robust selector
              if not ingredient_section:
@@ -134,20 +142,23 @@ def scrape_ingredients_fallback(html_content, url):
                 # Simple deduplication if necessary (due to broad search)
                 ingredients = list(dict.fromkeys(potential_ingredients))
                 print(f\"Koket Scraper: Found {len(ingredients)} potential ingredients.\", flush=True)
+                scraped_successfully = len(ingredients) > 0
 
         elif 'arla.se' in hostname:
-            # Arla: Often uses <div class="recipe-section__ingredients"> or similar
+            # Arla: Often uses <div class=\"recipe-section__ingredients\"> or similar
             ingredient_section = soup.find('div', class_=lambda x: x and 'ingredients' in x and 'recipe' in x)
             if ingredient_section:
                 # Often uses <p> tags directly under the section or within a list
                 items = ingredient_section.find_all(['li', 'p'])
                 ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
                 print(f\"Arla Scraper: Found {len(ingredients)} potential ingredients.\", flush=True)
+                scraped_successfully = len(ingredients) > 0
 
     except Exception as e:
         print(f\"Error during fallback scraping for {url}: {e}\", flush=True)
         # Don't crash, just return empty list if scraping fails
 
+    print(f\"Fallback scraping finished. Scraped successfully: {scraped_successfully}. Found ingredients: {ingredients}\", flush=True)
     return [ing for ing in ingredients if ing] # Final filter for empty strings
 
 # --- Main Handler Class ---
@@ -227,6 +238,7 @@ class handler(BaseHTTPRequestHandler):
             if json_ld_data:
                 title = json_ld_data.get('name', title) # Use JSON-LD name if available
                 image_url = get_image_url(json_ld_data, response.url) or image_url # Use JSON-LD image if available
+                print(f\"Image URL after get_image_url: {image_url}\", flush=True)
                 ingredients = get_ingredients_from_json_ld(json_ld_data)
                 
                 if ingredients:
@@ -241,10 +253,15 @@ class handler(BaseHTTPRequestHandler):
                 # Attempt to get title from HTML title tag as a basic fallback
                 soup_for_title = BeautifulSoup(html_content, 'html.parser')
                 html_title = soup_for_title.find('title')
+                og_image = soup_for_title.find('meta', property='og:image')
+                
                 if html_title:
                     title = clean_ingredient_text(html_title.get_text()) or title # Use cleaned title or default
                 
-                # TODO: Add image scraping fallback if needed (e.g., og:image meta tag)
+                # Fallback image scraping using og:image
+                if not image_url and og_image and og_image.get('content'):
+                    image_url = urllib.parse.urljoin(response.url, og_image['content'])
+                    print(f\"Used fallback og:image for image URL: {image_url}\", flush=True)
 
                 ingredients = scrape_ingredients_fallback(html_content, response.url)
 
