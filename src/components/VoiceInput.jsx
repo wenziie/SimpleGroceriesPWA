@@ -112,10 +112,18 @@ function VoiceInput({ onAddItem }) {
     const itemToAdd = transcript.trim();
     if (itemToAdd) {
       onAddItem(itemToAdd);
-      // Remove the automatic restart
-      // startListening(); 
-      // Clear transcript manually now, as startListening isn't doing it
-      setTranscript(''); 
+      setTranscript(''); // Clear display immediately
+
+      // Explicitly stop any lingering recognition from the previous session
+      stopListening();
+
+      // Start a new listening session after a delay
+      setTimeout(() => {
+          // Check if still mounted / relevant before starting
+          // (A more robust check might involve a ref to the component's mounted state)
+          console.log("Starting delayed listening session...");
+          startListening(); 
+      }, 250); // 250ms delay - adjust if needed
     }
   };
 
