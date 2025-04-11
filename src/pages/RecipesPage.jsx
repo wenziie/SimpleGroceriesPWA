@@ -60,11 +60,17 @@ function RecipesPage({
   // Effect to scroll to bottom when recipes length increases
   useEffect(() => {
     if (recipes.length > prevRecipesLength) {
-       console.log("[RecipesPage] Recipe added, scrolling to bottom.");
+       console.log(`[RecipesPage Debug] Condition met: recipes.length (${recipes.length}) > prevRecipesLength (${prevRecipesLength})`);
+       console.log('[RecipesPage Debug] scrollRef.current:', scrollRef.current);
       // Scroll content to bottom after length increases
       if (scrollRef.current) {
+        const targetScrollTop = scrollRef.current.scrollHeight;
+        console.log(`[RecipesPage Debug] Attempting to scroll to: ${targetScrollTop}`);
         // Scroll to the bottom of the container
-        scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+        scrollRef.current.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+        console.log('[RecipesPage Debug] scrollTo called.');
+      } else {
+        console.warn('[RecipesPage Debug] scrollRef.current was null or undefined.');
       }
     }
     // Update previous length state *after* checking
