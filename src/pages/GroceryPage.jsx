@@ -33,7 +33,7 @@ const modalStyle = {
   // Use theme's shadow (elevation) - Paper component applies this
   // boxShadow: 24, // Default MUI shadow, let Paper/theme handle
   p: { xs: 2, sm: 3, md: 4}, // Responsive padding
-  borderRadius: 2, // Use a smaller, fixed value (e.g., 8px)
+  borderRadius: 1, // Use 8px for less roundness
   outline: 'none', // Remove default focus outline on modal
 };
 

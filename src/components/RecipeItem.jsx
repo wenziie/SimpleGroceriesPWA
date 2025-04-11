@@ -37,7 +37,7 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   return (
     // Wrap in Paper for structure and elevation
     <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper' }}> 
-      <ListItem alignItems="flex-start" disablePadding>
+      <ListItem alignItems="flex-start">
         {/* Avatar for Image */}
         {recipe.imageUrl && (
           <ListItemAvatar sx={{ mr: 1 }}>
@@ -54,8 +54,19 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
         <ListItemText
           primary={
             // Use Typography for better control
-            <Typography variant="body1" component="span" sx={{ fontWeight: 'medium' }}>
-              {recipe.title}
+            <Typography 
+              variant="body1" 
+              component="span" 
+              sx={{ 
+                 fontWeight: 'medium',
+                 // Truncate text
+                 display: 'block', // Needed for truncation
+                 whiteSpace: 'nowrap',
+                 overflow: 'hidden',
+                 textOverflow: 'ellipsis'
+               }}
+             >
+               {recipe.title}
             </Typography>
           }
           secondary={
@@ -65,27 +76,35 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
               rel="noopener noreferrer" 
               variant="caption" 
               color="text.secondary"
-              sx={{ wordBreak: 'break-all', display: 'block', mt: 0.5 }}
+              sx={{ 
+                 wordBreak: 'break-all', 
+                 display: 'block', 
+                 mt: 0.5,
+                 // Truncate text
+                 whiteSpace: 'nowrap',
+                 overflow: 'hidden',
+                 textOverflow: 'ellipsis'
+              }}
             >
                {recipe.url}
             </Link>
           }
           sx={{ my: 1, mr: 1 }} // Add vertical margin and right margin
         />
-        {/* Action Buttons */}
-        <Box sx={{ display: 'flex', flexDirection:'column', alignItems: 'flex-end', justifyContent: 'center', ml: 'auto', my: 1, mr: 1 }}>
-          <Button 
-            variant="contained" // Use contained for primary action
-            color="primary"
-            size="small" 
-            onClick={handleAddIngredients} 
-            sx={{ mb: 0.5, minWidth: '100px' }} // Add margin bottom and min width
-            disabled={!hasIngredients || ingredientsAdded}
-            startIcon={ingredientsAdded ? <CheckIcon fontSize="small"/> : <AddShoppingCartIcon fontSize="small"/>}
-            title={!hasIngredients ? "Ingredients not found" : (ingredientsAdded ? "Added" : "Add items")}
-          >
-            {ingredientsAdded ? 'Added' : 'Add Items'}
-          </Button>
+        {/* Action Buttons - Adjust layout */}
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 1, mr: 1 }}>
+           {/* Replace Button with IconButton */}
+           <IconButton 
+             color="primary" 
+             size="small" 
+             onClick={handleAddIngredients} 
+             sx={{ mr: 0.5 }} // Add margin between icons
+             disabled={!hasIngredients || ingredientsAdded}
+             title={!hasIngredients ? "Ingredients not found" : (ingredientsAdded ? "Added" : "Add items")}
+           >
+             {/* Show checkmark when added, otherwise cart */}
+             {ingredientsAdded ? <CheckIcon fontSize="small" /> : <AddShoppingCartIcon fontSize="small"/>}
+           </IconButton>
           <IconButton 
             onClick={() => onDeleteRecipe(recipe.id)} 
             size="small" 

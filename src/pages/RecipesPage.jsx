@@ -26,7 +26,7 @@ const modalStyle = {
   // borderColor: 'divider',
   // boxShadow: 24, // Let Paper/theme handle
   p: { xs: 2, sm: 3, md: 4}, // Responsive padding
-  borderRadius: 2, // Use a smaller, fixed value (e.g., 8px)
+  borderRadius: 1, // Use 8px for less roundness
   outline: 'none', // Remove default focus outline on modal
 };
 
