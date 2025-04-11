@@ -51,7 +51,17 @@ const lightTheme = createTheme({
       styleOverrides: {
          root: {
            borderRadius: '24px', // Pill shape common in M3
-           textTransform: 'none' // Keep button text case as is
+           textTransform: 'none', // Keep button text case as is
+           // Remove focus outline
+           outline: 'none !important',
+           '&:focus': {
+             outline: 'none !important',
+           },
+           '&.Mui-focusVisible': {
+             outline: 'none !important',
+             // Optionally add a subtle visual indicator other than outline
+             // boxShadow: `0 0 0 2px ${lightTheme.palette.primary.light}` 
+           },
          },
          // Contained buttons use primary color
          containedPrimary: {
@@ -62,7 +72,17 @@ const lightTheme = createTheme({
     MuiIconButton: {
        styleOverrides: {
          root: {
-           borderRadius: '12px' // Consistent rounding
+           borderRadius: '12px', // Consistent rounding
+           // Remove focus outline
+           outline: 'none !important',
+           '&:focus': {
+             outline: 'none !important',
+           },
+           '&.Mui-focusVisible': {
+             outline: 'none !important',
+             // Optionally add a subtle visual indicator other than outline
+             // backgroundColor: 'action.hover' 
+           },
          }
        }
     },
@@ -87,16 +107,14 @@ const lightTheme = createTheme({
        },
        styleOverrides: {
          root: {
-           // Remove default focus outline more aggressively
            outline: 'none !important', 
            '&:focus': {
              outline: 'none !important', 
            },
            '&.Mui-focusVisible': { 
              outline: 'none !important', 
-             backgroundColor: 'action.hover' // Optional: subtle background on focus
+             backgroundColor: 'action.hover'
            },
-           // Ensure selected state doesn't add an outline either
            '&.Mui-selected': {
              outline: 'none !important',
            },
@@ -105,7 +123,7 @@ const lightTheme = createTheme({
            },
            '&.Mui-selected.Mui-focusVisible': { 
              outline: 'none !important', 
-             backgroundColor: 'action.hover' // Optional: subtle background on focus
+             backgroundColor: 'action.hover'
            }
          }
        }

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { useOutletContext } from 'react-router-dom'; // Re-import useOutletContext
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 // MUI Imports
@@ -30,8 +29,8 @@ function RecipesPage({
   addIngredientsFromRecipe,
   lastRecipeParseFailed
 }) {
-  // Re-introduce context usage
-  const { scrollContainerRef } = useOutletContext(); 
+  // Remove scrollContainerRef usage
+  // const { scrollContainerRef } = useOutletContext(); 
 
   // State controls modal visibility for adding recipes
   const [showAddRecipe, setShowAddRecipe] = useState(false);
@@ -39,8 +38,9 @@ function RecipesPage({
   const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
   // State to track previous recipes length for scroll effect
   const [prevRecipesLength, setPrevRecipesLength] = useState(recipes.length);
-  // Create a ref for the last item
-  const lastItemRef = useRef(null);
+  // Remove lastItemRef, add bottomAnchorRef
+  // const lastItemRef = useRef(null);
+  const bottomAnchorRef = useRef(null);
 
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
@@ -60,37 +60,20 @@ function RecipesPage({
     }
   }, [lastRecipeParseFailed, recipes]); 
 
-  // Effect to scroll the last item into view and adjust for AppBar
+  // Effect to scroll the bottom anchor into view
   useLayoutEffect(() => {
     if (recipes.length > prevRecipesLength) {
-      if (lastItemRef.current) { 
-        console.log('[RecipesPage] New recipe. Scrolling last item into view (start).');
-        // Scroll the top of the item to the top of the scrollable ancestor
-        lastItemRef.current.scrollIntoView({ behavior: 'auto', block: 'start' }); 
-        
-        // Now, adjust scroll position to account for the fixed AppBar
-        if (scrollContainerRef.current) {
-            const appBarHeight = 64; // Approximate AppBar height
-            const padding = 8; // Extra padding
-            const currentScrollTop = scrollContainerRef.current.scrollTop;
-            const adjustedScrollTop = currentScrollTop - appBarHeight - padding;
-            
-            // Ensure we don't scroll above the top
-            const finalScrollTop = Math.max(0, adjustedScrollTop);
-
-            console.log(`[RecipesPage] Adjusting scroll for AppBar. Current: ${currentScrollTop}, Adjusted: ${finalScrollTop}`);
-            scrollContainerRef.current.scrollTop = finalScrollTop; 
-        } else {
-             console.warn('[RecipesPage] scrollContainerRef was null when trying to adjust for AppBar.');
-        }
-
+      if (bottomAnchorRef.current) { 
+        console.log('[RecipesPage] New recipe. Scrolling bottom anchor into view (end).');
+        // Scroll bottom of anchor to bottom of view
+        bottomAnchorRef.current.scrollIntoView({ behavior: 'auto', block: 'end' }); 
       } else {
-        console.warn('[RecipesPage] lastItemRef.current was null or undefined.');
+        console.warn('[RecipesPage] bottomAnchorRef.current was null or undefined.');
       }
     }
     setPrevRecipesLength(recipes.length);
-    // Add scrollContainerRef back to dependencies
-  }, [recipes.length, prevRecipesLength, scrollContainerRef]); 
+    // Remove scrollContainerRef from dependencies
+  }, [recipes.length, prevRecipesLength]); 
 
   const handleCloseSnackbar = (event, reason) => {
      if (reason === 'clickaway') {
@@ -171,12 +154,12 @@ function RecipesPage({
            {/* No DialogActions needed as submit is inside the form */}
          </Dialog>
 
-         {/* Recipe List - Pass the lastItemRef */}
+         {/* Recipe List - Pass the bottomAnchorRef */}
          <RecipeList 
            recipes={recipes} 
            onDeleteRecipe={deleteRecipe} 
            onAddIngredients={addIngredientsFromRecipe} 
-           lastItemRef={lastItemRef} // Pass the ref here
+           bottomAnchorRef={bottomAnchorRef} // Pass the anchor ref
          />
 
          {/* Snackbar for Parsing Failure Message */}

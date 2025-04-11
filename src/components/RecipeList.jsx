@@ -4,7 +4,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, lastItemRef }) {
+function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, bottomAnchorRef }) {
   return (
     <Box>
       {/* Title removed as it's now in RecipesPage header */}
@@ -20,17 +20,17 @@ function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, lastItemRef }) 
         </Typography>
       ) : (
         <List>
-          {recipes.map((recipe, index) => (
+          {recipes.map((recipe) => (
             <RecipeItem
               key={recipe.id}
               recipe={recipe}
               onDeleteRecipe={onDeleteRecipe}
               onAddIngredients={onAddIngredients}
-              itemRef={index === recipes.length - 1 ? lastItemRef : null}
             />
           ))}
         </List>
       )}
+      <div ref={bottomAnchorRef} style={{ height: '1px' }} />
     </Box>
   );
 }
