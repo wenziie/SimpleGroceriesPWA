@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 
 function RecipeList({ recipes, onDeleteRecipe, onAddIngredients }) {
   return (
-    <Box sx={{ mt: 2 }}>
+    <Box>
       {/* Title removed as it's now in RecipesPage header */}
       {/* <h2>Recipes</h2> */}
       {recipes.length === 0 ? (

@@ -30,7 +30,12 @@ function Layout() {
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
       
       {/* Main Content Area - Make this independently scrollable */}
-      <Box component="main" sx={{ flexGrow: 1, overflowY: 'auto', pb: 7 /* Add padding-bottom for BottomNav height */ }}>
+      <Box component="main" sx={{ 
+         flexGrow: 1, 
+         overflowY: 'auto', 
+         // Adjust pb to account for default nav height (56px) + safe area
+         pb: `calc(56px + env(safe-area-inset-bottom, 0px))` 
+       }}>
          {/* REMOVE Container - Let page content handle its own width/padding */}
          {/* <Container sx={{ py: 3 }}> */}
            <Outlet />
@@ -38,7 +43,17 @@ function Layout() {
       </Box>
 
       {/* Bottom Navigation - Position fixed at the bottom */}
-      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1100 /* Ensure it's above content */ }} elevation={3}>
+      <Paper sx={{ 
+         position: 'fixed', 
+         bottom: 0, 
+         left: 0, 
+         right: 0, 
+         zIndex: 1100, 
+         // Add padding-bottom to lift above home indicator
+         pb: 'env(safe-area-inset-bottom, 0px)' 
+        }} 
+        elevation={3}
+      >
         <BottomNavigation
           showLabels
           value={value} // Controlled component

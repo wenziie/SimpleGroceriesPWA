@@ -12,7 +12,7 @@ function GroceryList({ items, onToggleComplete, onDeleteItem, onEditItem }) {
   // const completedItems = items.filter(item => item.completed);
 
   return (
-    <Box sx={{ mt: 2 }}> {/* Add margin top */}
+    <Box /* sx={{ mt: 2 }} REMOVE */ > {/* Remove margin top */}
       {/* Render message if the entire list is empty */}
       {items.length === 0 && 
         <Typography 
