@@ -132,7 +132,7 @@ function GroceryPage({
             <CloseIcon />
           </IconButton>
           <h4 id="add-item-modal-title">Lägg till artikel</h4>
-          <AddItemForm onAddItem={handleAddItemAndClose} />
+          <AddItemForm onAddItem={addItem} />
         </Box>
       </Modal>
 

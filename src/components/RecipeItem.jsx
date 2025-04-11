@@ -1,49 +1,66 @@
 import React from 'react';
+import DeleteIcon from '@mui/icons-material/Delete'; // For consistency
+import IconButton from '@mui/material/IconButton'; // For consistency
+import Button from '@mui/material/Button'; // Use MUI button
 
 function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
 
   const handleAddIngredients = async () => {
-    // We'll implement the fetch call here
-    console.log(`Requesting ingredients for: ${recipe.url}`);
-    try {
-      // Construct the backend API URL
-      const apiUrl = `http://localhost:3001/parse-recipe?url=${encodeURIComponent(recipe.url)}`;
-      const response = await fetch(apiUrl);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.ingredients && data.ingredients.length > 0) {
-        console.log('Ingredients received:', data.ingredients);
-        // Call the handler passed from App.jsx to add these items to the grocery list
-        onAddIngredients(data.ingredients);
-        alert('Ingredients added to grocery list!'); // Simple confirmation
-      } else {
-        alert('Could not automatically find ingredients for this recipe.');
-      }
-    } catch (error) {
-      console.error("Error fetching ingredients:", error);
-      alert(`Error fetching ingredients: ${error.message}`);
-    }
+    // Placeholder - Ingredient parsing logic not implemented in this step
+    console.log(`Placeholder: Add ingredients for ${recipe.title || recipe.url}`);
+    alert('Ingredient parsing not implemented yet.');
+    // try {
+    //   const apiUrl = `/api/parse_ingredients?url=${encodeURIComponent(recipe.url)}`;
+    //   const response = await fetch(apiUrl);
+    //   ...
+    // } catch (error) { ... }
   };
 
   return (
-    <li>
-      {/* Open link in a new tab */}
-      <a href={recipe.url} target="_blank" rel="noopener noreferrer" style={{ flexGrow: 1, marginRight: '1rem' }}>
-        {recipe.url} {/* Display URL for now, add title later */}
-      </a>
-      {/* Add Ingredients Button */}
-      <button onClick={handleAddIngredients} style={{ marginRight: '0.5rem' }}>
-        Add Ingredients
-      </button>
-      <button onClick={() => onDeleteRecipe(recipe.id)} style={{ color: 'red' }}>
-        Delete
-      </button>
+    <li style={{
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: '1rem',
+      paddingBottom: '1rem',
+      borderBottom: '1px solid #eee'
+    }}>
+      {/* Display image if available */}
+      {recipe.imageUrl && (
+        <img 
+          src={recipe.imageUrl} 
+          alt={`Thumbnail for ${recipe.title}`}
+          style={{ width: '60px', height: '60px', objectFit: 'cover', marginRight: '1rem', borderRadius: '4px' }}
+          onError={(e) => { e.target.style.display = 'none' }} // Hide if image fails to load
+        />
+      )}
+      {/* Info Section (Title + URL) */}
+      <div style={{ flexGrow: 1, marginRight: '1rem' }}>
+        <a href={recipe.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>
+            {recipe.title} {/* Display Title */}
+          </span>
+          <span style={{ fontSize: '0.8em', color: 'grey', wordBreak: 'break-all' }}>
+             {recipe.url} {/* Keep URL subtle */}
+          </span>
+        </a>
+      </div>
+      {/* Action Buttons */}
+      <div style={{ flexShrink: 0 }}>
+        {/* Use MUI Button for adding ingredients */}
+        <Button 
+          variant="outlined" 
+          size="small" 
+          onClick={handleAddIngredients} 
+          style={{ marginRight: '0.5rem' }}
+          disabled // Disable for now until parsing is implemented
+        >
+          Add Ingredients
+        </Button>
+        {/* Use MUI IconButton for deleting */}
+        <IconButton onClick={() => onDeleteRecipe(recipe.id)} size="small" title="Delete Recipe">
+          <DeleteIcon style={{ color: 'red' }} />
+        </IconButton>
+      </div>
     </li>
   );
 }

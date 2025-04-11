@@ -17,8 +17,12 @@ const LOCAL_STORAGE_KEY_RECIPES = 'simple-groceries-pwa.recipes'
 function App() {
   // State for grocery items
   const [items, setItems] = useState([])
-  // State for recipes
-  const [recipes, setRecipes] = useState([])
+  // State for recipes - include title and imageUrl
+  const [recipes, setRecipes] = useState(() => {
+    const storedRecipes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECIPES));
+    // Ensure existing recipes have default null values for new fields
+    return storedRecipes ? storedRecipes.map(r => ({ ...r, title: r.title || r.url, imageUrl: r.imageUrl || null })) : [];
+  });
 
   // Load items from localStorage on initial render
   useEffect(() => {
@@ -33,28 +37,25 @@ function App() {
     localStorage.setItem(LOCAL_STORAGE_KEY_ITEMS, JSON.stringify(items))
   }, [items])
 
-  // Load recipes from localStorage
-  useEffect(() => {
-    const storedRecipes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECIPES))
-    if (storedRecipes) {
-      setRecipes(storedRecipes)
-    }
-  }, [])
+  // No need for separate recipe loading effect now, handled in useState initial value
+  // useEffect(() => { ... }, [])
 
   // Save recipes to localStorage
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY_RECIPES, JSON.stringify(recipes))
   }, [recipes])
 
-  // --- Effect to handle shared URL on load ---
+  // Effect to handle shared URL on load
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const sharedUrl = queryParams.get('url');
     if (sharedUrl) {
       addRecipe(sharedUrl);
+      // Clear the query param from the URL after processing
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, []); 
+    // Intentionally run only once on mount, addRecipe handles duplicates
+  }, []);
 
   // Function to add a new item
   const addItem = (name) => {
@@ -98,31 +99,67 @@ function App() {
   };
 
   // Function to clear ALL items
+  // NOTE: Removing the window.confirm here as we now have a dedicated modal in GroceryPage
   const clearAllItems = () => {
-    // Optional: Add confirmation prompt
-    if (window.confirm('Är du säker på att du vill tömma hela listan?')) {
-        setItems([]); // Set items to empty array
-    }
+    setItems([]); // Set items to empty array
   };
 
-  // Function to add a new recipe
-  const addRecipe = (url) => {
+  // Function to add a new recipe - now asynchronous
+  const addRecipe = async (url) => {
     const trimmedUrl = url.trim()
     if (!trimmedUrl) return
+    
     try {
-      new URL(trimmedUrl)
+      new URL(trimmedUrl) // Basic validation
     } catch (_) {
       alert("Please enter a valid URL.")
       return
     }
+    
+    // Check for duplicates before fetching
     if (recipes.some(recipe => recipe.url === trimmedUrl)) {
       alert("This recipe URL is already saved.")
       return
     }
+
+    // Show some loading state (optional, implement later if needed)
+    console.log(`Fetching metadata for: ${trimmedUrl}`); 
+
+    let title = trimmedUrl; // Default title is the URL
+    let imageUrl = null;
+
+    try {
+      const response = await fetch('/api/fetch_recipe_meta', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: trimmedUrl }),
+      });
+
+      if (!response.ok) {
+        // Handle API errors (e.g., 400, 500)
+        const errorData = await response.json().catch(() => ({})); // Try to parse error, ignore if not JSON
+        console.error(`API Error (${response.status}): ${errorData.error || response.statusText}`);
+        // Keep default title/imageUrl (the URL itself)
+      } else {
+        const data = await response.json();
+        title = data.title || trimmedUrl; // Use fetched title or fallback to URL
+        imageUrl = data.imageUrl; // Use fetched image URL (can be null)
+      }
+    } catch (error) {
+      // Handle network errors during fetch
+      console.error('Network error fetching recipe metadata:', error);
+      // Keep default title/imageUrl (the URL itself)
+    }
+
     const newRecipe = {
       id: crypto.randomUUID(),
       url: trimmedUrl,
+      title: title, // Use fetched or default title
+      imageUrl: imageUrl // Use fetched image URL or null
     }
+    
     setRecipes(prevRecipes => [...prevRecipes, newRecipe])
   }
 

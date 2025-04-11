@@ -95,8 +95,14 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
           />
         ) : (
           <span 
-            onClick={handleEdit} // Allow clicking name to edit (optional)
-            style={{ flexGrow: 1, marginRight: '10px', cursor: 'pointer' }} // Add cursor pointer
+            onClick={() => onToggleComplete(item.id)} 
+            style={{ 
+              flexGrow: 1, 
+              marginRight: '10px', 
+              cursor: 'pointer', 
+              // Add conditional style for completed items if needed (text-decoration is already on <li>)
+              // color: item.completed ? 'grey' : 'inherit' // Optional: Change text color too
+            }} 
           >
             {item.name}
           </span>
