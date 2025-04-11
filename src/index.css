@@ -101,44 +101,45 @@ ul {
   margin: 0;
 }
 
+/* REMOVE global li styles - Handled by MUI Paper/ListItem now */
+/* 
 li {
   display: flex;
   align-items: center;
   padding: 0.75rem 0.5rem;
   margin-bottom: 0.5rem;
-  background-color: rgba(128, 128, 128, 0.1); /* Subtle background */
+  background-color: rgba(128, 128, 128, 0.1); 
   border-radius: 4px;
 }
 
 li span {
- flex-grow: 1; /* Allow text to take space */
- margin: 0 0.75rem !important; /* Override inline style if needed */
+ flex-grow: 1; 
+ margin: 0 0.75rem !important; 
 }
 
 li input[type="checkbox"] {
   margin-right: 0.5rem;
-  /* Optionally increase size/style checkbox */
   width: 1.2em;
   height: 1.2em;
   cursor: pointer;
 }
 
-/* Specific button styling for delete */
 li button {
   background: none;
   border: none;
-  color: #ff4d4d; /* Reddish color for delete */
+  color: #ff4d4d; 
   cursor: pointer;
   font-weight: bold;
-  padding: 0.2em 0.5em; /* Smaller padding */
-  margin-left: 0.5rem !important; /* Override inline style */
-  min-width: 30px; /* Ensure minimum tap area */
+  padding: 0.2em 0.5em; 
+  margin-left: 0.5rem !important; 
+  min-width: 30px; 
 }
 
 li button:hover {
   color: #cc0000;
-  border-color: transparent; /* Remove hover border */
+  border-color: transparent; 
 }
+*/
 
 h2 {
   margin-top: 2rem;
