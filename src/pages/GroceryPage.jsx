@@ -147,10 +147,28 @@ function GroceryPage({
         </Toolbar>
       </AppBar>
 
-      {/* Adjust Padding Top for only ONE fixed AppBar */}
+      {/* Re-add Sticky Title Header - POSITION FIXED, MATCH ELEVATION */}
+      <AppBar 
+        position="fixed"
+        color="inherit"
+        elevation={3} // Match other bars
+        sx={{ 
+          top: 56, // Adjust based on main AppBar height (default dense is 48, regular is 64)
+          zIndex: 1090, // Below main action bar
+          bgcolor: 'background.paper',
+          // Remove border styles
+        }}
+      >
+        <Toolbar variant="dense"> {/* Use dense for less height */}
+          <Typography variant="h6" component="h2" sx={{ color: 'text.primary' }}>
+            Inköpslista
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      {/* Adjust Padding Top for BOTH fixed AppBars again */}
       <Box sx={{ 
-         // Approx 64px. Use theme calculation if possible
-         pt: '64px' // ADJUST PADDING
+         pt: '112px' // ADJUST PADDING BACK (approx 64 + 48)
         }}> 
          {/* --- Modals --- */}
          {/* Refactor Add Item Modal to Dialog */}
