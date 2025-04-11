@@ -60,18 +60,22 @@ function RecipesPage({
   // Effect to scroll to bottom when recipes length increases
   useEffect(() => {
     if (recipes.length > prevRecipesLength) {
-       console.log(`[RecipesPage Debug] Condition met: recipes.length (${recipes.length}) > prevRecipesLength (${prevRecipesLength})`);
-       console.log('[RecipesPage Debug] scrollRef.current:', scrollRef.current);
-      // Scroll content to bottom after length increases
-      if (scrollRef.current) {
-        const targetScrollTop = scrollRef.current.scrollHeight;
-        console.log(`[RecipesPage Debug] Attempting to scroll to: ${targetScrollTop}`);
-        // Scroll to the bottom of the container
-        scrollRef.current.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
-        console.log('[RecipesPage Debug] scrollTo called.');
-      } else {
-        console.warn('[RecipesPage Debug] scrollRef.current was null or undefined.');
-      }
+      console.log(`[RecipesPage Debug] Condition met: recipes.length (${recipes.length}) > prevRecipesLength (${prevRecipesLength})`);
+      
+      // Introduce a timeout to allow DOM update before scrolling
+      setTimeout(() => {
+        console.log('[RecipesPage Debug] Inside setTimeout');
+        console.log('[RecipesPage Debug] scrollRef.current:', scrollRef.current);
+        if (scrollRef.current) {
+          const targetScrollTop = scrollRef.current.scrollHeight;
+          console.log(`[RecipesPage Debug] Attempting to scroll to: ${targetScrollTop}`);
+          scrollRef.current.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+          console.log('[RecipesPage Debug] scrollTo called.');
+        } else {
+          console.warn('[RecipesPage Debug] scrollRef.current was null or undefined within setTimeout.');
+        }
+      }, 0); // 0ms delay pushes execution after current event loop task
+
     }
     // Update previous length state *after* checking
     setPrevRecipesLength(recipes.length);
