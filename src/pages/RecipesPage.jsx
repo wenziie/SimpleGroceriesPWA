@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-// Remove useOutletContext if no longer needed
-// import { useOutletContext } from 'react-router-dom'; 
+import { useOutletContext } from 'react-router-dom'; // Re-import useOutletContext
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 // MUI Imports
@@ -31,8 +30,8 @@ function RecipesPage({
   addIngredientsFromRecipe,
   lastRecipeParseFailed
 }) {
-  // Remove context usage
-  // const { scrollContainerRef } = useOutletContext(); 
+  // Re-introduce context usage
+  const { scrollContainerRef } = useOutletContext(); 
 
   // State controls modal visibility for adding recipes
   const [showAddRecipe, setShowAddRecipe] = useState(false);
@@ -61,20 +60,37 @@ function RecipesPage({
     }
   }, [lastRecipeParseFailed, recipes]); 
 
-  // Effect to scroll the last item into view
+  // Effect to scroll the last item into view and adjust for AppBar
   useLayoutEffect(() => {
     if (recipes.length > prevRecipesLength) {
       if (lastItemRef.current) { 
-        console.log('[RecipesPage] New recipe. Scrolling last item into view.');
-        // Scroll the last item element into the nearest edge of the scrollable ancestor
-        lastItemRef.current.scrollIntoView({ behavior: 'auto', block: 'nearest' }); 
+        console.log('[RecipesPage] New recipe. Scrolling last item into view (start).');
+        // Scroll the top of the item to the top of the scrollable ancestor
+        lastItemRef.current.scrollIntoView({ behavior: 'auto', block: 'start' }); 
+        
+        // Now, adjust scroll position to account for the fixed AppBar
+        if (scrollContainerRef.current) {
+            const appBarHeight = 64; // Approximate AppBar height
+            const padding = 8; // Extra padding
+            const currentScrollTop = scrollContainerRef.current.scrollTop;
+            const adjustedScrollTop = currentScrollTop - appBarHeight - padding;
+            
+            // Ensure we don't scroll above the top
+            const finalScrollTop = Math.max(0, adjustedScrollTop);
+
+            console.log(`[RecipesPage] Adjusting scroll for AppBar. Current: ${currentScrollTop}, Adjusted: ${finalScrollTop}`);
+            scrollContainerRef.current.scrollTop = finalScrollTop; 
+        } else {
+             console.warn('[RecipesPage] scrollContainerRef was null when trying to adjust for AppBar.');
+        }
+
       } else {
         console.warn('[RecipesPage] lastItemRef.current was null or undefined.');
       }
     }
     setPrevRecipesLength(recipes.length);
-    // Remove scrollContainerRef from dependencies
-  }, [recipes.length, prevRecipesLength]); 
+    // Add scrollContainerRef back to dependencies
+  }, [recipes.length, prevRecipesLength, scrollContainerRef]); 
 
   const handleCloseSnackbar = (event, reason) => {
      if (reason === 'clickaway') {
