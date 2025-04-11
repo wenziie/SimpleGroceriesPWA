@@ -12,23 +12,15 @@ import Alert from '@mui/material/Alert'; // For styling Snackbar messages
 import AppBar from '@mui/material/AppBar'; // Import AppBar
 import Toolbar from '@mui/material/Toolbar'; // Import Toolbar
 import Typography from '@mui/material/Typography'; // Import Typography
+// Use Dialog components for modals
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+// import DialogActions from '@mui/material/DialogActions'; // No actions needed here
 
 // Basic style for modal content box - USE THEME VALUES
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', sm: '80%' }, // Responsive width
-  maxWidth: 500,
-  bgcolor: 'background.paper', // Use theme paper background
-  // border: '1px solid', // Let Paper handle border/elevation
-  // borderColor: 'divider',
-  // boxShadow: 24, // Let Paper/theme handle
-  p: { xs: 2, sm: 3, md: 4}, // Responsive padding
-  borderRadius: 1, // Use 8px for less roundness
-  outline: 'none', // Remove default focus outline on modal
-};
+// Remove modalStyle if using Dialog components fully
+// const modalStyle = { ... };
 
 function RecipesPage({ 
   recipes, 
@@ -105,20 +97,36 @@ function RecipesPage({
         </Toolbar>
       </AppBar>
 
-      {/* Add Recipe Modal */}
-       <Modal
-        open={showAddRecipe}
-        onClose={handleCloseAddRecipe}
-        aria-labelledby="add-recipe-modal-title"
-      >
-        <Box sx={modalStyle}>
-          <IconButton onClick={handleCloseAddRecipe} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
-            <CloseIcon />
-          </IconButton>
-          <h4 id="add-recipe-modal-title">Lägg till recept</h4>
-          <AddRecipeForm onAddRecipe={handleAddRecipeAndClose} />
-        </Box>
-      </Modal>
+      {/* Add Recipe Dialog (replaces Modal) */}
+       <Dialog 
+         open={showAddRecipe}
+         onClose={handleCloseAddRecipe}
+         aria-labelledby="add-recipe-dialog-title"
+         // Let Dialog handle width/styling based on content
+         // fullWidth 
+         // maxWidth="sm" 
+       >
+         <DialogTitle id="add-recipe-dialog-title">
+           Lägg till recept
+           {/* Optional: Add close button to title */}
+           <IconButton
+             aria-label="close"
+             onClick={handleCloseAddRecipe}
+             sx={{
+               position: 'absolute',
+               right: 8,
+               top: 8,
+               color: (theme) => theme.palette.grey[500],
+             }}
+           >
+             <CloseIcon />
+           </IconButton>
+         </DialogTitle>
+         <DialogContent dividers> {/* Add dividers for padding */}
+           <AddRecipeForm onAddRecipe={handleAddRecipeAndClose} />
+         </DialogContent>
+         {/* No DialogActions needed as submit is inside the form */}
+       </Dialog>
 
       {/* Recipe List - remove onOpenVoiceModal */}
       <RecipeList 

@@ -37,10 +37,10 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   return (
     // Wrap in Paper for structure and elevation
     <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper' }}> 
-      <ListItem alignItems="flex-start">
+      <ListItem alignItems="center">
         {/* Avatar for Image */}
         {recipe.imageUrl && (
-          <ListItemAvatar sx={{ mr: 1 }}>
+          <ListItemAvatar sx={{ mr: 1.5 }}>
             <Avatar 
               variant="rounded" // Square corners
               src={recipe.imageUrl} 
@@ -89,10 +89,10 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
                {recipe.url}
             </Link>
           }
-          sx={{ my: 1, mr: 1 }} // Add vertical margin and right margin
+          sx={{ my: 1, mr: 2 }} // Add vertical margin and right margin
         />
         {/* Action Buttons - Adjust layout */}
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 1, mr: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 1, mr: 0 }}>
            {/* Replace Button with IconButton */}
            <IconButton 
              color="primary" 
