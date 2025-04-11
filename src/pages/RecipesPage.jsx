@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
+import VoiceInput from '../components/VoiceInput'; // Import VoiceInput
 // MUI Imports
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box'; // For Modal content styling
@@ -30,16 +31,30 @@ function RecipesPage({
   addRecipe, 
   deleteRecipe, 
   addIngredientsFromRecipe,
-  lastRecipeParseFailed
+  lastRecipeParseFailed,
+  addVoiceIngredientsToList // Receive the new function
 }) {
   // State controls modal visibility
   const [showAddRecipe, setShowAddRecipe] = useState(false);
   // State for showing the parsing failure message
   const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
+  // State for voice input modal
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [currentRecipeForVoice, setCurrentRecipeForVoice] = useState(null); // Track which recipe
 
   // Handlers to open/close modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
   const handleCloseAddRecipe = () => setShowAddRecipe(false);
+
+  // Handlers for voice input modal
+  const handleOpenVoiceModal = (recipe) => {
+    setCurrentRecipeForVoice(recipe);
+    setVoiceModalOpen(true);
+  };
+  const handleCloseVoiceModal = () => {
+    setVoiceModalOpen(false);
+    setCurrentRecipeForVoice(null);
+  };
 
   // Update handler to close modal on add
   const handleAddRecipeAndClose = (url) => {
@@ -101,12 +116,31 @@ function RecipesPage({
         </Box>
       </Modal>
 
-      {/* Recipe List */}
+      {/* Recipe List - pass handleOpenVoiceModal */}
       <RecipeList 
         recipes={recipes} 
         onDeleteRecipe={deleteRecipe} 
         onAddIngredients={addIngredientsFromRecipe} 
+        onOpenVoiceModal={handleOpenVoiceModal} // Pass down the handler
       />
+
+      {/* Voice Input Modal */}
+      <Modal
+        open={voiceModalOpen}
+        onClose={handleCloseVoiceModal}
+        aria-labelledby="voice-input-modal-title"
+      >
+        <Box sx={modalStyle}>
+           <IconButton onClick={handleCloseVoiceModal} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
+            <CloseIcon />
+          </IconButton>
+           <h4 id="voice-input-modal-title">
+             Add Ingredients for "{currentRecipeForVoice?.title || 'Recipe'}"
+           </h4>
+           {/* Use VoiceInput, passing the function from App.jsx */}
+          <VoiceInput onAddItem={addVoiceIngredientsToList} /> 
+        </Box>
+      </Modal>
 
       {/* Snackbar for Parsing Failure Message */}
       <Snackbar 

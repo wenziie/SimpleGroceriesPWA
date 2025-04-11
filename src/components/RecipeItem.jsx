@@ -4,8 +4,9 @@ import IconButton from '@mui/material/IconButton'; // For consistency
 import Button from '@mui/material/Button'; // Use MUI button
 import CheckIcon from '@mui/icons-material/Check'; // Icon for success
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'; // Icon for adding
+import MicIcon from '@mui/icons-material/Mic'; // Icon for voice input
 
-function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
+function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients, onOpenVoiceModal }) {
   const [ingredientsAdded, setIngredientsAdded] = useState(false);
 
   const handleAddIngredients = () => {
@@ -54,8 +55,8 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
         </a>
       </div>
       {/* Action Buttons */}
-      <div style={{ flexShrink: 0 }}>
-        {/* Use MUI Button for adding ingredients */}
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+        {/* Add Ingredients Button (from backend parsing) */}
         <Button 
           variant="outlined" 
           size="small" 
@@ -63,12 +64,27 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
           style={{ marginRight: '0.5rem' }}
           disabled={!hasIngredients || ingredientsAdded} // Disable if no ingredients or already added
           startIcon={ingredientsAdded ? <CheckIcon /> : <AddShoppingCartIcon />}
+          title={!hasIngredients ? "Ingredients not found automatically" : (ingredientsAdded ? "Ingredients added" : "Add parsed ingredients")}
         >
-          {ingredientsAdded ? 'Added!' : 'Add Ingredients'}
+          {ingredientsAdded ? 'Added!' : 'Add Items'} {/* Shorten text */}
         </Button>
-        {/* Use MUI IconButton for deleting */}
-        <IconButton onClick={() => onDeleteRecipe(recipe.id)} size="small" title="Delete Recipe">
-          <DeleteIcon style={{ color: 'red' }} />
+        {/* Add Ingredients by Voice Button */}
+        <IconButton 
+          onClick={() => onOpenVoiceModal(recipe)}
+          size="small"
+          title="Add Ingredients by Voice"
+          style={{ marginRight: '0.5rem', color: 'var(--primary-color)' }} 
+        >
+           <MicIcon />
+        </IconButton>
+        {/* Delete Recipe Button */}
+        <IconButton 
+          onClick={() => onDeleteRecipe(recipe.id)} 
+          size="small" 
+          title="Delete Recipe"
+          style={{ color: 'red' }}
+        >
+          <DeleteIcon />
         </IconButton>
       </div>
     </li>

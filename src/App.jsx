@@ -202,6 +202,32 @@ function App() {
     }
   };
 
+  // Function to add multiple ingredients from voice transcript
+  const addVoiceIngredientsToList = (transcript) => {
+    const lines = transcript
+      .split('\\n') // Split transcript into lines
+      .map(line => line.trim()) // Trim whitespace
+      .filter(line => line !== ''); // Remove empty lines
+
+    if (lines.length === 0) return; // Exit if no lines
+
+    const newItems = lines
+      // Filter out items that already exist in the list (case-insensitive)
+      .filter(name => !items.some(item => item.name.toLowerCase() === name.toLowerCase()))
+      .map(name => ({ 
+        id: crypto.randomUUID(),
+        name: name,
+        completed: false
+      }));
+
+    if (newItems.length > 0) {
+      console.log(`[App] Adding ${newItems.length} items from voice transcript.`);
+      setItems(prevItems => [...prevItems, ...newItems]);
+    } else {
+       console.log(`[App] No new items to add from voice transcript (all might exist already).`);
+    }
+  };
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}> { /* Layout wraps the pages */}
@@ -224,6 +250,7 @@ function App() {
             deleteRecipe={deleteRecipe}
             addIngredientsFromRecipe={addIngredientsFromRecipe}
             lastRecipeParseFailed={lastRecipeParseFailed} // Pass down the flag
+            addVoiceIngredientsToList={addVoiceIngredientsToList} // Pass down the new function
           />
         } />
       </Route>

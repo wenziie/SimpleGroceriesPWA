@@ -1,12 +1,15 @@
 import React from 'react';
 import RecipeItem from './RecipeItem';
 
-function RecipeList({ recipes, onDeleteRecipe, onAddIngredients }) {
+function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, onOpenVoiceModal }) {
   return (
     <div>
-      <h2>Recipes</h2>
+      {/* Title removed as it's now in RecipesPage header */}
+      {/* <h2>Recipes</h2> */}
       {recipes.length === 0 ? (
-        <p>No recipes saved yet.</p>
+        <p style={{ textAlign: 'center', color: 'grey', marginTop: '4rem' }}>
+          No recipes saved yet. Add one using the '+' button above.
+        </p>
       ) : (
         <ul>
           {recipes.map(recipe => (
@@ -15,6 +18,7 @@ function RecipeList({ recipes, onDeleteRecipe, onAddIngredients }) {
               recipe={recipe}
               onDeleteRecipe={onDeleteRecipe}
               onAddIngredients={onAddIngredients}
+              onOpenVoiceModal={onOpenVoiceModal}
             />
           ))}
         </ul>
