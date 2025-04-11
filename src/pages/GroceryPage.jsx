@@ -156,17 +156,15 @@ function GroceryPage({
            open={showAddItem}
            onClose={handleCloseAddItem}
            aria-labelledby="add-item-dialog-title"
-           PaperProps={{ // Target the inner Paper component
+           PaperProps={{
              sx: {
-               // Add horizontal margin on mobile, auto margin on larger screens
                mx: { xs: 2, sm: 'auto' }, 
-               // Ensure width fits within margins on mobile
                width: { xs: 'calc(100% - 32px)', sm: 'auto' }, 
              }
            }}
          >
            <DialogTitle id="add-item-dialog-title">
-             Lägg till artikel
+             Lägg till artiklar
              <IconButton
                aria-label="close"
                onClick={handleCloseAddItem}

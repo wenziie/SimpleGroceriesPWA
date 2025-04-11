@@ -35,7 +35,7 @@ function AddItemForm({ onAddItem }) {
       <TextField
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
-        placeholder="Lägg till artiklar (en per rad)"
+        placeholder="Skriv artiklar (en per rad)"
         multiline 
         rows={4}
         required
