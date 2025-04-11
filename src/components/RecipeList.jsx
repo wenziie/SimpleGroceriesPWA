@@ -1,17 +1,25 @@
 import React from 'react';
 import RecipeItem from './RecipeItem';
+import List from '@mui/material/List';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 function RecipeList({ recipes, onDeleteRecipe, onAddIngredients }) {
   return (
-    <div>
+    <Box sx={{ mt: 2 }}>
       {/* Title removed as it's now in RecipesPage header */}
       {/* <h2>Recipes</h2> */}
       {recipes.length === 0 ? (
-        <p style={{ textAlign: 'center', color: 'grey', marginTop: '4rem' }}>
+        <Typography 
+          variant="body2" 
+          color="text.secondary" 
+          align="center" 
+          sx={{ mt: 8, mb: 4 }}
+        >
           No recipes saved yet. Add one using the '+' button above.
-        </p>
+        </Typography>
       ) : (
-        <ul>
+        <List disablePadding>
           {recipes.map(recipe => (
             <RecipeItem
               key={recipe.id}
@@ -20,9 +28,9 @@ function RecipeList({ recipes, onDeleteRecipe, onAddIngredients }) {
               onAddIngredients={onAddIngredients}
             />
           ))}
-        </ul>
+        </List>
       )}
-    </div>
+    </Box>
   );
 }
 

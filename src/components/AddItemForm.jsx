@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 
 // Receive onAddItem function as a prop
 function AddItemForm({ onAddItem }) {
@@ -18,17 +21,28 @@ function AddItemForm({ onAddItem }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '0.5rem' }}>
-      <textarea
+    // Use Box instead of form for layout, handle submit on button
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 /* Add margin top */ }}>
+      <TextField
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         placeholder="Lägg till artiklar (en per rad)"
-        rows={5}
+        multiline // Use multiline TextField instead of textarea
+        rows={4}
         required
-        style={{ width: '100%', resize: 'vertical', padding: '0.5em' , fontFamily: 'inherit', fontSize: '1em'}}
+        fullWidth // Take full width
+        variant="outlined" // Standard outlined style
+        sx={{ mb: 2 /* Add margin bottom */ }}
       />
-      <button type="submit" style={{ marginTop: '0.5rem', width: '100%' }}>Lägg till</button>
-    </form>
+      <Button 
+        type="submit" 
+        variant="contained" 
+        fullWidth
+        disabled={!inputValue.trim()} // Disable if input is empty
+      >
+        Lägg till
+      </Button>
+    </Box>
   );
 }
 

@@ -12,20 +12,28 @@ import AddIcon from '@mui/icons-material/Add';
 import MicIcon from '@mui/icons-material/Mic';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import CloseIcon from '@mui/icons-material/Close'; // Icon for closing modal
+import AppBar from '@mui/material/AppBar'; // Import AppBar
+import Toolbar from '@mui/material/Toolbar'; // Import Toolbar
+import Button from '@mui/material/Button'; // Import Button
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'; // Icon for clear
+import { useTheme } from '@mui/material/styles';
 
-// Basic style for modal content box
+// Basic style for modal content box - USE THEME VALUES
 const modalStyle = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '80%', // Adjust width as needed
+  width: { xs: '90%', sm: '80%' }, // Responsive width
   maxWidth: 500,
-  bgcolor: 'var(--background-color, white)', // Use background variable
-  border: '1px solid #ccc',
-  boxShadow: 24, // MUI shadow intensity
-  p: 4, // Padding
-  borderRadius: '8px'
+  bgcolor: 'background.paper', // Use theme paper background
+  // border: '1px solid', // Let Paper handle border/elevation
+  // borderColor: 'divider',
+  // Use theme's shadow (elevation) - Paper component applies this
+  // boxShadow: 24, // Default MUI shadow, let Paper/theme handle
+  p: { xs: 2, sm: 3, md: 4}, // Responsive padding
+  borderRadius: theme => theme.shape.borderRadius, // Use theme border radius
+  outline: 'none', // Remove default focus outline on modal
 };
 
 function GroceryPage({ 
@@ -68,56 +76,73 @@ function GroceryPage({
 
   return (
     <div>
-      {/* Header Actions - Update onClick to open modals */}
-      <div 
-        style={{
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          width: '100%',
-          maxWidth: '600px',
-          margin: '0 auto',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          padding: '1rem 0 0.5rem 0'
+      {/* Refactor Header Actions using AppBar */}
+      <AppBar 
+        position="sticky" 
+        color="inherit" 
+        elevation={1} 
+        sx={{ 
+           maxWidth: 'calc(600px + 3rem)',
+           left: 'auto',
+           right: 'auto',
+           mx: 'auto',
+           bgcolor: 'background.paper'
         }}
       >
-        {/* Left Action */}
-        <button 
-          onClick={handleOpenClearConfirm}
-          style={{ color: 'red', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-          disabled={items.length === 0}
-        >
-          Töm lista
-        </button> 
-        
-        {/* Right Actions (MUI Icons) - Update onClick */}
-        <div>
-          <IconButton 
-            onClick={handleOpenAddItem} 
-            title="Add Item"
-            style={{ backgroundColor: '#43CB37', borderRadius: '50%', marginRight: '0.5rem' }}
-          >
-            <AddIcon style={{ color: '#ffffff' }} />
-          </IconButton>
-          <IconButton 
-            onClick={handleOpenVoiceInput} 
-            title="Add by Voice"
-            style={{ backgroundColor: '#43CB37', borderRadius: '50%', marginRight: '0.5rem' }}
-          >
-            <MicIcon style={{ color: '#ffffff' }} />
-          </IconButton>
-          <IconButton 
-            onClick={handleOpenReminders} 
-            title="Set Reminder"
-            disabled={items.length === 0} 
-            color={items.length > 0 ? 'primary' : 'inherit'}
-          >
-            <NotificationsIcon />
-          </IconButton>
-        </div>
-      </div>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+           {/* Left Action - Use MUI Button */}
+           <Button 
+             onClick={handleOpenClearConfirm}
+             color="error" // Use error color for destructive action
+             size="small"
+             startIcon={<DeleteSweepIcon />} // Add an icon
+             disabled={items.length === 0}
+           >
+              Töm lista
+           </Button> 
+           
+           {/* Right Actions Group */}
+           <Box>
+             <IconButton 
+               onClick={handleOpenAddItem} 
+               title="Add Item"
+               // Use sx prop for better theme integration
+               sx={{ 
+                  bgcolor: 'primary.main', 
+                  color: 'primary.contrastText', // Use contrast text color
+                  mr: 1, // Add margin right using theme spacing
+                  '&:hover': { // Darken on hover
+                    bgcolor: 'primary.dark', 
+                  }
+                }}
+             >
+               <AddIcon /> 
+             </IconButton>
+             <IconButton 
+               onClick={handleOpenVoiceInput} 
+               title="Add by Voice"
+               sx={{ 
+                  bgcolor: 'primary.main', 
+                  color: 'primary.contrastText', 
+                  mr: 1, 
+                  '&:hover': { 
+                    bgcolor: 'primary.dark', 
+                  }
+               }}
+             >
+               <MicIcon /> 
+             </IconButton>
+             <IconButton 
+               onClick={handleOpenReminders} 
+               title="Set Reminder"
+               disabled={items.length === 0} 
+               color={items.length > 0 ? 'primary' : 'default'} // Use default instead of inherit
+             >
+               <NotificationsIcon />
+             </IconButton>
+           </Box>
+        </Toolbar>
+      </AppBar>
 
       {/* --- Modals --- */}
       {/* Add Item Modal */}

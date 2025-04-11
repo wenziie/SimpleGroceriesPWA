@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography'; // For text
+import Alert from '@mui/material/Alert'; // For feedback
+import Stack from '@mui/material/Stack'; // For button layout
 
 function ReminderSetter() {
   const [customDateTime, setCustomDateTime] = useState('');
@@ -78,28 +84,47 @@ function ReminderSetter() {
   }
 
   return (
-    <div style={{ marginTop: '1.5rem', /*borderTop: '1px solid #ccc',*/ paddingTop: '1rem' }}>
-      <h4>Set Reminder (In-App)</h4>
-      <p style={{ fontSize: '0.8em', fontStyle: 'italic' }}>Note: These reminders only work while the app tab is open.</p>
-      <div>
-        <button onClick={() => setReminder(30)} style={{ marginRight: '0.5rem' }}>Remind in 30 mins</button>
-        <button onClick={() => setReminder(60)} style={{ marginRight: '0.5rem' }}>Remind in 1 hour</button>
-        <button onClick={() => setReminder(120)}>Remind in 2 hours</button>
-      </div>
-      <form onSubmit={handleSetCustomReminder} style={{ marginTop: '1rem' }}>
-        <label htmlFor="custom-reminder-time" style={{ marginRight: '0.5rem'}}>Specific time:</label>
-        <input 
+    <Box sx={{ mt: 2, pt: 2 }}>
+      <Typography variant="h6" component="h4" gutterBottom>
+        Set Reminder (In-App)
+      </Typography>
+      <Typography variant="caption" component="p" sx={{ mb: 2 }}>
+        Note: These reminders only work while the app tab is open.
+      </Typography>
+      {/* Use Stack for horizontal button layout */}
+      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+        <Button variant="outlined" onClick={() => setReminder(30)}>30 mins</Button>
+        <Button variant="outlined" onClick={() => setReminder(60)}>1 hour</Button>
+        <Button variant="outlined" onClick={() => setReminder(120)}>2 hours</Button>
+      </Stack>
+      <Box component="form" onSubmit={handleSetCustomReminder} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Use TextField for datetime-local input */}
+        <TextField 
           type="datetime-local"
+          label="Specific time" // Use label prop
           id="custom-reminder-time"
           value={customDateTime}
           onChange={(e) => setCustomDateTime(e.target.value)}
-          min={getMinDateTime()} // Prevent selecting past dates
+          inputProps={{ min: getMinDateTime() }} // Pass min via inputProps
           required 
+          InputLabelProps={{
+            shrink: true, // Keep label shrunk
+          }}
+          size="small" // Make it slightly smaller
+          sx={{ flexGrow: 1 }}
         />
-        <button type="submit" style={{ marginLeft: '0.5rem' }}>Set Custom Reminder</button>
-      </form>
-      {feedback && <p style={{ marginTop: '0.5rem', color: feedback.includes('denied') || feedback.includes('Invalid') || feedback.includes('past') ? 'red' : 'green' }}>{feedback}</p>}
-    </div>
+        <Button type="submit" variant="contained">Set</Button>
+      </Box>
+      {/* Use Alert for feedback */}
+      {feedback && (
+        <Alert 
+          severity={feedback.includes('denied') || feedback.includes('Invalid') || feedback.includes('past') ? 'error' : 'success'} 
+          sx={{ mt: 2 }}
+        >
+          {feedback}
+        </Alert>
+      )}
+    </Box>
   );
 }
 

@@ -8,6 +8,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box'; // Likely still used for layout
 import Button from '@mui/material/Button'; // Likely still used for edit buttons if applicable, or future use
 import ConfirmationModal from './ConfirmationModal'; // Import the reusable modal
+// Import MUI components for list items
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper'; // To wrap the item
 
 // Remove the old modalStyle definition
 // const modalStyle = { ... };
@@ -64,73 +71,99 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
     handleCloseDeleteConfirm(); // Close modal
   };
 
+  const handleToggleClick = () => {
+    if (!isEditing) {
+      onToggleComplete(item.id);
+    }
+  };
+
+  const handleTextClick = () => {
+    if (!item.completed) { // Only allow edit if not completed
+       setIsEditing(true);
+    }
+  }
+
   return (
     <>
-      <li style={{
-        textDecoration: !isEditing && item.completed ? 'line-through' : 'none',
-        opacity: !isEditing && item.completed ? 0.6 : 1,
-        display: 'flex', 
-        alignItems: 'center', 
-        padding: '8px 0'
-      }}>
-        {/* Checkbox */}
-        <input
-          type="checkbox"
-          checked={item.completed}
-          onChange={() => !isEditing && onToggleComplete(item.id)} // Disable toggle when editing
-          disabled={isEditing}
-          style={{ marginRight: '10px', flexShrink: 0 }}
-        />
-        
-        {/* Item Name or Input Field */}
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            onBlur={handleSave} // Save when input loses focus
-            onKeyDown={handleKeyDown}
-            style={{ flexGrow: 1, marginRight: '10px', padding: '4px' }} // Basic styling
-          />
-        ) : (
-          <span 
-            onClick={() => onToggleComplete(item.id)} 
-            style={{ 
-              flexGrow: 1, 
-              marginRight: '10px', 
-              cursor: 'pointer', 
-              // Add conditional style for completed items if needed (text-decoration is already on <li>)
-              // color: item.completed ? 'grey' : 'inherit' // Optional: Change text color too
-            }} 
-          >
-            {item.name}
-          </span>
-        )}
-        
-        {/* Action Buttons */}
-        <div style={{ flexShrink: 0, opacity: 1 }}> {/* Ensure buttons are always visible */}
-          <IconButton 
-            size="small" 
-            onClick={handleEdit} 
-            title="Edit Item" 
-            disabled={isEditing} 
-            style={{ marginRight: '5px', color: 'var(--primary-color)' }} // Add back primary color
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-          {/* Delete button still opens the confirmation */}
-          <IconButton 
-            size="small" 
-            onClick={handleOpenDeleteConfirm} 
-            title="Delete Item" 
-            style={{ color: 'red' }} 
-            disabled={isEditing} 
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </div>
-      </li>
+      {/* Wrap each item in Paper for elevation/border */}
+      <Paper sx={{ mb: 1, overflow: 'hidden' /* Prevent content overflow */ }}>
+        <ListItem 
+          disablePadding // Remove default padding, Paper provides visual separation
+          sx={{ 
+             opacity: !isEditing && item.completed ? 0.6 : 1,
+             bgcolor: isEditing ? 'action.hover' : 'transparent' // Subtle bg when editing
+            }}
+        >
+          {/* Checkbox */}
+          <ListItemIcon sx={{ minWidth: 'auto', mr: 1.5 }}>
+            <Checkbox
+              edge="start"
+              checked={item.completed}
+              onChange={handleToggleClick} // Use dedicated handler
+              disabled={isEditing}
+              tabIndex={-1}
+              disableRipple
+              // Size adjusted via theme
+            />
+          </ListItemIcon>
+          
+          {/* Item Name or Input Field */}
+          {isEditing ? (
+            <TextField
+              ref={inputRef}
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onBlur={handleSave} // Save when input loses focus
+              onKeyDown={handleKeyDown}
+              variant="standard" // Use standard variant for inline look
+              fullWidth
+              autoFocus
+              sx={{ 
+                 mr: 1,
+                 // Remove underline for cleaner look
+                 '& .MuiInput-underline:before': { borderBottom: 'none' },
+                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
+                 '& .MuiInput-underline:after': { borderBottom: 'none' },
+              }}
+            />
+          ) : (
+            <ListItemText 
+              primary={item.name}
+              onClick={handleTextClick} // Use dedicated handler
+              sx={{ 
+                 textDecoration: item.completed ? 'line-through' : 'none',
+                 cursor: item.completed ? 'default' : 'pointer', // Only pointer if not completed
+                 mr: 1 // Add margin before buttons
+               }}
+            />
+          )}
+          
+          {/* Action Buttons - only show if not editing */}
+          {!isEditing && (
+             <Box sx={{ display: 'flex', flexShrink: 0 }}>
+               <IconButton 
+                 edge="end"
+                 size="small" 
+                 onClick={handleEdit} 
+                 title="Edit Item" 
+                 disabled={item.completed} // Disable edit if completed
+                 sx={{ mr: 0.5 }} 
+               >
+                 <EditIcon fontSize="small" color={item.completed ? 'disabled' : 'action'} />
+               </IconButton>
+               <IconButton 
+                 edge="end"
+                 size="small" 
+                 onClick={handleOpenDeleteConfirm} 
+                 title="Delete Item" 
+                 sx={{ color: 'error.main' }} // Use theme error color
+               >
+                 <DeleteIcon fontSize="small" />
+               </IconButton>
+            </Box>
+          )}
+        </ListItem>
+      </Paper>
 
       {/* Use the reusable ConfirmationModal */}
       <ConfirmationModal

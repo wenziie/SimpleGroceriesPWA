@@ -4,6 +4,15 @@ import IconButton from '@mui/material/IconButton'; // For consistency
 import Button from '@mui/material/Button'; // Use MUI button
 import CheckIcon from '@mui/icons-material/Check'; // Icon for success
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'; // Icon for adding
+// MUI List Imports
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link'; // For clickable URL
+import Paper from '@mui/material/Paper'; // To wrap item
+import Box from '@mui/material/Box'; // For layout
 
 function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   const [ingredientsAdded, setIngredientsAdded] = useState(false);
@@ -26,58 +35,68 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
 
   return (
-    <li style={{
-      display: 'flex',
-      alignItems: 'center',
-      marginBottom: '1rem',
-      paddingBottom: '1rem',
-      borderBottom: '1px solid #eee'
-    }}>
-      {/* Display image if available */}
-      {recipe.imageUrl && (
-        <img 
-          src={recipe.imageUrl} 
-          alt={`Thumbnail for ${recipe.title}`}
-          style={{ width: '60px', height: '60px', objectFit: 'cover', marginRight: '1rem', borderRadius: '4px' }}
-          onError={(e) => { e.target.style.display = 'none' }} // Hide if image fails to load
+    // Wrap in Paper for structure and elevation
+    <Paper sx={{ mb: 1.5, overflow: 'hidden' }}> 
+      <ListItem alignItems="flex-start" disablePadding>
+        {/* Avatar for Image */}
+        {recipe.imageUrl && (
+          <ListItemAvatar sx={{ mr: 1 }}>
+            <Avatar 
+              variant="rounded" // Square corners
+              src={recipe.imageUrl} 
+              alt={`Thumbnail for ${recipe.title}`}
+              sx={{ width: 56, height: 56 }}
+              // onError prop could be added if needed
+            />
+          </ListItemAvatar>
+        )}
+        {/* Main Text Content */}
+        <ListItemText
+          primary={
+            // Use Typography for better control
+            <Typography variant="body1" component="span" sx={{ fontWeight: 'medium' }}>
+              {recipe.title}
+            </Typography>
+          }
+          secondary={
+            <Link 
+              href={recipe.url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ wordBreak: 'break-all', display: 'block', mt: 0.5 }}
+            >
+               {recipe.url}
+            </Link>
+          }
+          sx={{ my: 1, mr: 1 }} // Add vertical margin and right margin
         />
-      )}
-      {/* Info Section (Title + URL) */}
-      <div style={{ flexGrow: 1, marginRight: '1rem' }}>
-        <a href={recipe.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>
-            {recipe.title} {/* Display Title */}
-          </span>
-          <span style={{ fontSize: '0.8em', color: 'grey', wordBreak: 'break-all' }}>
-             {recipe.url} {/* Keep URL subtle */}
-          </span>
-        </a>
-      </div>
-      {/* Action Buttons */}
-      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-        {/* Add Ingredients Button (from backend parsing) */}
-        <Button 
-          variant="outlined" 
-          size="small" 
-          onClick={handleAddIngredients} 
-          style={{ marginRight: '0.5rem' }}
-          disabled={!hasIngredients || ingredientsAdded} // Disable if no ingredients or already added
-          startIcon={ingredientsAdded ? <CheckIcon /> : <AddShoppingCartIcon />}
-          title={!hasIngredients ? "Ingredients not found automatically" : (ingredientsAdded ? "Ingredients added" : "Add parsed ingredients")}
-        >
-          {ingredientsAdded ? 'Added!' : 'Add Items'} {/* Shorten text */}
-        </Button>
-        {/* Delete Recipe Button */}
-        <IconButton 
-          onClick={() => onDeleteRecipe(recipe.id)} 
-          size="small" 
-          title="Delete Recipe"
-          style={{ color: 'red' }}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </div>
-    </li>
+        {/* Action Buttons */}
+        <Box sx={{ display: 'flex', flexDirection:'column', alignItems: 'flex-end', justifyContent: 'center', ml: 'auto', my: 1, mr: 1 }}>
+          <Button 
+            variant="contained" // Use contained for primary action
+            color="primary"
+            size="small" 
+            onClick={handleAddIngredients} 
+            sx={{ mb: 0.5, minWidth: '100px' }} // Add margin bottom and min width
+            disabled={!hasIngredients || ingredientsAdded}
+            startIcon={ingredientsAdded ? <CheckIcon fontSize="small"/> : <AddShoppingCartIcon fontSize="small"/>}
+            title={!hasIngredients ? "Ingredients not found" : (ingredientsAdded ? "Added" : "Add items")}
+          >
+            {ingredientsAdded ? 'Added' : 'Add Items'}
+          </Button>
+          <IconButton 
+            onClick={() => onDeleteRecipe(recipe.id)} 
+            size="small" 
+            title="Delete Recipe"
+            sx={{ color: 'error.main' }} // Use theme error color
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      </ListItem>
+    </Paper>
   );
 }
 

@@ -13,19 +13,21 @@ import AppBar from '@mui/material/AppBar'; // Import AppBar
 import Toolbar from '@mui/material/Toolbar'; // Import Toolbar
 import Typography from '@mui/material/Typography'; // Import Typography
 
-// Basic style for modal content box (can share or redefine)
+// Basic style for modal content box - USE THEME VALUES
 const modalStyle = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '80%',
+  width: { xs: '90%', sm: '80%' }, // Responsive width
   maxWidth: 500,
-  bgcolor: 'var(--background-color, white)',
-  border: '1px solid #ccc',
-  boxShadow: 24,
-  p: 4,
-  borderRadius: '8px'
+  bgcolor: 'background.paper', // Use theme paper background
+  // border: '1px solid', // Let Paper handle border/elevation
+  // borderColor: 'divider',
+  // boxShadow: 24, // Let Paper/theme handle
+  p: { xs: 2, sm: 3, md: 4}, // Responsive padding
+  borderRadius: theme => theme.shape.borderRadius, // Use theme border radius
+  outline: 'none', // Remove default focus outline on modal
 };
 
 function RecipesPage({ 

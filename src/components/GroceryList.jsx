@@ -1,5 +1,8 @@
 import React from 'react';
 import GroceryItem from './GroceryItem';
+import List from '@mui/material/List';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 // Removed onClearCompleted prop as it's handled in the page header
 function GroceryList({ items, onToggleComplete, onDeleteItem, onEditItem }) {
@@ -9,26 +12,23 @@ function GroceryList({ items, onToggleComplete, onDeleteItem, onEditItem }) {
   // const completedItems = items.filter(item => item.completed);
 
   return (
-    <div>
-      {/* Heading removed as it's handled in the page header */}
-      {/* <h2>Inköpslista</h2> */}
-      
+    <Box sx={{ mt: 2 }}> {/* Add margin top */}
       {/* Render message if the entire list is empty */}
       {items.length === 0 && 
-        <p 
-          style={{
-            textAlign: 'center', 
-            color: 'grey', 
-            marginTop: '4rem'
-          }}
+        <Typography 
+          variant="body2" 
+          color="text.secondary" 
+          align="center" 
+          sx={{ mt: 8, mb: 4 }} // More margin
         >
             Din inköpslista är tom. Tryck på '+' eller mikrofonen för att lägga till artiklar.
-        </p>
+        </Typography>
       }
       
-      {/* Render single list with all items */}
+      {/* Render list using MUI List */}
       {items.length > 0 && (
-        <ul>
+        // Disable padding on List if GroceryItem itself will have padding/margins
+        <List disablePadding>
           {items.map(item => (
             <GroceryItem
               key={item.id}
@@ -38,12 +38,12 @@ function GroceryList({ items, onToggleComplete, onDeleteItem, onEditItem }) {
               onEditItem={onEditItem}
             />
           ))}
-        </ul>
+        </List>
       )}
 
       {/* Remove completed items section */}
       {/* {completedItems.length > 0 && ( ... )} */}
-    </div>
+    </Box>
   );
 }
 
