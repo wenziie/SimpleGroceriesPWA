@@ -19,7 +19,7 @@ function RecipeList({ recipes, onDeleteRecipe, onAddIngredients }) {
           No recipes saved yet. Add one using the '+' button above.
         </Typography>
       ) : (
-        <List disablePadding>
+        <List>
           {recipes.map(recipe => (
             <RecipeItem
               key={recipe.id}

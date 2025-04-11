@@ -27,8 +27,8 @@ function GroceryList({ items, onToggleComplete, onDeleteItem, onEditItem }) {
       
       {/* Render list using MUI List */}
       {items.length > 0 && (
-        // Disable padding on List if GroceryItem itself will have padding/margins
-        <List disablePadding>
+        // Remove disablePadding to restore default item padding
+        <List /* disablePadding */>
           {items.map(item => (
             <GroceryItem
               key={item.id}

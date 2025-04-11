@@ -88,14 +88,13 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
       {/* Wrap each item in Paper for elevation/border */}
       <Paper sx={{ mb: 1, overflow: 'hidden' /* Prevent content overflow */ }}>
         <ListItem 
-          disablePadding // Remove default padding, Paper provides visual separation
           sx={{ 
              opacity: !isEditing && item.completed ? 0.6 : 1,
              bgcolor: isEditing ? 'action.hover' : 'transparent' // Subtle bg when editing
             }}
         >
           {/* Checkbox */}
-          <ListItemIcon sx={{ minWidth: 'auto', mr: 1.5 }}>
+          <ListItemIcon sx={{ minWidth: 'auto' }}>
             <Checkbox
               edge="start"
               checked={item.completed}
@@ -133,7 +132,6 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
               sx={{ 
                  textDecoration: item.completed ? 'line-through' : 'none',
                  cursor: item.completed ? 'default' : 'pointer', // Only pointer if not completed
-                 mr: 1 // Add margin before buttons
                }}
             />
           )}
