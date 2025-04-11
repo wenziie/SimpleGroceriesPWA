@@ -99,8 +99,8 @@ def clean_ingredient_text(text):
     return cleaned
 
 def scrape_ingredients_fallback(html_content, url):
-    \"\"\"Fallback HTML scraping for specific sites.\"\"\"
-    print(f\"Attempting fallback HTML scraping for {url}\", flush=True)
+    """Fallback HTML scraping for specific sites."""
+    print(f"Attempting fallback HTML scraping for {url}", flush=True)
     soup = BeautifulSoup(html_content, 'html.parser')
     ingredients = []
     scraped_successfully = False
@@ -117,7 +117,7 @@ def scrape_ingredients_fallback(html_content, url):
                  if not items: # Check within divs if no LIs
                     items = ingredient_section.find_all('div', recursive=False) # Non-recursive to avoid nesting issues
                  ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
-                 print(f\"ICA Scraper: Found {len(ingredients)} potential ingredients.\", flush=True)
+                 print(f"ICA Scraper: Found {len(ingredients)} potential ingredients.", flush=True)
                  scraped_successfully = len(ingredients) > 0
                  
         elif 'koket.se' in hostname:
@@ -141,7 +141,7 @@ def scrape_ingredients_fallback(html_content, url):
                          potential_ingredients.append(text)
                 # Simple deduplication if necessary (due to broad search)
                 ingredients = list(dict.fromkeys(potential_ingredients))
-                print(f\"Koket Scraper: Found {len(ingredients)} potential ingredients.\", flush=True)
+                print(f"Koket Scraper: Found {len(ingredients)} potential ingredients.", flush=True)
                 scraped_successfully = len(ingredients) > 0
 
         elif 'arla.se' in hostname:
@@ -151,14 +151,14 @@ def scrape_ingredients_fallback(html_content, url):
                 # Often uses <p> tags directly under the section or within a list
                 items = ingredient_section.find_all(['li', 'p'])
                 ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
-                print(f\"Arla Scraper: Found {len(ingredients)} potential ingredients.\", flush=True)
+                print(f"Arla Scraper: Found {len(ingredients)} potential ingredients.", flush=True)
                 scraped_successfully = len(ingredients) > 0
 
     except Exception as e:
-        print(f\"Error during fallback scraping for {url}: {e}\", flush=True)
+        print(f"Error during fallback scraping for {url}: {e}", flush=True)
         # Don't crash, just return empty list if scraping fails
 
-    print(f\"Fallback scraping finished. Scraped successfully: {scraped_successfully}. Found ingredients: {ingredients}\", flush=True)
+    print(f"Fallback scraping finished. Scraped successfully: {scraped_successfully}. Found ingredients: {ingredients}", flush=True)
     return [ing for ing in ingredients if ing] # Final filter for empty strings
 
 # --- Main Handler Class ---
@@ -238,7 +238,7 @@ class handler(BaseHTTPRequestHandler):
             if json_ld_data:
                 title = json_ld_data.get('name', title) # Use JSON-LD name if available
                 image_url = get_image_url(json_ld_data, response.url) or image_url # Use JSON-LD image if available
-                print(f\"Image URL after get_image_url: {image_url}\", flush=True)
+                print(f"Image URL after get_image_url: {image_url}", flush=True)
                 ingredients = get_ingredients_from_json_ld(json_ld_data)
                 
                 if ingredients:
@@ -261,7 +261,7 @@ class handler(BaseHTTPRequestHandler):
                 # Fallback image scraping using og:image
                 if not image_url and og_image and og_image.get('content'):
                     image_url = urllib.parse.urljoin(response.url, og_image['content'])
-                    print(f\"Used fallback og:image for image URL: {image_url}\", flush=True)
+                    print(f"Used fallback og:image for image URL: {image_url}", flush=True)
 
                 ingredients = scrape_ingredients_fallback(html_content, response.url)
 
@@ -302,10 +302,19 @@ class handler(BaseHTTPRequestHandler):
              print(f"--- Function End. Total Time: {end_time - start_time:.2f} seconds ---", flush=True)
              
     def is_valid_url(self, url):
+        """Checks if a string is a valid HTTP/HTTPS URL."""
         try:
             result = urllib.parse.urlparse(url)
             return all([result.scheme in ['http', 'https'], result.netloc]) # Check scheme too
         except ValueError:
             return False
+
+    def _send_response(self, status_code, body_dict):
+        """Helper to send JSON responses."""
+        self.send_response(status_code)
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*') # Basic CORS for Vercel dev
+        self.end_headers()
+        self.wfile.write(json.dumps(body_dict).encode('utf-8'))
 
 # This setup allows Vercel to run the handler class. 
