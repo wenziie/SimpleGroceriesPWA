@@ -68,9 +68,10 @@ function RecipesPage({
         console.log('[RecipesPage Debug] scrollRef.current:', scrollRef.current);
         if (scrollRef.current) {
           const targetScrollTop = scrollRef.current.scrollHeight;
-          console.log(`[RecipesPage Debug] Attempting to scroll to: ${targetScrollTop}`);
-          scrollRef.current.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
-          console.log('[RecipesPage Debug] scrollTo called (useLayoutEffect).');
+          console.log(`[RecipesPage Debug] Attempting to scroll INSTANTLY to: ${targetScrollTop}`);
+          // Try instant scroll instead of smooth
+          scrollRef.current.scrollTo({ top: targetScrollTop /*, behavior: 'smooth' */ }); 
+          console.log('[RecipesPage Debug] scrollTo called (useLayoutEffect - instant).');
         } else {
           console.warn('[RecipesPage Debug] scrollRef.current was null or undefined within setTimeout (useLayoutEffect).');
         }
