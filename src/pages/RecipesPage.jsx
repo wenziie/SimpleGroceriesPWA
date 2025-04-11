@@ -60,10 +60,10 @@ function RecipesPage({
   };
 
   return (
-    <div>
-      {/* Refactor Header using AppBar */}
+    <Box> { /* Wrap page content in Box */ }
+      {/* Refactor Header using AppBar - POSITION FIXED */}
       <AppBar 
-        position="sticky" 
+        position="fixed" // CHANGE to fixed
         color="inherit" // Use theme background, not primary/secondary color
         elevation={1} // Subtle elevation
         sx={{ 
@@ -73,7 +73,8 @@ function RecipesPage({
              left: 'auto', // Allow margin auto to work
              right: 'auto', 
              mx: 'auto', // Center the AppBar itself
-             bgcolor: 'background.paper' // Ensure paper background
+             bgcolor: 'background.paper', // Ensure paper background
+             zIndex: 1100 // Ensure above content
            }}
       >
         <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -97,57 +98,65 @@ function RecipesPage({
         </Toolbar>
       </AppBar>
 
-      {/* Add Recipe Dialog (replaces Modal) */}
-       <Dialog 
-         open={showAddRecipe}
-         onClose={handleCloseAddRecipe}
-         aria-labelledby="add-recipe-dialog-title"
-         // Let Dialog handle width/styling based on content
-         // fullWidth 
-         // maxWidth="sm" 
-       >
-         <DialogTitle id="add-recipe-dialog-title">
-           Lägg till recept
-           {/* Optional: Add close button to title */}
-           <IconButton
-             aria-label="close"
-             onClick={handleCloseAddRecipe}
-             sx={{
-               position: 'absolute',
-               right: 8,
-               top: 8,
-               color: (theme) => theme.palette.grey[500],
-             }}
-           >
-             <CloseIcon />
-           </IconButton>
-         </DialogTitle>
-         <DialogContent dividers> {/* Add dividers for padding */}
-           <AddRecipeForm onAddRecipe={handleAddRecipeAndClose} />
-         </DialogContent>
-         {/* No DialogActions needed as submit is inside the form */}
-       </Dialog>
+      {/* Add Padding Top to account for the fixed AppBar */}
+      <Box sx={{ 
+         // Approx 64px. Use theme calculation if possible
+         // Example: pt: theme => `${theme.mixins.toolbar[theme.breakpoints.up('sm')]?.minHeight || 64}px`
+         pt: '64px' // Use fixed value for now, adjust if needed
+        }}> 
 
-      {/* Recipe List - remove onOpenVoiceModal */}
-      <RecipeList 
-        recipes={recipes} 
-        onDeleteRecipe={deleteRecipe} 
-        onAddIngredients={addIngredientsFromRecipe} 
-      />
+         {/* Add Recipe Dialog (replaces Modal) */}
+         <Dialog 
+           open={showAddRecipe}
+           onClose={handleCloseAddRecipe}
+           aria-labelledby="add-recipe-dialog-title"
+           // Let Dialog handle width/styling based on content
+           // fullWidth 
+           // maxWidth="sm" 
+         >
+           <DialogTitle id="add-recipe-dialog-title">
+             Lägg till recept
+             {/* Optional: Add close button to title */}
+             <IconButton
+               aria-label="close"
+               onClick={handleCloseAddRecipe}
+               sx={{
+                 position: 'absolute',
+                 right: 8,
+                 top: 8,
+                 color: (theme) => theme.palette.grey[500],
+               }}
+             >
+               <CloseIcon />
+             </IconButton>
+           </DialogTitle>
+           <DialogContent dividers> {/* Add dividers for padding */}
+             <AddRecipeForm onAddRecipe={handleAddRecipeAndClose} />
+           </DialogContent>
+           {/* No DialogActions needed as submit is inside the form */}
+         </Dialog>
 
-      {/* Snackbar for Parsing Failure Message */}
-      <Snackbar 
-        open={showParseFailedMsg} 
-        autoHideDuration={6000} // Hide after 6 seconds
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Position
-      >
-        <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
-           Ingredients could not be auto added. This can be due to the website's formatting. You can try to add the ingredients manually instead.
-        </Alert>
-      </Snackbar>
+         {/* Recipe List - remove onOpenVoiceModal */}
+         <RecipeList 
+           recipes={recipes} 
+           onDeleteRecipe={deleteRecipe} 
+           onAddIngredients={addIngredientsFromRecipe} 
+         />
 
-    </div>
+         {/* Snackbar for Parsing Failure Message */}
+         <Snackbar 
+           open={showParseFailedMsg} 
+           autoHideDuration={6000} // Hide after 6 seconds
+           onClose={handleCloseSnackbar}
+           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Position
+         >
+           <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+              Ingredients could not be auto added. This can be due to the website's formatting. You can try to add the ingredients manually instead.
+           </Alert>
+         </Snackbar>
+
+      </Box> { /* Close content Box */ }
+    </Box>
   );
 }
 

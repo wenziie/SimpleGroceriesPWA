@@ -79,10 +79,10 @@ function GroceryPage({
   }
 
   return (
-    <div>
-      {/* Refactor Header Actions using AppBar */}
+    <Box> { /* Wrap page content in Box */ }
+      {/* Refactor Header Actions using AppBar - POSITION FIXED */}
       <AppBar 
-        position="sticky" 
+        position="fixed" // CHANGE to fixed
         color="inherit" 
         elevation={1} 
         sx={{ 
@@ -90,7 +90,8 @@ function GroceryPage({
            left: 'auto',
            right: 'auto',
            mx: 'auto',
-           bgcolor: 'background.paper'
+           bgcolor: 'background.paper',
+           zIndex: 1100 // Ensure above content
         }}
       >
         <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -148,15 +149,17 @@ function GroceryPage({
         </Toolbar>
       </AppBar>
 
-      {/* Sticky Title Header */}
+      {/* Sticky Title Header - POSITION FIXED */}
       <AppBar 
-        position="sticky"
+        position="fixed" // CHANGE to fixed
         color="inherit"
-        elevation={0} // No shadow needed, just background
+        elevation={0} 
         sx={{ 
-          top: 64, // Adjust based on main AppBar height (default is 64px, check if different)
-          zIndex: 9, // Below main AppBar
-          maxWidth: 'calc(600px + 3rem)', 
+          // Calculate top based on default AppBar height (adjust if theme changes it)
+          top: 56, // MUI default dense is 48, regular is 64. Check actual height or use theme
+          // top: theme => `calc(${theme.mixins.toolbar.minHeight}px)`, // More robust if theme changes
+          zIndex: 1090, // Below main action bar
+          maxWidth: 'calc(600px + 3rem)',
           left: 'auto',
           right: 'auto',
           mx: 'auto',
@@ -171,92 +174,100 @@ function GroceryPage({
           </Typography>
         </Toolbar>
       </AppBar>
+      
+      {/* Add Padding Top to account for BOTH fixed AppBars */}
+      <Box sx={{ 
+         // Need padding equal to combined height of both AppBars
+         // Approx 64px + 48px = 112px. Use theme calculation if possible
+         // Example: pt: theme => `calc(${theme.mixins.toolbar[theme.breakpoints.up('sm')]?.minHeight || 64}px + ${theme.mixins.toolbar.minHeight}px)`
+         pt: '112px' // Use fixed value for now, adjust if needed
+       }}> 
+         {/* --- Modals --- */}
+         {/* Refactor Add Item Modal to Dialog */}
+         <Dialog
+           open={showAddItem}
+           onClose={handleCloseAddItem}
+           aria-labelledby="add-item-dialog-title"
+         >
+           <DialogTitle id="add-item-dialog-title">
+             Lägg till artikel
+             <IconButton
+               aria-label="close"
+               onClick={handleCloseAddItem}
+               sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+             >
+               <CloseIcon />
+             </IconButton>
+           </DialogTitle>
+           <DialogContent dividers>
+             <AddItemForm onAddItem={handleAddItemAndClose} /> { /* Pass the closing handler */ }
+           </DialogContent>
+         </Dialog>
 
-      {/* --- Modals --- */}
-      {/* Refactor Add Item Modal to Dialog */}
-      <Dialog
-        open={showAddItem}
-        onClose={handleCloseAddItem}
-        aria-labelledby="add-item-dialog-title"
-      >
-        <DialogTitle id="add-item-dialog-title">
-          Lägg till artikel
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseAddItem}
-            sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          <AddItemForm onAddItem={handleAddItemAndClose} /> { /* Pass the closing handler */ }
-        </DialogContent>
-      </Dialog>
+         {/* Refactor Voice Input Modal to Dialog */}
+         <Dialog
+           open={showVoiceInput}
+           onClose={handleCloseVoiceInput}
+           aria-labelledby="voice-input-dialog-title"
+         >
+            <DialogTitle id="voice-input-dialog-title">
+             Lägg till med röst
+              <IconButton
+                aria-label="close"
+                onClick={handleCloseVoiceInput}
+                sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+              >
+               <CloseIcon />
+             </IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
+              <VoiceInput onAddItem={addItem} /> 
+            </DialogContent>
+         </Dialog>
 
-      {/* Refactor Voice Input Modal to Dialog */}
-      <Dialog
-        open={showVoiceInput}
-        onClose={handleCloseVoiceInput}
-        aria-labelledby="voice-input-dialog-title"
-      >
-         <DialogTitle id="voice-input-dialog-title">
-          Lägg till med röst
-           <IconButton
-             aria-label="close"
-             onClick={handleCloseVoiceInput}
-             sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
-           >
-            <CloseIcon />
-          </IconButton>
-         </DialogTitle>
-         <DialogContent dividers>
-           <VoiceInput onAddItem={addItem} /> 
-         </DialogContent>
-      </Dialog>
+         {/* Refactor Reminder Modal to Dialog */}
+         <Dialog
+           open={showReminders}
+           onClose={handleCloseReminders}
+           aria-labelledby="reminder-dialog-title"
+         >
+           <DialogTitle id="reminder-dialog-title">
+             Set Reminder
+             <IconButton
+               aria-label="close"
+               onClick={handleCloseReminders}
+               sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+             >
+               <CloseIcon />
+             </IconButton>
+           </DialogTitle>
+           <DialogContent dividers>
+             <ReminderSetter />
+           </DialogContent>
+         </Dialog>
 
-      {/* Refactor Reminder Modal to Dialog */}
-      <Dialog
-        open={showReminders}
-        onClose={handleCloseReminders}
-        aria-labelledby="reminder-dialog-title"
-      >
-        <DialogTitle id="reminder-dialog-title">
-          Set Reminder
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseReminders}
-            sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          <ReminderSetter />
-        </DialogContent>
-      </Dialog>
+         {/* --- Confirmation Modals --- */}
+         {/* Clear List Confirmation Modal */}
+         <ConfirmationModal
+           open={showClearConfirm}
+           onClose={handleCloseClearConfirm}
+           onConfirm={handleConfirmClear}
+           title="Bekräfta tömning"
+           message="Är du säker på att du vill tömma hela listan?"
+           confirmText="Ja, töm listan"
+           cancelText="Avbryt"
+           confirmColor="error" // Use red for destructive action
+         />
 
-      {/* --- Confirmation Modals --- */}
-      {/* Clear List Confirmation Modal */}
-      <ConfirmationModal
-        open={showClearConfirm}
-        onClose={handleCloseClearConfirm}
-        onConfirm={handleConfirmClear}
-        title="Bekräfta tömning"
-        message="Är du säker på att du vill tömma hela listan?"
-        confirmText="Ja, töm listan"
-        cancelText="Avbryt"
-        confirmColor="error" // Use red for destructive action
-      />
-
-      {/* Grocery List */}
-      <GroceryList 
-        items={items} 
-        onToggleComplete={toggleComplete} 
-        onDeleteItem={deleteItem} 
-        onEditItem={editItem}
-      />
-    </div>
+         {/* Grocery List */}
+         <GroceryList 
+           items={items} 
+           onToggleComplete={toggleComplete} 
+           onDeleteItem={deleteItem} 
+           onEditItem={editItem}
+         />
+      </Box> { /* Close content Box */ }
+    </Box>
   );
 }
 

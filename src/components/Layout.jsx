@@ -26,17 +26,19 @@ function Layout() {
   };
 
   return (
-    // Use Box for overall flex container
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+    // Use Box for overall flex container, height 100vh
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', bgcolor: 'background.default' }}>
       
-      {/* Use Container to constrain main content width and center */}
-      <Container component="main" sx={{ flexGrow: 1, py: 3 }}>
-        {/* Outlet renders the matched child route component */}
-        <Outlet />
-      </Container>
+      {/* Main Content Area - Make this independently scrollable */}
+      <Box component="main" sx={{ flexGrow: 1, overflowY: 'auto', pb: 7 /* Add padding-bottom for BottomNav height */ }}>
+         {/* Container still useful for max-width and centering */}
+         <Container sx={{ py: 3 }}> 
+           <Outlet />
+         </Container>
+      </Box>
 
-      {/* Use Paper for elevated BottomNavigation */}
-      <Paper sx={{ position: 'sticky', bottom: 0, left: 0, right: 0 }} elevation={3}>
+      {/* Bottom Navigation - Position fixed at the bottom */}
+      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1100 /* Ensure it's above content */ }} elevation={3}>
         <BottomNavigation
           showLabels
           value={value} // Controlled component
