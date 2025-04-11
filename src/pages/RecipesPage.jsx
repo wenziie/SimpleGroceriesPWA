@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 // MUI Imports
@@ -57,22 +57,22 @@ function RecipesPage({
     }
   }, [lastRecipeParseFailed, recipes]); 
 
-  // Effect to scroll to bottom when recipes length increases
-  useEffect(() => {
+  // Effect to scroll to bottom when recipes length increases - USE useLayoutEffect
+  useLayoutEffect(() => {
     if (recipes.length > prevRecipesLength) {
-      console.log(`[RecipesPage Debug] Condition met: recipes.length (${recipes.length}) > prevRecipesLength (${prevRecipesLength})`);
+      console.log(`[RecipesPage Debug] Condition met (useLayoutEffect): recipes.length (${recipes.length}) > prevRecipesLength (${prevRecipesLength})`);
       
-      // Introduce a timeout to allow DOM update before scrolling
+      // Introduce a timeout to allow DOM update before scrolling (keep as precaution)
       setTimeout(() => {
-        console.log('[RecipesPage Debug] Inside setTimeout');
+        console.log('[RecipesPage Debug] Inside setTimeout (useLayoutEffect)');
         console.log('[RecipesPage Debug] scrollRef.current:', scrollRef.current);
         if (scrollRef.current) {
           const targetScrollTop = scrollRef.current.scrollHeight;
           console.log(`[RecipesPage Debug] Attempting to scroll to: ${targetScrollTop}`);
           scrollRef.current.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
-          console.log('[RecipesPage Debug] scrollTo called.');
+          console.log('[RecipesPage Debug] scrollTo called (useLayoutEffect).');
         } else {
-          console.warn('[RecipesPage Debug] scrollRef.current was null or undefined within setTimeout.');
+          console.warn('[RecipesPage Debug] scrollRef.current was null or undefined within setTimeout (useLayoutEffect).');
         }
       }, 0); // 0ms delay pushes execution after current event loop task
 
