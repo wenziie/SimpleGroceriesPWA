@@ -185,11 +185,11 @@ function VoiceInput({ onAddItem }) {
         title={isListening ? 'Sluta lyssna' : 'Börja lyssna'} 
         size="large" 
         sx={{
-          color: isListening ? 'common.white' : 'primary.main',
-          bgcolor: isListening ? 'error.main' : 'transparent',
-          borderRadius: isListening ? '50%' : undefined,
+          color: 'common.white',
+          bgcolor: isListening ? 'error.main' : 'primary.main',
+          borderRadius: '50%',
           '&:hover': {
-            bgcolor: isListening ? 'error.dark' : 'action.hover', 
+            bgcolor: isListening ? 'error.dark' : 'primary.dark', 
           },
         }}
       >
