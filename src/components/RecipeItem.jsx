@@ -35,9 +35,9 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
 
   return (
-    // Wrap in Paper for structure and elevation
-    <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper' }}> 
-      <ListItem alignItems="center">
+    // Wrap in Paper for structure and elevation - ADD PADDING HERE
+    <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper', p: 1.5 /* Add padding */ }}> 
+      <ListItem alignItems="center" disablePadding /* REMOVE PADDING FROM LISTITEM */ >
         {/* Avatar for Image */}
         {recipe.imageUrl && (
           <ListItemAvatar sx={{ mr: 1.5 }}>

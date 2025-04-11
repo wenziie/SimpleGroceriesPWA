@@ -18,6 +18,9 @@ import Button from '@mui/material/Button'; // Import Button
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'; // Icon for clear
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
 
 // Basic style for modal content box - USE THEME VALUES
 const modalStyle = {
@@ -170,49 +173,68 @@ function GroceryPage({
       </AppBar>
 
       {/* --- Modals --- */}
-      {/* Add Item Modal */}
-      <Modal
+      {/* Refactor Add Item Modal to Dialog */}
+      <Dialog
         open={showAddItem}
         onClose={handleCloseAddItem}
-        aria-labelledby="add-item-modal-title"
+        aria-labelledby="add-item-dialog-title"
       >
-        <Box sx={modalStyle}>
-          <IconButton onClick={handleCloseAddItem} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
+        <DialogTitle id="add-item-dialog-title">
+          Lägg till artikel
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseAddItem}
+            sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+          >
             <CloseIcon />
           </IconButton>
-          <h4 id="add-item-modal-title">Lägg till artikel</h4>
-          <AddItemForm onAddItem={addItem} />
-        </Box>
-      </Modal>
+        </DialogTitle>
+        <DialogContent dividers>
+          <AddItemForm onAddItem={handleAddItemAndClose} /> { /* Pass the closing handler */ }
+        </DialogContent>
+      </Dialog>
 
-      {/* Voice Input Modal */}
-      <Modal
+      {/* Refactor Voice Input Modal to Dialog */}
+      <Dialog
         open={showVoiceInput}
         onClose={handleCloseVoiceInput}
-        aria-labelledby="voice-input-modal-title"
+        aria-labelledby="voice-input-dialog-title"
       >
-        <Box sx={modalStyle}>
-           <IconButton onClick={handleCloseVoiceInput} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
+         <DialogTitle id="voice-input-dialog-title">
+          Lägg till med röst
+           <IconButton
+             aria-label="close"
+             onClick={handleCloseVoiceInput}
+             sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+           >
             <CloseIcon />
           </IconButton>
-           {/* Note: VoiceInput needs onAddItem prop */}
-          <VoiceInput onAddItem={addItem} /> 
-        </Box>
-      </Modal>
+         </DialogTitle>
+         <DialogContent dividers>
+           <VoiceInput onAddItem={addItem} /> 
+         </DialogContent>
+      </Dialog>
 
-      {/* Reminder Modal */}
-      <Modal
+      {/* Refactor Reminder Modal to Dialog */}
+      <Dialog
         open={showReminders}
         onClose={handleCloseReminders}
-        aria-labelledby="reminder-modal-title"
+        aria-labelledby="reminder-dialog-title"
       >
-        <Box sx={modalStyle}>
-           <IconButton onClick={handleCloseReminders} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
+        <DialogTitle id="reminder-dialog-title">
+          Set Reminder
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseReminders}
+            sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+          >
             <CloseIcon />
           </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
           <ReminderSetter />
-        </Box>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       {/* --- Confirmation Modals --- */}
       {/* Clear List Confirmation Modal */}
