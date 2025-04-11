@@ -37,7 +37,6 @@ function AddItemForm({ onAddItem }) {
       <Button 
         type="submit" 
         variant="contained" 
-        fullWidth
         disabled={!inputValue.trim()} // Disable if input is empty
       >
         Lägg till
