@@ -64,15 +64,14 @@ function RecipesPage({
   useLayoutEffect(() => {
     if (recipes.length > prevRecipesLength) {
       if (bottomAnchorRef.current) { 
-        console.log('[RecipesPage] New recipe. Scrolling bottom anchor into view (end).');
+        // console.log('[RecipesPage] New recipe. Scrolling bottom anchor into view (end).'); // REMOVE LOG
         // Scroll bottom of anchor to bottom of view
         bottomAnchorRef.current.scrollIntoView({ behavior: 'auto', block: 'end' }); 
       } else {
-        console.warn('[RecipesPage] bottomAnchorRef.current was null or undefined.');
+        // console.warn('[RecipesPage] bottomAnchorRef.current was null or undefined.'); // REMOVE LOG
       }
     }
     setPrevRecipesLength(recipes.length);
-    // Remove scrollContainerRef from dependencies
   }, [recipes.length, prevRecipesLength]); 
 
   const handleCloseSnackbar = (event, reason) => {
