@@ -15,11 +15,7 @@ def extract_json_ld(html_content, url):
     print(f"Attempting JSON-LD extraction for {url}", flush=True)
     try:
         # Use extruct to find all JSON-LD blocks
-        print("--- HTML Content Snippet for Extruct ---", flush=True)
-        print(html_content[:2000], flush=True) # Log beginning of HTML
-        print("---------------------------------------", flush=True)
         metadata = extruct.extract(html_content, base_url=url, syntaxes=['json-ld'], uniform=True)
-        print(f"Extruct result: {metadata}", flush=True)
         
         if not metadata or 'json-ld' not in metadata or not metadata['json-ld']:
              print("No JSON-LD metadata found.", flush=True)
@@ -51,7 +47,6 @@ def get_image_url(recipe_data, source_url):
     if not recipe_data or not isinstance(recipe_data, dict):
         return None
 
-    print(f"Attempting to get image from JSON-LD data: {recipe_data.get('image')}", flush=True)
     image_info = recipe_data.get('image')
     
     if not image_info:
@@ -80,7 +75,6 @@ def get_ingredients_from_json_ld(recipe_data):
     if not recipe_data or not isinstance(recipe_data, dict):
         return []
         
-    print(f"Attempting to get ingredients from JSON-LD field 'recipeIngredient': {recipe_data.get('recipeIngredient')}", flush=True)
     ingredients = recipe_data.get('recipeIngredient', [])
     if isinstance(ingredients, list) and all(isinstance(i, str) for i in ingredients):
          print(f"Found {len(ingredients)} ingredients via JSON-LD recipeIngredient.", flush=True)
@@ -158,7 +152,6 @@ def scrape_ingredients_fallback(html_content, url):
         print(f"Error during fallback scraping for {url}: {e}", flush=True)
         # Don't crash, just return empty list if scraping fails
 
-    print(f"Fallback scraping finished. Scraped successfully: {scraped_successfully}. Found ingredients: {ingredients}", flush=True)
     return [ing for ing in ingredients if ing] # Final filter for empty strings
 
 # --- Main Handler Class ---
@@ -238,7 +231,6 @@ class handler(BaseHTTPRequestHandler):
             if json_ld_data:
                 title = json_ld_data.get('name', title) # Use JSON-LD name if available
                 image_url = get_image_url(json_ld_data, response.url) or image_url # Use JSON-LD image if available
-                print(f"Image URL after get_image_url: {image_url}", flush=True)
                 ingredients = get_ingredients_from_json_ld(json_ld_data)
                 
                 if ingredients:
@@ -261,7 +253,6 @@ class handler(BaseHTTPRequestHandler):
                 # Fallback image scraping using og:image
                 if not image_url and og_image and og_image.get('content'):
                     image_url = urllib.parse.urljoin(response.url, og_image['content'])
-                    print(f"Used fallback og:image for image URL: {image_url}", flush=True)
 
                 ingredients = scrape_ingredients_fallback(html_content, response.url)
 

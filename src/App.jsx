@@ -157,7 +157,6 @@ function App() {
         const data = await response.json();
         title = data.title || trimmedUrl; // Use fetched title or fallback to URL
         imageUrl = data.imageUrl; // Use fetched image URL (can be null)
-        console.log("[App.jsx] Data received from API:", data); // Log received data
         ingredients = data.ingredients || []; // Use fetched ingredients or empty list
         // Check if ingredients are empty after a successful fetch
         if (response.ok && ingredients.length === 0) {
@@ -178,7 +177,6 @@ function App() {
       imageUrl: imageUrl,
       ingredients: ingredients
     };
-    console.log("[App.jsx] Creating new recipe object:", newRecipe); // Log object before setting state
     
     setRecipes(prevRecipes => [...prevRecipes, newRecipe])
   }
