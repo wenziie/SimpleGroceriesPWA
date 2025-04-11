@@ -130,15 +130,36 @@ function RecipesPage({
         onClose={handleCloseVoiceModal}
         aria-labelledby="voice-input-modal-title"
       >
-        <Box sx={modalStyle}>
+        <Box sx={{ 
+           ...modalStyle, // Keep original styles
+           width: '90%',  // Make it wider
+           height: '85%', // Make it taller
+           display: 'flex',
+           flexDirection: 'column'
+         }}>
            <IconButton onClick={handleCloseVoiceModal} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
             <CloseIcon />
           </IconButton>
-           <h4 id="voice-input-modal-title">
+           <h4 id="voice-input-modal-title" style={{ flexShrink: 0, marginBottom: '1rem' }}>
              Add Ingredients for "{currentRecipeForVoice?.title || 'Recipe'}"
            </h4>
-           {/* Use VoiceInput, passing the function from App.jsx */}
-          <VoiceInput onAddItem={addVoiceIngredientsToList} /> 
+           {/* Iframe to display the recipe */}
+           <iframe 
+              src={currentRecipeForVoice?.url || ''} 
+              title={`Recipe: ${currentRecipeForVoice?.title || 'Recipe'}`}
+              style={{
+                width: '100%',
+                height: '60%', // Adjust height as needed, maybe 50-60%
+                border: '1px solid #ccc',
+                flexGrow: 1 // Allow iframe to take up space
+              }}
+              // Optional: sandbox attribute for security, but might break functionality
+              // sandbox="allow-scripts allow-same-origin"
+           ></iframe>
+           {/* Voice Input component below the iframe */}
+           <div style={{ flexShrink: 0, marginTop: '1rem', overflowY: 'auto' }}>
+              <VoiceInput onAddItem={addVoiceIngredientsToList} /> 
+           </div>
         </Box>
       </Modal>
 
