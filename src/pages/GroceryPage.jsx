@@ -86,10 +86,6 @@ function GroceryPage({
         color="inherit" 
         elevation={1} 
         sx={{ 
-           maxWidth: 'calc(600px + 3rem)',
-           left: 'auto',
-           right: 'auto',
-           mx: 'auto',
            bgcolor: 'background.paper',
            zIndex: 1100 // Ensure above content
         }}
@@ -159,10 +155,6 @@ function GroceryPage({
           top: 56, // MUI default dense is 48, regular is 64. Check actual height or use theme
           // top: theme => `calc(${theme.mixins.toolbar.minHeight}px)`, // More robust if theme changes
           zIndex: 1090, // Below main action bar
-          maxWidth: 'calc(600px + 3rem)',
-          left: 'auto',
-          right: 'auto',
-          mx: 'auto',
           bgcolor: 'background.paper',
           borderBottom: '1px solid',
           borderColor: 'divider'

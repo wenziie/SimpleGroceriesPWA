@@ -67,14 +67,8 @@ function RecipesPage({
         color="inherit" // Use theme background, not primary/secondary color
         elevation={1} // Subtle elevation
         sx={{ 
-            // Apply max-width and centering similar to the Container in Layout
-            // This keeps the AppBar content aligned with the page content
-             maxWidth: 'calc(600px + 3rem)', // Match container width (600px) + padding (1.5rem * 2)
-             left: 'auto', // Allow margin auto to work
-             right: 'auto', 
-             mx: 'auto', // Center the AppBar itself
-             bgcolor: 'background.paper', // Ensure paper background
-             zIndex: 1100 // Ensure above content
+            bgcolor: 'background.paper', // Ensure paper background
+            zIndex: 1100 // Ensure above content
            }}
       >
         <Toolbar sx={{ justifyContent: 'space-between' }}>
