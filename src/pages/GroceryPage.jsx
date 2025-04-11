@@ -147,8 +147,8 @@ function GroceryPage({
       {/* Adjust Padding Top for the taller AppBar (two toolbars) */}
       <Box sx={{ 
          // Approx 64px + 48px = 112px. Use theme calculation if possible
-         pt: '112px', // ADJUST PADDING
-         px: 2 // Add horizontal padding (theme spacing unit * 2)
+         pt: '112px', // Keep this padding
+         px: 3 // INCREASE horizontal padding
         }}> 
          {/* --- Modals --- */}
          {/* Refactor Add Item Modal to Dialog */}

@@ -95,8 +95,8 @@ function RecipesPage({
       {/* Add Padding Top to account for the fixed AppBar */}
       <Box sx={{ 
          // Approx 64px. Use theme calculation if possible
-         pt: '64px', // Use fixed value for now, adjust if needed
-         px: 2 // Add horizontal padding (theme spacing unit * 2)
+         pt: '64px', // Keep this padding
+         px: 3 // INCREASE horizontal padding
         }}> 
 
          {/* Add Recipe Dialog (replaces Modal) */}
