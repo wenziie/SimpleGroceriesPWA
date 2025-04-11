@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 // MUI Imports
@@ -33,15 +33,22 @@ function RecipesPage({
   const [showAddRecipe, setShowAddRecipe] = useState(false);
   // State for showing the parsing failure message
   const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
+  // Ref for the scrollable content area
+  const scrollableContentRef = useRef(null);
 
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
   const handleCloseAddRecipe = () => setShowAddRecipe(false);
 
-  // Update handler to close modal on add
-  const handleAddRecipeAndClose = (url) => {
-    addRecipe(url);
+  // Update handler to close modal on add AND scroll to top
+  const handleAddRecipeAndClose = async (url) => {
+    // Use await here if addRecipe is async (it is)
+    await addRecipe(url); 
     handleCloseAddRecipe(); // Close modal after adding
+    // Scroll content area to top
+    if (scrollableContentRef.current) {
+      scrollableContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   // Effect to watch for the parsing failure flag from App.jsx
@@ -92,12 +99,19 @@ function RecipesPage({
         </Toolbar>
       </AppBar>
 
-      {/* Add Padding Top to account for the fixed AppBar */}
-      <Box sx={{ 
-         // Approx 64px. Use theme calculation if possible
-         pt: '64px', // Keep top padding
-         px: 2 // RE-ADD horizontal padding (theme spacing unit * 2)
-        }}> 
+      {/* Add Padding Top + Add Ref to scrollable Box */}
+      <Box 
+        ref={scrollableContentRef} // Add ref here
+        sx={{ 
+           // Approx 64px. Use theme calculation if possible
+           pt: '64px', // Keep top padding
+           px: 2, // Keep horizontal padding
+           // Ensure the box itself can scroll if needed (should match layout)
+           flexGrow: 1, 
+           overflowY: 'auto', 
+           // pb required to avoid overlap with fixed bottom nav
+           pb: `calc(56px + env(safe-area-inset-bottom, 0px))`
+         }}> 
 
          {/* Add Recipe Dialog (replaces Modal) */}
          <Dialog 

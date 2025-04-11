@@ -37,10 +37,15 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   return (
     // Wrap in Paper for structure and elevation - REMOVE PADDING
     <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper' /* Remove p: 1.5 */ }}> 
-      <ListItem alignItems="center" /* REMOVE disablePadding */ >
+      <ListItem 
+         alignItems="center" 
+         // Apply explicit padding to ListItem
+         sx={{ py: 1, px: 2 }} 
+       >
         {/* Avatar for Image */}
         {recipe.imageUrl && (
-          <ListItemAvatar sx={{ mr: 1.5 }}>
+          // Remove margin from Avatar container, rely on ListItem padding
+          <ListItemAvatar sx={{ /* mr: 1.5 */ }}> 
             <Avatar 
               variant="rounded" // Square corners
               src={recipe.imageUrl} 
@@ -89,10 +94,11 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
                {recipe.url}
             </Link>
           }
-          sx={{ my: 1, mr: 2 }} // Add vertical margin and right margin
+          // Remove margin from Text container, rely on ListItem padding
+          sx={{ my: 0, mr: 1 /* Keep some right margin before buttons */ }} 
         />
         {/* Action Buttons - Adjust layout */}
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 1, mr: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0 /* Remove vertical margin */ /* mr: 0 REMOVE */ }}>
            {/* Replace Button with IconButton */}
            <IconButton 
              color="primary" 
