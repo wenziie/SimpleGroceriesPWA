@@ -11,18 +11,18 @@ import os # Import os to potentially access environment variables later if neede
 # --- Helper Functions for Parsing ---
 
 def extract_json_ld(html_content, url):
-    \"\"\"Extracts JSON-LD metadata, specifically looking for Recipe schema.\"\"\"
-    print(f\"Attempting JSON-LD extraction for {url}\", flush=True)
+    """Extracts JSON-LD metadata, specifically looking for Recipe schema."""
+    print(f"Attempting JSON-LD extraction for {url}", flush=True)
     try:
         # Use extruct to find all JSON-LD blocks
-        print(\"--- HTML Content Snippet for Extruct ---", flush=True)
+        print("--- HTML Content Snippet for Extruct ---", flush=True)
         print(html_content[:2000], flush=True) # Log beginning of HTML
-        print(\"---------------------------------------\", flush=True)
+        print("---------------------------------------", flush=True)
         metadata = extruct.extract(html_content, base_url=url, syntaxes=['json-ld'], uniform=True)
-        print(f\"Extruct result: {metadata}\", flush=True)
+        print(f"Extruct result: {metadata}", flush=True)
         
         if not metadata or 'json-ld' not in metadata or not metadata['json-ld']:
-             print(\"No JSON-LD metadata found.\", flush=True)
+             print("No JSON-LD metadata found.", flush=True)
              return None
 
         # Find the first item that looks like a Recipe
@@ -37,21 +37,21 @@ def extract_json_ld(html_content, url):
                      is_recipe = item_type == 'Recipe' or item_type == 'http://schema.org/Recipe'
                  
                  if is_recipe:
-                    print(f\"Found JSON-LD Recipe object for {url}\", flush=True)
+                    print(f"Found JSON-LD Recipe object for {url}", flush=True)
                     return item # Return the whole recipe object
         
-        print(f\"No JSON-LD object with @type 'Recipe' found for {url}\", flush=True)
+        print(f"No JSON-LD object with @type 'Recipe' found for {url}", flush=True)
         return None
     except Exception as e:
-        print(f\"Error during JSON-LD extraction for {url}: {e}\", flush=True)
+        print(f"Error during JSON-LD extraction for {url}: {e}", flush=True)
         return None
 
 def get_image_url(recipe_data, source_url):
-    \"\"\"Extracts image URL from JSON-LD data (can be complex).\"\"\"
+    """Extracts image URL from JSON-LD data (can be complex)."""
     if not recipe_data or not isinstance(recipe_data, dict):
         return None
 
-    print(f\"Attempting to get image from JSON-LD data: {recipe_data.get('image')}\", flush=True)
+    print(f"Attempting to get image from JSON-LD data: {recipe_data.get('image')}", flush=True)
     image_info = recipe_data.get('image')
     
     if not image_info:
@@ -76,22 +76,22 @@ def get_image_url(recipe_data, source_url):
     return None # No usable image found
 
 def get_ingredients_from_json_ld(recipe_data):
-    \"\"\"Extracts ingredients from the 'recipeIngredient' field.\"\"\"
+    """Extracts ingredients from the 'recipeIngredient' field."""
     if not recipe_data or not isinstance(recipe_data, dict):
         return []
         
-    print(f\"Attempting to get ingredients from JSON-LD field 'recipeIngredient': {recipe_data.get('recipeIngredient')}\", flush=True)
+    print(f"Attempting to get ingredients from JSON-LD field 'recipeIngredient': {recipe_data.get('recipeIngredient')}", flush=True)
     ingredients = recipe_data.get('recipeIngredient', [])
     if isinstance(ingredients, list) and all(isinstance(i, str) for i in ingredients):
-         print(f\"Found {len(ingredients)} ingredients via JSON-LD recipeIngredient.\", flush=True)
+         print(f"Found {len(ingredients)} ingredients via JSON-LD recipeIngredient.", flush=True)
          # Basic cleaning: remove extra whitespace
          return [re.sub(r'\\s+', ' ', ing).strip() for ing in ingredients if ing.strip()]
     else:
-        print(f\"JSON-LD found, but 'recipeIngredient' field is missing or not a list of strings.\", flush=True)
+        print(f"JSON-LD found, but 'recipeIngredient' field is missing or not a list of strings.", flush=True)
         return []
 
 def clean_ingredient_text(text):
-    \"\"\"Cleans up extracted ingredient text.\"\"\"
+    """Cleans up extracted ingredient text."""
     # Remove leading/trailing whitespace, condense multiple spaces, remove potential unicode noise
     cleaned = re.sub(r'\\s+', ' ', text).strip()
     # Optional: remove common instructional prefixes if needed (e.g., "Optional:", "For the sauce:")
