@@ -12,122 +12,105 @@ function VoiceInput({ onAddItem }) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState(null);
-  const [isSupported, setIsSupported] = useState(false);
-  const recognitionRef = useRef(null); // Ref to store the recognition instance
+  const [isSupported, setIsSupported] = useState(!!SpeechRecognition); // Check support directly
+  const recognitionRef = useRef(null); // Ref to store the CURRENT recognition instance
 
-  useEffect(() => {
-    if (SpeechRecognition) {
-      setIsSupported(true);
-      // Create the recognition instance but don't start it yet
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.lang = 'sv-SE'; // Set language to Swedish
-      recognitionRef.current.interimResults = true; // Keep interim for feedback
-      // Set continuous to false - stop after pause
-      recognitionRef.current.continuous = false; 
+  // Function to create and start a new recognition instance
+  const startListening = () => {
+    if (!isSupported || isListening) return; // Don't start if not supported or already listening
 
-      // Event Handlers for the recognition instance
-      recognitionRef.current.onresult = (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
+    console.log("Creating new SpeechRecognition instance and starting...");
+    setTranscript(''); // Clear previous transcript
+    setError(null);
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const transcriptPiece = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcriptPiece;
-          } else {
-            interimTranscript += transcriptPiece;
-          }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'sv-SE';
+    recognition.interimResults = true;
+    recognition.continuous = false; // Stop after pause
+
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcriptPiece = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcriptPiece;
+        } else {
+          interimTranscript += transcriptPiece;
         }
-        // Update state with interim or final results
-        // Prioritize final results if available
-        setTranscript(finalTranscript || interimTranscript);
-        setError(null); // Clear error on new results
-      };
-
-      recognitionRef.current.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-        let errorMessage = `Speech recognition error: ${event.error}`;
-        // Provide more user-friendly messages for common errors
-        if (event.error === 'no-speech') {
-          errorMessage = 'Ingen tal upptäcktes. Försök igen.';
-        } else if (event.error === 'audio-capture') {
-          errorMessage = 'Kunde inte komma åt mikrofonen. Kontrollera behörigheter.';
-        } else if (event.error === 'not-allowed') {
-          errorMessage = 'Åtkomst till mikrofonen nekades.';
-        }
-        setError(errorMessage);
-        setIsListening(false); // Ensure listening stops on error
-      };
-
-      recognitionRef.current.onend = () => {
-        console.log("Speech recognition ended.");
-        // Recognition ended (either manually or automatically after speech)
-        setIsListening(false); 
-      };
-
-    } else {
-      setIsSupported(false);
-      console.warn("Web Speech Recognition API is not supported by this browser.");
-    }
-
-    // Cleanup function to stop recognition if component unmounts while listening
-    return () => {
-      if (recognitionRef.current && isListening) {
-        recognitionRef.current.stop();
       }
+      setTranscript(finalTranscript || interimTranscript);
+      setError(null);
     };
-  }, []); // Empty dependency array - setup runs once
 
-  const handleToggleListen = () => {
-    if (!isSupported || !recognitionRef.current) return;
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      let errorMessage = `Speech recognition error: ${event.error}`;
+      if (event.error === 'no-speech') {
+        errorMessage = 'Ingen tal upptäcktes. Försök igen.';
+      } else if (event.error === 'audio-capture') {
+        errorMessage = 'Kunde inte komma åt mikrofonen. Kontrollera behörigheter.';
+      } else if (event.error === 'not-allowed') {
+        errorMessage = 'Åtkomst till mikrofonen nekades.';
+      }
+      setError(errorMessage);
+      setIsListening(false); // Ensure listening stops on error
+      recognitionRef.current = null; // Clear ref on error
+    };
 
-    if (isListening) {
-      console.log("Stopping recognition manually...");
-      recognitionRef.current.stop(); // Will trigger onend, setting isListening=false
-      // Transcript remains until added or next listen starts
-    } else {
-      try {
-        console.log("Starting recognition...");
-        setTranscript(''); // Clear previous transcript before starting
-        setError(null);
-        recognitionRef.current.start();
+    recognition.onend = () => {
+      console.log("Speech recognition ended.");
+      setIsListening(false); 
+      // Maybe clear ref here too? Let's see if needed.
+      // recognitionRef.current = null; 
+    };
+
+    // Store the new instance and start
+    recognitionRef.current = recognition;
+    try {
+        recognition.start();
         setIsListening(true);
-      } catch (err) {
+    } catch (err) {
         console.error("Error starting recognition:", err);
         setError("Could not start voice recognition.");
         setIsListening(false);
-      }
+        recognitionRef.current = null;
     }
   };
 
-  // Rename button/handler to reflect single addition
+  // Function to stop the current recognition instance
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      console.log("Stopping recognition manually...");
+      recognitionRef.current.stop(); // onend should set isListening=false
+      // No need to set isListening false here, let onend handle it
+      recognitionRef.current = null; // Clear the ref immediately
+    }
+  };
+
+  // Effect for cleanup on unmount
+  useEffect(() => {
+    // Return cleanup function
+    return () => {
+      stopListening(); // Call stopListening to ensure cleanup
+    };
+  }, []); // Empty dependency array, run cleanup only on unmount
+
+  const handleToggleListen = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   const handleAddItem = () => {
     const itemToAdd = transcript.trim();
     if (itemToAdd) {
       onAddItem(itemToAdd);
-      setTranscript(''); // Clear transcript after adding
-      
-      // --- Automatically restart listening with a delay --- 
-      // Check if recognition instance exists and isn't already listening
-      if (recognitionRef.current && !isListening) {
-          // Introduce a small delay before restarting
-          setTimeout(() => {
-              // Double-check state in case stop was clicked during delay
-              if (recognitionRef.current && !isListening) { 
-                  try {
-                    console.log("Auto-restarting recognition after delay...");
-                    setError(null); // Clear any previous errors
-                    recognitionRef.current.start();
-                    setIsListening(true);
-                  } catch (err) {
-                    console.error("Error auto-restarting recognition:", err);
-                    setError("Could not restart voice recognition.");
-                    setIsListening(false); // Ensure state is correct on error
-                  }
-              }
-          }, 150); // Delay in milliseconds (e.g., 150ms)
-      } 
-      // ----------------------------------------
+      // After adding, immediately start a new listening session
+      // No need to clear transcript here, startListening does it
+      startListening(); 
     }
   };
 
@@ -146,7 +129,6 @@ function VoiceInput({ onAddItem }) {
       {transcript && (
         <div style={{ margin: '1rem 0' }}>
           <p>Hörde: <strong>{transcript}</strong></p>
-          {/* Use MUI Button and update text/handler */}
           <Button variant="contained" onClick={handleAddItem} disabled={!transcript.trim()}>
             Lägg till artikel
           </Button>
