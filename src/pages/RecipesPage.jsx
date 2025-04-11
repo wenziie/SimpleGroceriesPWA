@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
-import VoiceInput from '../components/VoiceInput'; // Import VoiceInput
 // MUI Imports
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box'; // For Modal content styling
@@ -10,8 +9,6 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close'; // Icon for closing modal
 import Snackbar from '@mui/material/Snackbar'; // For showing messages
 import Alert from '@mui/material/Alert'; // For styling Snackbar messages
-import Button from '@mui/material/Button'; // Import Button
-import LinkIcon from '@mui/icons-material/Link'; // Icon for the link button
 
 // Basic style for modal content box (can share or redefine)
 const modalStyle = {
@@ -33,30 +30,16 @@ function RecipesPage({
   addRecipe, 
   deleteRecipe, 
   addIngredientsFromRecipe,
-  lastRecipeParseFailed,
-  addVoiceIngredientsToList // Receive the new function
+  lastRecipeParseFailed
 }) {
-  // State controls modal visibility
+  // State controls modal visibility for adding recipes
   const [showAddRecipe, setShowAddRecipe] = useState(false);
   // State for showing the parsing failure message
   const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
-  // State for voice input modal
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
-  const [currentRecipeForVoice, setCurrentRecipeForVoice] = useState(null); // Track which recipe
 
-  // Handlers to open/close modal
+  // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
   const handleCloseAddRecipe = () => setShowAddRecipe(false);
-
-  // Handlers for voice input modal
-  const handleOpenVoiceModal = (recipe) => {
-    setCurrentRecipeForVoice(recipe);
-    setVoiceModalOpen(true);
-  };
-  const handleCloseVoiceModal = () => {
-    setVoiceModalOpen(false);
-    setCurrentRecipeForVoice(null);
-  };
 
   // Update handler to close modal on add
   const handleAddRecipeAndClose = (url) => {
@@ -118,65 +101,12 @@ function RecipesPage({
         </Box>
       </Modal>
 
-      {/* Recipe List - pass handleOpenVoiceModal */}
+      {/* Recipe List - remove onOpenVoiceModal */}
       <RecipeList 
         recipes={recipes} 
         onDeleteRecipe={deleteRecipe} 
         onAddIngredients={addIngredientsFromRecipe} 
-        onOpenVoiceModal={handleOpenVoiceModal} // Pass down the handler
       />
-
-      {/* Voice Input Modal */}
-      <Modal
-        open={voiceModalOpen}
-        onClose={handleCloseVoiceModal}
-        aria-labelledby="voice-input-modal-title"
-      >
-        <Box sx={{ 
-           ...modalStyle, 
-           width: '90%',
-           maxHeight: '85vh', // Use maxHeight instead of height for flexibility
-           display: 'flex',
-           flexDirection: 'column',
-           overflow: 'hidden' // Prevent main box scroll
-         }}>
-           <IconButton onClick={handleCloseVoiceModal} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
-            <CloseIcon />
-          </IconButton>
-           <h4 id="voice-input-modal-title" style={{ flexShrink: 0, marginBottom: '1rem' }}>
-             Add Ingredients for "{currentRecipeForVoice?.title || 'Recipe'}"
-           </h4>
-           
-           {/* Button to open recipe in new tab */}
-           <Button
-             variant="contained"
-             startIcon={<LinkIcon />}
-             onClick={() => window.open(currentRecipeForVoice?.url, '_blank', 'noopener,noreferrer')}
-             disabled={!currentRecipeForVoice?.url}
-             style={{ marginBottom: '1.5rem', flexShrink: 0 }} // Add margin below
-           >
-              Öppna recept i webbläsare
-           </Button>
-           
-           {/* Remove iframe */}
-           {/* <iframe 
-              src={currentRecipeForVoice?.url || ''} 
-              title={`Recipe: ${currentRecipeForVoice?.title || 'Recipe'}`}
-              style={{
-                width: '100%',
-                height: '60%', 
-                border: '1px solid #ccc',
-                flexGrow: 1
-              }}
-           ></iframe> */}
-           
-           {/* Voice Input component below the button */}
-           {/* Make this div scrollable if content overflows */}
-           <div style={{ flexGrow: 1, overflowY: 'auto', marginTop: '0' /* Remove top margin */ }}>
-              <VoiceInput onAddItem={addVoiceIngredientsToList} /> 
-           </div>
-        </Box>
-      </Modal>
 
       {/* Snackbar for Parsing Failure Message */}
       <Snackbar 

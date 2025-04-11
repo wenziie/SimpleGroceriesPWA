@@ -1,7 +1,7 @@
 import React from 'react';
 import RecipeItem from './RecipeItem';
 
-function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, onOpenVoiceModal }) {
+function RecipeList({ recipes, onDeleteRecipe, onAddIngredients }) {
   return (
     <div>
       {/* Title removed as it's now in RecipesPage header */}
@@ -18,7 +18,6 @@ function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, onOpenVoiceModa
               recipe={recipe}
               onDeleteRecipe={onDeleteRecipe}
               onAddIngredients={onAddIngredients}
-              onOpenVoiceModal={onOpenVoiceModal}
             />
           ))}
         </ul>

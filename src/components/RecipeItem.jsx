@@ -4,9 +4,8 @@ import IconButton from '@mui/material/IconButton'; // For consistency
 import Button from '@mui/material/Button'; // Use MUI button
 import CheckIcon from '@mui/icons-material/Check'; // Icon for success
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'; // Icon for adding
-import MicIcon from '@mui/icons-material/Mic'; // Icon for voice input
 
-function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients, onOpenVoiceModal }) {
+function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   const [ingredientsAdded, setIngredientsAdded] = useState(false);
 
   const handleAddIngredients = () => {
@@ -68,15 +67,6 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients, onOpenVoiceModal
         >
           {ingredientsAdded ? 'Added!' : 'Add Items'} {/* Shorten text */}
         </Button>
-        {/* Add Ingredients by Voice Button */}
-        <IconButton 
-          onClick={() => onOpenVoiceModal(recipe)}
-          size="small"
-          title="Add Ingredients by Voice"
-          style={{ marginRight: '0.5rem', color: 'var(--primary-color)' }} 
-        >
-           <MicIcon />
-        </IconButton>
         {/* Delete Recipe Button */}
         <IconButton 
           onClick={() => onDeleteRecipe(recipe.id)} 

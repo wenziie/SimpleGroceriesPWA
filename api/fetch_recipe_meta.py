@@ -325,109 +325,84 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({'error': 'Invalid or missing URL'}).encode('utf-8'))
             return
 
-        # Default values
-        title = url
+        # --- Fetch HTML Content --- #
+        try:
+            print(f"Fetching HTML for: {url}", flush=True)
+            start_time = time.time()
+            response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10) # Add User-Agent
+            response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+            html_content = response.text
+            fetch_duration = time.time() - start_time
+            print(f"HTML fetch took {fetch_duration:.2f} seconds. Status: {response.status_code}", flush=True)
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching URL {url}: {e}", flush=True)
+            # Return raw HTML as None and error state if fetch fails
+            self._send_response(500, {"error": f"Failed to fetch URL: {e}", "title": url, "imageUrl": None, "ingredients": []})
+            return
+        except Exception as e: # Catch potential unexpected errors during fetch setup
+            print(f"Unexpected error during fetch setup for {url}: {e}", flush=True)
+            self._send_response(500, {"error": f"Unexpected error: {e}", "title": url, "imageUrl": None, "ingredients": []})
+            return
+
+        # --- Attempt Metadata Extraction --- #
+        title = url # Default title
         image_url = None
         ingredients = []
         
-        headers = {
-             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-             'Accept-Language': 'en-US,en;q=0.5',
-             'Referer': 'https://www.google.com/', # Common referer
-             'DNT': '1', # Do Not Track
-             'Upgrade-Insecure-Requests': '1'
-        }
-
-        try:
-            # 1. Fetch HTML content
-            fetch_start = time.time()
-            print(f"Fetching HTML for: {url}", flush=True)
-            response = requests.get(url, headers=headers, timeout=15, allow_redirects=True)
-            fetch_end = time.time()
-            print(f"HTML fetch took {fetch_end - fetch_start:.2f} seconds. Status: {response.status_code}", flush=True)
-            response.raise_for_status() # Ensure we got a successful response
-
-            # Check content type - only parse HTML
-            content_type = response.headers.get('Content-Type', '').lower()
-            if 'html' not in content_type:
-                 print(f"ERROR: Content-Type is not HTML ({content_type}), skipping parsing.", flush=True)
-                 # Return defaults (URL as title)
-                 self.send_response(200)
-                 self.send_header('Content-type', 'application/json')
-                 self.end_headers()
-                 self.wfile.write(json.dumps({'title': title, 'imageUrl': image_url, 'ingredients': ingredients}).encode('utf-8'))
-                 return
-
-            html_content = response.text
+        # 1. Try JSON-LD
+        json_ld_data = extract_json_ld(html_content, url)
+        if json_ld_data:
+            title = json_ld_data.get('name', title)
+            image_url = get_image_url(json_ld_data, url)
+            ingredients = get_ingredients_from_json_ld(json_ld_data)
             
-            # 2. Try JSON-LD extraction
-            json_ld_data = extract_json_ld(html_content, response.url) # Use final URL after redirects
-
-            if json_ld_data:
-                title = json_ld_data.get('name', title) # Use JSON-LD name if available
-                image_url = get_image_url(json_ld_data, response.url) or image_url # Use JSON-LD image if available
-                ingredients = get_ingredients_from_json_ld(json_ld_data)
-                
-                if ingredients:
-                    print(f"Successfully extracted {len(ingredients)} ingredients via JSON-LD.", flush=True)
-                else:
-                    print("JSON-LD found but no ingredients extracted, attempting fallback scraping.", flush=True)
-                    ingredients = scrape_ingredients_fallback(html_content, response.url)
-
+            # If JSON-LD worked, we might have found everything
+            if ingredients:
+                print(f"Success via JSON-LD for {url}", flush=True)
+                self._send_response(200, {"title": title, "imageUrl": image_url, "ingredients": ingredients})
+                return
             else:
-                # 3. Fallback to HTML scraping if JSON-LD fails or is missing
-                print("No JSON-LD Recipe found, attempting fallback scraping.", flush=True)
-                # Attempt to get title from HTML title tag as a basic fallback
-                soup_for_title = BeautifulSoup(html_content, 'html.parser')
-                html_title = soup_for_title.find('title')
-                og_image = soup_for_title.find('meta', property='og:image')
-                
-                if html_title:
-                    title = clean_ingredient_text(html_title.get_text()) or title # Use cleaned title or default
-                
-                # Fallback image scraping using og:image
-                if not image_url and og_image and og_image.get('content'):
-                    image_url = urllib.parse.urljoin(response.url, og_image['content'])
+                 print(f"JSON-LD found for {url}, but no ingredients. Proceeding to fallback scraping.", flush=True)
+        else:
+            print(f"No JSON-LD Recipe found for {url}, attempting fallback scraping.", flush=True)
 
-                ingredients = scrape_ingredients_fallback(html_content, response.url)
+        # 2. Fallback HTML Scraping (if JSON-LD failed or yielded no ingredients)
+        # Ensure title/image from JSON-LD (if any) are kept if scraping fails later
+        try:
+            fallback_ingredients = scrape_ingredients_fallback(html_content, url)
+            # Only overwrite ingredients if fallback scraping was successful
+            if fallback_ingredients:
+                ingredients = fallback_ingredients
+                print(f"Success via Fallback Scraping for {url}", flush=True)
+            else:
+                print(f"Fallback scraping did not find ingredients for {url}", flush=True)
+            
+            # Try to find title/image via basic meta tags if JSON-LD didn't provide them
+            if title == url or not image_url:
+                 soup = BeautifulSoup(html_content, 'html.parser')
+                 if title == url:
+                     og_title = soup.find('meta', property='og:title')
+                     if og_title and og_title.get('content'):
+                         title = og_title['content']
+                     else:
+                         html_title = soup.find('title')
+                         if html_title:
+                             title = html_title.string
+                 if not image_url:
+                     og_image = soup.find('meta', property='og:image')
+                     if og_image and og_image.get('content'):
+                         image_url = urllib.parse.urljoin(url, og_image['content']) 
 
-            # Final result structure
-            result = {'title': title, 'imageUrl': image_url, 'ingredients': ingredients}
-            print(f"Final result: Title='{result['title']}', Image={'Yes' if result['imageUrl'] else 'No'}, Ingredients={len(result['ingredients'])}", flush=True)
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(result).encode('utf-8'))
-
-        except requests.exceptions.Timeout:
-             print(f"ERROR: Timeout fetching URL: {url}", flush=True)
-             self.send_response(408)
-             self.send_header('Content-type', 'application/json')
-             self.end_headers()
-             self.wfile.write(json.dumps({'error': 'Timeout fetching recipe URL', 'title': url, 'imageUrl': None, 'ingredients': []}).encode('utf-8'))
-        except requests.exceptions.RequestException as e:
-            print(f"ERROR fetching URL {url}: {e}", flush=True)
-            # Return default title, no image/ingredients, but maybe a specific error status?
-            # For now, return 200 with defaults to avoid breaking frontend logic that expects title/imageUrl
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': f'Failed to fetch recipe: {e}', 'title': url, 'imageUrl': None, 'ingredients': []}).encode('utf-8'))
         except Exception as e:
-            # Catch-all for unexpected errors during parsing etc.
-            print(f"ERROR processing URL {url}: {e}", flush=True)
-            import traceback
-            traceback.print_exc() # Print full traceback to logs
-            self.send_response(500)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': 'Internal server error processing recipe'}).encode('utf-8'))
+            print(f"Error during fallback scraping for {url}: {e}", flush=True)
+            # Don't crash, just use whatever we got before the error (or defaults)
+            # Fallback scraping errors shouldn't prevent returning basic info + raw HTML
 
-        finally:
-             end_time = time.time()
-             print(f"--- Function End. Total Time: {end_time - start_time:.2f} seconds ---", flush=True)
-             
+        print(f"Final result: Title='{title}', Image={'Yes' if image_url else 'No'}, Ingredients={len(ingredients)}", flush=True)
+        # Always return raw_html, along with parsed results (which might be empty)
+        self._send_response(200, {"title": title, "imageUrl": image_url, "ingredients": ingredients})
+
     def is_valid_url(self, url):
         """Checks if a string is a valid HTTP/HTTPS URL."""
         try:
