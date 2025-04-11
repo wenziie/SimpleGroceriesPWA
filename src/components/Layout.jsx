@@ -1,66 +1,61 @@
-import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'; // Import useState/useEffect
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 // MUI Imports
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; // Icon for Grocery List (Cart)
-import BookIcon from '@mui/icons-material/Book'; // Icon for Recipes (Symmetrical Book)
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper'; // Use Paper for elevation
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import BookIcon from '@mui/icons-material/Book';
 
 function Layout() {
-  const location = useLocation(); // Hook to get the current path
+  const location = useLocation();
+  const navigate = useNavigate();
+  // State to track the current navigation value
+  const [value, setValue] = useState(location.pathname); // Initialize with current path
 
-  const getLinkStyle = (path) => ({
-    display: 'flex', // Needed for column layout
-    flexDirection: 'column',
-    alignItems: 'center',
-    fontWeight: location.pathname === path ? 'bold' : 'normal',
-    // Use active color, or inactive grey color
-    color: location.pathname === path ? 'var(--link-active-color)' : 'var(--navbar-inactive-color)',
-    textDecoration: 'none',
-    // Adjust padding for icon layout
-    padding: '5px 10px',
-    flexGrow: 1, 
-    textAlign: 'center',
-    fontSize: '0.8rem' // Smaller base font size for the link container
-  });
+  // Update state if the path changes (e.g., browser back/forward)
+  useEffect(() => {
+    setValue(location.pathname);
+  }, [location.pathname]);
 
-  const iconStyle = { marginBottom: '2px' }; // Small space between icon and text
-  const labelStyle = { fontSize: '0.75rem' }; // Even smaller font size for the label itself
+  const handleChange = (event, newValue) => {
+    setValue(newValue); // Update state
+    navigate(newValue); // Navigate to the new path
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {/* 
-      <header style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
-        <h1>Simple Groceries</h1>
-      </header>
-      */}
-
-      <main style={{ flexGrow: 1, padding: '1rem' }}>
-        {/* Outlet renders the matched child route component (GroceryPage or RecipesPage) */}
+    // Use Box for overall flex container
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+      
+      {/* Use Container to constrain main content width and center */}
+      <Container component="main" sx={{ flexGrow: 1, py: 3 }}>
+        {/* Outlet renders the matched child route component */}
         <Outlet />
-      </main>
+      </Container>
 
-      <nav style={{
-        display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        padding: '5px 0',
-        // backgroundColor: 'var(--navbar-bg)', // REMOVE THIS
-        // Make navbar sticky
-        position: 'sticky',
-        bottom: 0,
-        width: '100%', // Ensure it spans the full width
-        borderTop: '1px solid', // Add a top border for separation
-        borderColor: 'divider' // Use theme divider color
-      }}>
-        <Link to="/" style={getLinkStyle('/')}>
-          <ShoppingCartIcon />
-          <span style={labelStyle}>Inköpslista</span>
-        </Link>
-        <Link to="/recipes" style={getLinkStyle('/recipes')}>
-          <BookIcon />
-          <span style={labelStyle}>Recept</span>
-        </Link>
-      </nav>
-    </div>
+      {/* Use Paper for elevated BottomNavigation */}
+      <Paper sx={{ position: 'sticky', bottom: 0, left: 0, right: 0 }} elevation={3}>
+        <BottomNavigation
+          showLabels
+          value={value} // Controlled component
+          onChange={handleChange}
+          // Style applied via theme components.MuiBottomNavigation
+        >
+          <BottomNavigationAction 
+            label="Inköpslista"
+            value="/" 
+            icon={<ShoppingCartIcon />} 
+          />
+          <BottomNavigationAction 
+            label="Recept"
+            value="/recipes" 
+            icon={<BookIcon />} 
+          />
+        </BottomNavigation>
+      </Paper>
+    </Box>
   );
 }
 
