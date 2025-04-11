@@ -17,6 +17,7 @@ import Toolbar from '@mui/material/Toolbar'; // Import Toolbar
 import Button from '@mui/material/Button'; // Import Button
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'; // Icon for clear
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 
 // Basic style for modal content box - USE THEME VALUES
 const modalStyle = {
@@ -32,7 +33,7 @@ const modalStyle = {
   // Use theme's shadow (elevation) - Paper component applies this
   // boxShadow: 24, // Default MUI shadow, let Paper/theme handle
   p: { xs: 2, sm: 3, md: 4}, // Responsive padding
-  borderRadius: theme => theme.shape.borderRadius, // Use theme border radius
+  borderRadius: 2, // Use a smaller, fixed value (e.g., 8px)
   outline: 'none', // Remove default focus outline on modal
 };
 
@@ -141,6 +142,30 @@ function GroceryPage({
                <NotificationsIcon />
              </IconButton>
            </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Sticky Title Header */}
+      <AppBar 
+        position="sticky"
+        color="inherit"
+        elevation={0} // No shadow needed, just background
+        sx={{ 
+          top: 64, // Adjust based on main AppBar height (default is 64px, check if different)
+          zIndex: 9, // Below main AppBar
+          maxWidth: 'calc(600px + 3rem)', 
+          left: 'auto',
+          right: 'auto',
+          mx: 'auto',
+          bgcolor: 'background.paper',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Toolbar variant="dense"> {/* Use dense for less height */}
+          <Typography variant="h6" component="h2" sx={{ color: 'text.primary' }}>
+            Inköpslista
+          </Typography>
         </Toolbar>
       </AppBar>
 

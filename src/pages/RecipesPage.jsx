@@ -26,7 +26,7 @@ const modalStyle = {
   // borderColor: 'divider',
   // boxShadow: 24, // Let Paper/theme handle
   p: { xs: 2, sm: 3, md: 4}, // Responsive padding
-  borderRadius: theme => theme.shape.borderRadius, // Use theme border radius
+  borderRadius: 2, // Use a smaller, fixed value (e.g., 8px)
   outline: 'none', // Remove default focus outline on modal
 };
 
@@ -88,7 +88,18 @@ function RecipesPage({
            <Typography variant="h6" component="h2" sx={{ color: 'text.primary' }}>
              Recept
            </Typography>
-          <IconButton onClick={handleOpenAddRecipe} title="Add Recipe" color="primary">
+           {/* Match style with GroceryPage Add button */}
+          <IconButton 
+             onClick={handleOpenAddRecipe} 
+             title="Add Recipe" 
+             sx={{ 
+                bgcolor: 'primary.main', 
+                color: 'primary.contrastText',
+                '&:hover': { 
+                  bgcolor: 'primary.dark', 
+                }
+              }}
+             >
             <AddIcon />
           </IconButton>
         </Toolbar>

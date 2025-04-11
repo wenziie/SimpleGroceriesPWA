@@ -36,7 +36,7 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
 
   return (
     // Wrap in Paper for structure and elevation
-    <Paper sx={{ mb: 1.5, overflow: 'hidden' }}> 
+    <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper' }}> 
       <ListItem alignItems="flex-start" disablePadding>
         {/* Avatar for Image */}
         {recipe.imageUrl && (
