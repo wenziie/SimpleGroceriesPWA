@@ -106,7 +106,22 @@ function VoiceInput({ onAddItem }) {
     if (itemToAdd) {
       onAddItem(itemToAdd);
       setTranscript(''); // Clear transcript after adding
-      // No need to restart recognition, user clicks Mic again
+      
+      // --- Automatically restart listening --- 
+      // Check if recognition instance exists and isn't already listening (it shouldn't be)
+      if (recognitionRef.current && !isListening) {
+          try {
+            console.log("Auto-restarting recognition for next item...");
+            setError(null); // Clear any previous errors (like 'no-speech')
+            recognitionRef.current.start();
+            setIsListening(true);
+          } catch (err) {
+            console.error("Error auto-restarting recognition:", err);
+            setError("Could not restart voice recognition.");
+            setIsListening(false); // Ensure state is correct on error
+          }
+      } // Else: something unexpected happened, don't restart
+      // ----------------------------------------
     }
   };
 
