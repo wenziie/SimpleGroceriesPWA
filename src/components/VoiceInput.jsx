@@ -107,20 +107,26 @@ function VoiceInput({ onAddItem }) {
       onAddItem(itemToAdd);
       setTranscript(''); // Clear transcript after adding
       
-      // --- Automatically restart listening --- 
-      // Check if recognition instance exists and isn't already listening (it shouldn't be)
+      // --- Automatically restart listening with a delay --- 
+      // Check if recognition instance exists and isn't already listening
       if (recognitionRef.current && !isListening) {
-          try {
-            console.log("Auto-restarting recognition for next item...");
-            setError(null); // Clear any previous errors (like 'no-speech')
-            recognitionRef.current.start();
-            setIsListening(true);
-          } catch (err) {
-            console.error("Error auto-restarting recognition:", err);
-            setError("Could not restart voice recognition.");
-            setIsListening(false); // Ensure state is correct on error
-          }
-      } // Else: something unexpected happened, don't restart
+          // Introduce a small delay before restarting
+          setTimeout(() => {
+              // Double-check state in case stop was clicked during delay
+              if (recognitionRef.current && !isListening) { 
+                  try {
+                    console.log("Auto-restarting recognition after delay...");
+                    setError(null); // Clear any previous errors
+                    recognitionRef.current.start();
+                    setIsListening(true);
+                  } catch (err) {
+                    console.error("Error auto-restarting recognition:", err);
+                    setError("Could not restart voice recognition.");
+                    setIsListening(false); // Ensure state is correct on error
+                  }
+              }
+          }, 150); // Delay in milliseconds (e.g., 150ms)
+      } 
       // ----------------------------------------
     }
   };
