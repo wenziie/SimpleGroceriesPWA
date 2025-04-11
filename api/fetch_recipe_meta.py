@@ -11,17 +11,17 @@ import os # Import os to potentially access environment variables later if neede
 # --- Helper Functions for Parsing ---
 
 # --- Log raw HTML content for debugging Coop ---
-def log_raw_html(url, content):
-    if 'coop.se' in url:
-        print(f"--- DEBUG: Raw HTML start for {url} ---", flush=True)
-        print(content[:1000]) # Print first 1000 characters
-        print("--- DEBUG: End Raw HTML start ---", flush=True)
+# def log_raw_html(url, content):
+#     if 'coop.se' in url:
+#         print(f"--- DEBUG: Raw HTML start for {url} ---", flush=True)
+#         print(content[:1000]) # Print first 1000 characters
+#         print("--- DEBUG: End Raw HTML start ---", flush=True)
 
 # -----------------------------------------------
 
 def extract_json_ld(html_content, url):
     """Extracts JSON-LD metadata, specifically looking for Recipe schema."""
-    log_raw_html(url, html_content) # Add logging call here
+    # log_raw_html(url, html_content) # Removed logging call
     print(f"Attempting JSON-LD extraction for {url}", flush=True)
     try:
         # Use extruct to find all JSON-LD blocks
