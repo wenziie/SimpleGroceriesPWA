@@ -17,16 +17,12 @@ function VoiceInput({ onAddItem }) {
 
   // Function to create and start a new recognition instance
   const startListening = () => {
-    console.log('[VoiceInput] startListening: Called. Current transcript before clear:', transcript);
     if (!isSupported || isListening) {
-      console.log('[VoiceInput] startListening: Aborting - Not supported or already listening.');
       return; 
     }
 
-    // Clear previous transcript/error ONLY when starting fresh
     setTranscript(''); 
     setError(null);
-    console.log('[VoiceInput] startListening: Transcript cleared.');
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'sv-SE';
@@ -34,6 +30,11 @@ function VoiceInput({ onAddItem }) {
     recognition.continuous = false; // Stop after pause
 
     recognition.onresult = (event) => {
+      // IMPORTANT: Only process results if this instance is still the active one
+      if (recognitionRef.current !== recognition) {
+        return; // Ignore results from old/stopped instances
+      }
+
       let interimTranscript = '';
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -45,26 +46,26 @@ function VoiceInput({ onAddItem }) {
         }
       }
       const resultToSet = finalTranscript || interimTranscript;
-      console.log('[VoiceInput] onresult: Received result:', resultToSet);
       setTranscript(resultToSet);
-      setError(null); // Clear error on successful result
+      setError(null); 
     };
 
     recognition.onerror = (event) => {
+       // IMPORTANT: Only process errors if this instance is still the active one
+      if (recognitionRef.current !== recognition) {
+        return; // Ignore errors from old/stopped instances
+      }
       console.error("[VoiceInput] onerror:", event.error, event.message);
       let errorMessage = `Talfel: ${event.error}`;
-      if (event.error === 'no-speech') {
+       if (event.error === 'no-speech') {
         errorMessage = 'Ingen tal upptäcktes. Försök igen.';
       } else if (event.error === 'audio-capture') {
         errorMessage = 'Kunde inte komma åt mikrofonen. Kontrollera behörigheter.';
       } else if (event.error === 'not-allowed') {
         errorMessage = 'Åtkomst till mikrofonen nekades.';
       } else if (event.error === 'aborted') {
-        if (recognitionRef.current) { 
-            errorMessage = 'Lyssnandet avbröts oväntat.';
-        } else {
-            errorMessage = null; // Likely intentional stop
-        }
+        // If aborted, only show error if it wasn't deliberately stopped
+        errorMessage = null; // Assume deliberate stop if ref is already null
       } 
       if (errorMessage) setError(errorMessage);
       setIsListening(false); 
@@ -72,14 +73,16 @@ function VoiceInput({ onAddItem }) {
     };
 
     recognition.onend = () => {
-      console.log('[VoiceInput] onend: Recognition ended.');
-      setIsListening(false); 
+      // Only update state if this instance was the active one when it ended
+      if (recognitionRef.current === recognition) {
+         setIsListening(false); 
+         recognitionRef.current = null; // Ensure ref is cleared if it ended naturally
+      }
     };
 
     // Store the new instance and start
     recognitionRef.current = recognition;
     try {
-        console.log('[VoiceInput] startListening: Starting recognition instance.');
         recognition.start();
         setIsListening(true);
     } catch (err) {
@@ -93,30 +96,27 @@ function VoiceInput({ onAddItem }) {
   // Function to stop the current recognition instance
   const stopListening = () => {
     if (recognitionRef.current) {
-      console.log('[VoiceInput] stopListening: Stopping recognition instance.');
       const currentRecognition = recognitionRef.current; 
-      recognitionRef.current = null; // Clear the ref immediately before calling stop
+      recognitionRef.current = null; // Clear the ref *before* calling stop
       try {
-          currentRecognition.stop(); // Let onend handle setIsListening(false)
+          // Attempt to stop. Note: onend might fire AFTER this.
+          currentRecognition.stop(); 
       } catch (err) {
            console.error("[VoiceInput] stopListening: Error calling stop():", err);
-           setIsListening(false); // Force stop state
+           // Ensure listening state is false even if stop throws
+           setIsListening(false); 
       }
-    } else {
-        console.log('[VoiceInput] stopListening: No active recognition found.');
-    }
+    } 
   };
 
   // Effect for cleanup on unmount
   useEffect(() => {
     return () => {
-      console.log('[VoiceInput] cleanup: Component unmounting, stopping listener.');
       stopListening();
     };
   }, []);
 
   const handleToggleListen = () => {
-    console.log('[VoiceInput] handleToggleListen: Called. isListening:', isListening);
     if (isListening) {
       stopListening();
     } else {
@@ -125,15 +125,15 @@ function VoiceInput({ onAddItem }) {
   };
 
   const handleAddItem = () => {
+    // Immediately stop any active recognition when Add is clicked
+    stopListening(); 
+
     const itemToAdd = transcript.trim();
-    console.log('[VoiceInput] handleAddItem: Called. Transcript to add:', itemToAdd);
     if (itemToAdd) {
       onAddItem(itemToAdd); // Call the callback to add the item
-      console.log('[VoiceInput] handleAddItem: Clearing transcript state. Current value:', transcript);
-      setTranscript(''); // Clear the displayed transcript immediately
-    } else {
-      console.log('[VoiceInput] handleAddItem: No transcript to add.');
-    }
+      // Clear the displayed transcript *after* stopping and getting the value
+      setTranscript(''); 
+    } 
   };
 
   if (!isSupported) {
