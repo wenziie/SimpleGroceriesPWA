@@ -45,24 +45,28 @@ function VoiceInput({ onAddItem }) {
 
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
-      let errorMessage = `Speech recognition error: ${event.error}`;
+      let errorMessage = `Talfel: ${event.error}`;
       if (event.error === 'no-speech') {
         errorMessage = 'Ingen tal upptäcktes. Försök igen.';
       } else if (event.error === 'audio-capture') {
         errorMessage = 'Kunde inte komma åt mikrofonen. Kontrollera behörigheter.';
       } else if (event.error === 'not-allowed') {
         errorMessage = 'Åtkomst till mikrofonen nekades.';
+      } else if (event.error === 'aborted') {
+        errorMessage = 'Lyssnandet avbröts. Försök igen.'; // Friendlier 'aborted' message
       }
       setError(errorMessage);
-      setIsListening(false); // Ensure listening stops on error
-      recognitionRef.current = null; // Clear ref on error
+      setIsListening(false); 
+      recognitionRef.current = null; 
     };
 
     recognition.onend = () => {
       console.log("Speech recognition ended.");
-      setIsListening(false); 
-      // Maybe clear ref here too? Let's see if needed.
-      // recognitionRef.current = null; 
+      // Ensure state is consistent and ref is cleared when recognition ends naturally
+      if (isListening) {
+         setIsListening(false); 
+      }
+      recognitionRef.current = null; 
     };
 
     // Store the new instance and start
@@ -108,9 +112,10 @@ function VoiceInput({ onAddItem }) {
     const itemToAdd = transcript.trim();
     if (itemToAdd) {
       onAddItem(itemToAdd);
-      // After adding, immediately start a new listening session
-      // No need to clear transcript here, startListening does it
-      startListening(); 
+      // Remove the automatic restart
+      // startListening(); 
+      // Clear transcript manually now, as startListening isn't doing it
+      setTranscript(''); 
     }
   };
 
