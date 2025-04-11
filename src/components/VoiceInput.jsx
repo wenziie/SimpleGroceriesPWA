@@ -18,6 +18,7 @@ function VoiceInput({ onAddItem }) {
   // Function to create and start a new recognition instance
   const startListening = () => {
     if (!isSupported || isListening) {
+      console.log('[VoiceInput] startListening: Aborting - Not supported or already listening. isListening:', isListening);
       return; 
     }
 
