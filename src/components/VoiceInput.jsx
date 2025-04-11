@@ -17,8 +17,9 @@ function VoiceInput({ onAddItem }) {
 
   // Function to create and start a new recognition instance
   const startListening = () => {
-    if (!isSupported || isListening) {
-      console.log('[VoiceInput] startListening: Aborting - Not supported or already listening. isListening:', isListening);
+    // Only check for support, rely on calling context (setTimeout check) for isListening state
+    if (!isSupported) {
+      console.error("[VoiceInput] startListening: Speech Recognition not supported.");
       return; 
     }
 
@@ -72,9 +73,7 @@ function VoiceInput({ onAddItem }) {
 
     recognition.onend = () => {
       // This event fires when recognition stops naturally or programmatically.
-      // Ensure the state reflects that listening has stopped.
       setIsListening(false); 
-      // If the ref still points to this instance (e.g., natural stop), clear it.
       if (recognitionRef.current === recognition) {
          recognitionRef.current = null;
       }
@@ -122,9 +121,6 @@ function VoiceInput({ onAddItem }) {
   };
 
   const handleAddItem = () => {
-    // Ensure we stop any currently active recognition first.
-    // Do this *before* getting the transcript value to avoid potential race conditions
-    // where a late 'onresult' changes transcript *after* we stop.
     const activeRecognition = recognitionRef.current;
     if (activeRecognition) {
         stopListening(); // This sets isListening false and nulls the ref
@@ -137,21 +133,11 @@ function VoiceInput({ onAddItem }) {
 
       // Restart listening after a short delay
       setTimeout(() => {
-         // Check if the component might have been unmounted during the delay
-         // AND check if a recognition session isn't already active (ref is null)
          const container = document.getElementById('voice-input-container');
-         const shouldRestart = container && document.contains(container) && !recognitionRef.current;
-         console.log('[VoiceInput] setTimeout Check:', { 
-             isMounted: container && document.contains(container), 
-             isRefNull: !recognitionRef.current, 
-             shouldRestart 
-         });
-         if (shouldRestart) { 
-            console.log('[VoiceInput] setTimeout: Condition passed, calling startListening...');
+         // Check mount status and if ref is null (meaning no session is active)
+         if (container && document.contains(container) && !recognitionRef.current) { 
             startListening();
-         } else {
-            console.log('[VoiceInput] setTimeout: Condition failed, not restarting.');
-         }
+         } 
       }, 250); // 250ms delay, adjust if needed
 
     } 
@@ -162,7 +148,6 @@ function VoiceInput({ onAddItem }) {
   }
 
   return (
-    // Add an ID to the container for the mounted check in setTimeout
     <div id="voice-input-container" style={{ marginTop: '1.5rem', paddingTop: '1rem', textAlign: 'center' }}>
       <h4>Lägg till med röst</h4>
       <IconButton onClick={handleToggleListen} title={isListening ? 'Sluta lyssna' : 'Börja lyssna'} size="large" style={{ color: isListening ? 'red' : 'var(--primary-color)' }}>
