@@ -87,14 +87,24 @@ const lightTheme = createTheme({
        },
        styleOverrides: {
          root: {
-            // Remove default focus outline
+           // Remove default focus outline more aggressively
+           outline: 'none !important', 
+           '&:focus': {
+             outline: 'none !important', 
+           },
            '&.Mui-focusVisible': { 
-             outline: 'none', 
+             outline: 'none !important', 
              backgroundColor: 'action.hover' // Optional: subtle background on focus
            },
            // Ensure selected state doesn't add an outline either
+           '&.Mui-selected': {
+             outline: 'none !important',
+           },
+           '&.Mui-selected:focus': {
+             outline: 'none !important',
+           },
            '&.Mui-selected.Mui-focusVisible': { 
-             outline: 'none', 
+             outline: 'none !important', 
              backgroundColor: 'action.hover' // Optional: subtle background on focus
            }
          }
