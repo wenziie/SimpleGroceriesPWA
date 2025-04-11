@@ -55,7 +55,7 @@ function VoiceInput({ onAddItem }) {
     };
 
     recognition.onerror = (event) => {
-      // Guard: Only process if this instance is still the active one
+      // Guard: Only process errors if this instance is still the active one
       if (recognitionRef.current !== recognition) return;
 
       console.error("[VoiceInput] onerror:", event.error, event.message); 
@@ -67,10 +67,16 @@ function VoiceInput({ onAddItem }) {
       } else if (event.error === 'not-allowed') {
         errorMessage = 'Åtkomst till mikrofonen nekades.';
       } else if (event.error === 'aborted') {
-        errorMessage = null; // Assume deliberate stop
+        errorMessage = null; // Don't show error message for deliberate/aborted stops
       } 
       if (errorMessage) setError(errorMessage);
-      setIsListening(false); 
+
+      // Only set listening to false if it wasn't an intentional abort 
+      // (ref would already be null if stopped intentionally via stopListening/handleAddItem)
+      if (event.error !== 'aborted' || recognitionRef.current !== null) {
+         setIsListening(false); 
+      }
+      // Always clear the ref on error
       recognitionRef.current = null; 
     };
 
