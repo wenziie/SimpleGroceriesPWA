@@ -96,7 +96,6 @@ function RecipesPage({
       <Box sx={{ 
          // Approx 64px. Use theme calculation if possible
          pt: '64px', // Keep this padding
-         px: 3 // INCREASE horizontal padding
         }}> 
 
          {/* Add Recipe Dialog (replaces Modal) */}

@@ -148,7 +148,6 @@ function GroceryPage({
       <Box sx={{ 
          // Approx 64px + 48px = 112px. Use theme calculation if possible
          pt: '112px', // Keep this padding
-         px: 3 // INCREASE horizontal padding
         }}> 
          {/* --- Modals --- */}
          {/* Refactor Add Item Modal to Dialog */}
