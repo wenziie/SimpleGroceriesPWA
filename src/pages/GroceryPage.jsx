@@ -80,34 +80,28 @@ function GroceryPage({
 
   return (
     <Box> { /* Wrap page content in Box */ }
-      {/* Consolidate Title and Actions into ONE AppBar */}
+      {/* Consolidate Title and Actions into ONE AppBar with TWO Toolbars */}
       <AppBar 
         position="fixed"
         color="inherit" 
         elevation={3} 
         sx={{ bgcolor: 'background.paper', zIndex: 1100 }}
       >
-        {/* Use default Toolbar height */}
+        {/* Top Toolbar: Actions */}
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          {/* Title on the Left */}
-          <Typography variant="h6" component="h1" sx={{ color: 'text.primary' }}>
-            Inköpslista
-          </Typography>
-           
-           {/* Actions on the Right */}
+           {/* Clear Button on Left */}
+           <Button 
+             onClick={handleOpenClearConfirm}
+             color="error" 
+             size="small"
+             startIcon={<DeleteSweepIcon />} 
+             disabled={items.length === 0}
+             sx={{ textTransform: 'none' }} // Keep text case
+           >
+             Töm lista
+           </Button> 
+           {/* Action Icons on Right */}
            <Box>
-             {/* Clear Button */}
-             <Button 
-               onClick={handleOpenClearConfirm}
-               color="error" 
-               size="small"
-               startIcon={<DeleteSweepIcon />} 
-               disabled={items.length === 0}
-               sx={{ textTransform: 'none', mr: 1 }} // Add margin 
-             >
-               Töm lista
-             </Button> 
-             {/* Action Icons */}
              <IconButton 
                onClick={handleOpenAddItem} 
                title="Add Item"
@@ -142,12 +136,18 @@ function GroceryPage({
              </IconButton>
            </Box>
         </Toolbar>
+        {/* Bottom Toolbar: Title */}
+        <Toolbar variant="dense" sx={{ justifyContent: 'flex-start' /* Align title left */ }}>
+           <Typography variant="h6" component="h1" sx={{ color: 'text.primary' }}>
+             Inköpslista
+           </Typography>
+        </Toolbar>
       </AppBar>
 
-      {/* Adjust Padding Top for only ONE fixed AppBar */}
+      {/* Adjust Padding Top for the taller AppBar (two toolbars) */}
       <Box sx={{ 
-         // Approx 64px. Use theme calculation if possible
-         pt: '64px' // ADJUST PADDING
+         // Approx 64px + 48px = 112px. Use theme calculation if possible
+         pt: '112px' // ADJUST PADDING
         }}> 
          {/* --- Modals --- */}
          {/* Refactor Add Item Modal to Dialog */}
