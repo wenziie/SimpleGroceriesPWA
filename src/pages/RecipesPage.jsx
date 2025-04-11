@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 // MUI Imports
@@ -7,6 +7,8 @@ import Box from '@mui/material/Box'; // For Modal content styling
 import Modal from '@mui/material/Modal'; // Modal component
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close'; // Icon for closing modal
+import Snackbar from '@mui/material/Snackbar'; // For showing messages
+import Alert from '@mui/material/Alert'; // For styling Snackbar messages
 
 // Basic style for modal content box (can share or redefine)
 const modalStyle = {
@@ -27,10 +29,13 @@ function RecipesPage({
   recipes, 
   addRecipe, 
   deleteRecipe, 
-  addIngredientsFromRecipe 
+  addIngredientsFromRecipe,
+  lastRecipeParseFailed
 }) {
   // State controls modal visibility
   const [showAddRecipe, setShowAddRecipe] = useState(false);
+  // State for showing the parsing failure message
+  const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
 
   // Handlers to open/close modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
@@ -41,6 +46,21 @@ function RecipesPage({
     addRecipe(url);
     handleCloseAddRecipe(); // Close modal after adding
   }
+
+  // Effect to watch for the parsing failure flag from App.jsx
+  useEffect(() => {
+    if (lastRecipeParseFailed) {
+      setShowParseFailedMsg(true);
+      // Optionally reset the flag in App.jsx if needed, but Snackbar autoclose is enough
+    }
+  }, [lastRecipeParseFailed, recipes]); // Depend on flag and recipes (to trigger on add)
+
+  const handleCloseSnackbar = (event, reason) => {
+     if (reason === 'clickaway') {
+       return;
+     }
+     setShowParseFailedMsg(false);
+  };
 
   return (
     <div>
@@ -87,6 +107,19 @@ function RecipesPage({
         onDeleteRecipe={deleteRecipe} 
         onAddIngredients={addIngredientsFromRecipe} 
       />
+
+      {/* Snackbar for Parsing Failure Message */}
+      <Snackbar 
+        open={showParseFailedMsg} 
+        autoHideDuration={6000} // Hide after 6 seconds
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Position
+      >
+        <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+           Ingredients could not be auto added. This can be due to the website's formatting. You can try to add the ingredients manually instead.
+        </Alert>
+      </Snackbar>
+
     </div>
   );
 }

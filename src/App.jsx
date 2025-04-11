@@ -17,12 +17,19 @@ const LOCAL_STORAGE_KEY_RECIPES = 'simple-groceries-pwa.recipes'
 function App() {
   // State for grocery items
   const [items, setItems] = useState([])
-  // State for recipes - include title and imageUrl
+  // State for recipes
   const [recipes, setRecipes] = useState(() => {
     const storedRecipes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECIPES));
-    // Ensure existing recipes have default null values for new fields
-    return storedRecipes ? storedRecipes.map(r => ({ ...r, title: r.title || r.url, imageUrl: r.imageUrl || null })) : [];
+    // Ensure existing recipes have default null/empty values for new fields
+    return storedRecipes ? storedRecipes.map(r => ({ 
+      ...r, 
+      title: r.title || r.url, 
+      imageUrl: r.imageUrl || null,
+      ingredients: r.ingredients || [] // Add ingredients field
+    })) : [];
   });
+  // Add state to track if the *last* added recipe failed parsing
+  const [lastRecipeParseFailed, setLastRecipeParseFailed] = useState(false);
 
   // Load items from localStorage on initial render
   useEffect(() => {
@@ -109,6 +116,9 @@ function App() {
     const trimmedUrl = url.trim()
     if (!trimmedUrl) return
     
+    // Reset parsing failure flag on new attempt
+    setLastRecipeParseFailed(false);
+
     try {
       new URL(trimmedUrl) // Basic validation
     } catch (_) {
@@ -125,8 +135,9 @@ function App() {
     // Show some loading state (optional, implement later if needed)
     console.log(`Fetching metadata for: ${trimmedUrl}`); 
 
-    let title = trimmedUrl; // Default title is the URL
-    let imageUrl = null;
+    let title = trimmedUrl; // Default title
+    let imageUrl = null; // Default image
+    let ingredients = []; // Default ingredients
 
     try {
       const response = await fetch('/api/fetch_recipe_meta', {
@@ -146,18 +157,25 @@ function App() {
         const data = await response.json();
         title = data.title || trimmedUrl; // Use fetched title or fallback to URL
         imageUrl = data.imageUrl; // Use fetched image URL (can be null)
+        ingredients = data.ingredients || []; // Use fetched ingredients or empty list
+        // Check if ingredients are empty after a successful fetch
+        if (response.ok && ingredients.length === 0) {
+          console.log("API call successful, but no ingredients were parsed.");
+          setLastRecipeParseFailed(true); // Signal parsing failure
+        }
       }
     } catch (error) {
       // Handle network errors during fetch
       console.error('Network error fetching recipe metadata:', error);
-      // Keep default title/imageUrl (the URL itself)
+      setLastRecipeParseFailed(true); // Also signal failure on fetch error
     }
 
     const newRecipe = {
       id: crypto.randomUUID(),
       url: trimmedUrl,
       title: title, // Use fetched or default title
-      imageUrl: imageUrl // Use fetched image URL or null
+      imageUrl: imageUrl, // Use fetched image URL or null
+      ingredients: ingredients // Store the ingredients
     }
     
     setRecipes(prevRecipes => [...prevRecipes, newRecipe])
@@ -205,6 +223,7 @@ function App() {
             addRecipe={addRecipe}
             deleteRecipe={deleteRecipe}
             addIngredientsFromRecipe={addIngredientsFromRecipe}
+            lastRecipeParseFailed={lastRecipeParseFailed} // Pass down the flag
           />
         } />
       </Route>

@@ -1,20 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete'; // For consistency
 import IconButton from '@mui/material/IconButton'; // For consistency
 import Button from '@mui/material/Button'; // Use MUI button
+import CheckIcon from '@mui/icons-material/Check'; // Icon for success
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'; // Icon for adding
 
 function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
+  const [ingredientsAdded, setIngredientsAdded] = useState(false);
 
-  const handleAddIngredients = async () => {
-    // Placeholder - Ingredient parsing logic not implemented in this step
-    console.log(`Placeholder: Add ingredients for ${recipe.title || recipe.url}`);
-    alert('Ingredient parsing not implemented yet.');
-    // try {
-    //   const apiUrl = `/api/parse_ingredients?url=${encodeURIComponent(recipe.url)}`;
-    //   const response = await fetch(apiUrl);
-    //   ...
-    // } catch (error) { ... }
+  const handleAddIngredients = () => {
+    // Use the ingredients already stored in the recipe object
+    if (recipe.ingredients && recipe.ingredients.length > 0) {
+      onAddIngredients(recipe.ingredients); // Call the function passed from App.jsx
+      setIngredientsAdded(true); // Set state to show confirmation
+      // Optionally reset after a delay
+      setTimeout(() => setIngredientsAdded(false), 3000); 
+    } else {
+      // Optional: Show a message if there are no ingredients to add
+      // (though the button might be disabled in this case)
+      console.log("No ingredients found in recipe data to add.");
+    }
   };
+
+  // Determine if the button should be disabled
+  const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
 
   return (
     <li style={{
@@ -52,9 +61,10 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
           size="small" 
           onClick={handleAddIngredients} 
           style={{ marginRight: '0.5rem' }}
-          disabled // Disable for now until parsing is implemented
+          disabled={!hasIngredients || ingredientsAdded} // Disable if no ingredients or already added
+          startIcon={ingredientsAdded ? <CheckIcon /> : <AddShoppingCartIcon />}
         >
-          Add Ingredients
+          {ingredientsAdded ? 'Added!' : 'Add Ingredients'}
         </Button>
         {/* Use MUI IconButton for deleting */}
         <IconButton onClick={() => onDeleteRecipe(recipe.id)} size="small" title="Delete Recipe">
