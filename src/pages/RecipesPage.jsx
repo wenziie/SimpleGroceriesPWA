@@ -10,6 +10,8 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close'; // Icon for closing modal
 import Snackbar from '@mui/material/Snackbar'; // For showing messages
 import Alert from '@mui/material/Alert'; // For styling Snackbar messages
+import Button from '@mui/material/Button'; // Import Button
+import LinkIcon from '@mui/icons-material/Link'; // Icon for the link button
 
 // Basic style for modal content box (can share or redefine)
 const modalStyle = {
@@ -131,11 +133,12 @@ function RecipesPage({
         aria-labelledby="voice-input-modal-title"
       >
         <Box sx={{ 
-           ...modalStyle, // Keep original styles
-           width: '90%',  // Make it wider
-           height: '85%', // Make it taller
+           ...modalStyle, 
+           width: '90%',
+           maxHeight: '85vh', // Use maxHeight instead of height for flexibility
            display: 'flex',
-           flexDirection: 'column'
+           flexDirection: 'column',
+           overflow: 'hidden' // Prevent main box scroll
          }}>
            <IconButton onClick={handleCloseVoiceModal} style={{ position: 'absolute', top: 8, right: 8}} title="Close">
             <CloseIcon />
@@ -143,21 +146,33 @@ function RecipesPage({
            <h4 id="voice-input-modal-title" style={{ flexShrink: 0, marginBottom: '1rem' }}>
              Add Ingredients for "{currentRecipeForVoice?.title || 'Recipe'}"
            </h4>
-           {/* Iframe to display the recipe */}
-           <iframe 
+           
+           {/* Button to open recipe in new tab */}
+           <Button
+             variant="contained"
+             startIcon={<LinkIcon />}
+             onClick={() => window.open(currentRecipeForVoice?.url, '_blank', 'noopener,noreferrer')}
+             disabled={!currentRecipeForVoice?.url}
+             style={{ marginBottom: '1.5rem', flexShrink: 0 }} // Add margin below
+           >
+              Öppna recept i webbläsare
+           </Button>
+           
+           {/* Remove iframe */}
+           {/* <iframe 
               src={currentRecipeForVoice?.url || ''} 
               title={`Recipe: ${currentRecipeForVoice?.title || 'Recipe'}`}
               style={{
                 width: '100%',
-                height: '60%', // Adjust height as needed, maybe 50-60%
+                height: '60%', 
                 border: '1px solid #ccc',
-                flexGrow: 1 // Allow iframe to take up space
+                flexGrow: 1
               }}
-              // Optional: sandbox attribute for security, but might break functionality
-              // sandbox="allow-scripts allow-same-origin"
-           ></iframe>
-           {/* Voice Input component below the iframe */}
-           <div style={{ flexShrink: 0, marginTop: '1rem', overflowY: 'auto' }}>
+           ></iframe> */}
+           
+           {/* Voice Input component below the button */}
+           {/* Make this div scrollable if content overflows */}
+           <div style={{ flexGrow: 1, overflowY: 'auto', marginTop: '0' /* Remove top margin */ }}>
               <VoiceInput onAddItem={addVoiceIngredientsToList} /> 
            </div>
         </Box>
