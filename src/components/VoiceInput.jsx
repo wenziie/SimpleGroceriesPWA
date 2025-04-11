@@ -17,10 +17,14 @@ function VoiceInput({ onAddItem }) {
 
   // Function to create and start a new recognition instance
   const startListening = () => {
-    // Only check for support, rely on calling context (setTimeout check) for isListening state
     if (!isSupported) {
       console.error("[VoiceInput] startListening: Speech Recognition not supported.");
       return; 
+    }
+    // Safety check: Stop any existing instance before starting a new one.
+    if (recognitionRef.current) {
+      console.warn("[VoiceInput] startListening: Found existing recognition instance. Stopping it first.");
+      stopListening(); 
     }
 
     setTranscript(''); 
@@ -32,10 +36,9 @@ function VoiceInput({ onAddItem }) {
     recognition.continuous = false; // Stop after pause
 
     recognition.onresult = (event) => {
-      if (recognitionRef.current !== recognition) {
-        return; // Ignore results from old/stopped instances
-      }
-
+      // Guard: Only process if this instance is still the active one
+      if (recognitionRef.current !== recognition) return;
+      
       let interimTranscript = '';
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -52,10 +55,10 @@ function VoiceInput({ onAddItem }) {
     };
 
     recognition.onerror = (event) => {
-      if (recognitionRef.current !== recognition) {
-        return; // Ignore errors from old/stopped instances
-      }
-      console.error("[VoiceInput] onerror:", event.error, event.message); // Keep error logging
+      // Guard: Only process if this instance is still the active one
+      if (recognitionRef.current !== recognition) return;
+
+      console.error("[VoiceInput] onerror:", event.error, event.message); 
       let errorMessage = `Talfel: ${event.error}`;
        if (event.error === 'no-speech') {
         errorMessage = 'Ingen tal upptäcktes. Försök igen.';
@@ -72,19 +75,21 @@ function VoiceInput({ onAddItem }) {
     };
 
     recognition.onend = () => {
-      // This event fires when recognition stops naturally or programmatically.
-      setIsListening(false); 
+      // Guard: Only update state if this instance is still the one in the ref
+      // (prevents old instance's onend from interfering with restarted session)
       if (recognitionRef.current === recognition) {
+         setIsListening(false);
          recognitionRef.current = null;
       }
     };
 
-    recognitionRef.current = recognition;
+    recognitionRef.current = recognition; // Store the NEW instance
     try {
         recognition.start();
-        setIsListening(true);
+        // Set state AFTER successfully starting the new instance
+        setIsListening(true); 
     } catch (err) {
-        console.error("[VoiceInput] startListening: Error starting recognition:", err); // Keep error logging
+        console.error("[VoiceInput] startListening: Error starting recognition:", err); 
         setError("Could not start voice recognition.");
         setIsListening(false);
         recognitionRef.current = null;
@@ -96,11 +101,11 @@ function VoiceInput({ onAddItem }) {
     if (recognitionRef.current) {
       const currentRecognition = recognitionRef.current; 
       recognitionRef.current = null; 
-      setIsListening(false); 
+      setIsListening(false); // Always set state when stopping manually/cleanly
       try {
           currentRecognition.stop(); 
       } catch (err) {
-           console.error("[VoiceInput] stopListening: Error calling stop():", err); // Keep error logging
+           console.error("[VoiceInput] stopListening: Error calling stop():", err); 
       }
     } 
   };
@@ -113,6 +118,7 @@ function VoiceInput({ onAddItem }) {
   }, []);
 
   const handleToggleListen = () => {
+    // Manual toggle uses the main stop/start functions
     if (isListening) {
       stopListening();
     } else {
@@ -121,21 +127,34 @@ function VoiceInput({ onAddItem }) {
   };
 
   const handleAddItem = () => {
-    const activeRecognition = recognitionRef.current;
-    if (activeRecognition) {
-        stopListening(); // This sets isListening false and nulls the ref
-    }
-
+    // Get transcript value *before* stopping
     const itemToAdd = transcript.trim();
+
     if (itemToAdd) {
-      onAddItem(itemToAdd); // Call the callback to add the item
-      setTranscript(''); // Clear the displayed transcript immediately
+      // Stop the current recognition instance directly
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+          // Don't call setIsListening(false) here to avoid UI flicker
+          // Don't null the ref here; let onend or startListening handle it
+        } catch (err) {
+          console.error("[VoiceInput] handleAddItem: Error stopping recognition:", err);
+          // Force cleanup if stop failed?
+          recognitionRef.current = null;
+          setIsListening(false);
+        }
+      }
+
+      // Add item and clear display
+      onAddItem(itemToAdd);
+      setTranscript('');
 
       // Restart listening after a short delay
       setTimeout(() => {
          const container = document.getElementById('voice-input-container');
-         // Check mount status and if ref is null (meaning no session is active)
-         if (container && document.contains(container) && !recognitionRef.current) { 
+         // Check mount status. Ref might be the old stopped instance or null.
+         // startListening will handle creating/setting the new ref and state.
+         if (container && document.contains(container)) { 
             startListening();
          } 
       }, 250); // 250ms delay, adjust if needed
