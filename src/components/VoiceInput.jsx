@@ -180,8 +180,19 @@ function VoiceInput({ onAddItem }) {
 
   return (
     <div id="voice-input-container" style={{ marginTop: '1.5rem', paddingTop: '1rem', textAlign: 'center' }}>
-      <h4>Lägg till med röst</h4>
-      <IconButton onClick={handleToggleListen} title={isListening ? 'Sluta lyssna' : 'Börja lyssna'} size="large" style={{ color: isListening ? 'red' : 'var(--primary-color)' }}>
+      <IconButton 
+        onClick={handleToggleListen} 
+        title={isListening ? 'Sluta lyssna' : 'Börja lyssna'} 
+        size="large" 
+        sx={{
+          color: isListening ? 'common.white' : 'primary.main',
+          bgcolor: isListening ? 'error.main' : 'transparent',
+          borderRadius: isListening ? '50%' : undefined,
+          '&:hover': {
+            bgcolor: isListening ? 'error.dark' : 'action.hover', 
+          },
+        }}
+      >
         {isListening ? <StopIcon /> : <MicIcon />}
       </IconButton>
       {isListening && <p style={{ fontStyle: 'italic' }}>Lyssnar...</p>}
