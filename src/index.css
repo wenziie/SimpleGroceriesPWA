@@ -152,7 +152,3 @@ div > h2 + ul {
   /* Style the list immediately following the 'Completed' h2 */
   opacity: 0.7;
 }
-
-div > h2 + ul li {
-  background-color: rgba(128, 128, 128, 0.05); /* Even subtler background */
-}
