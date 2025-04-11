@@ -35,30 +35,40 @@ function RecipesPage({
   const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
   // Ref for the scrollable content area
   const scrollRef = useRef(null);
+  // State to track previous recipes length for scroll effect
+  const [prevRecipesLength, setPrevRecipesLength] = useState(recipes.length);
 
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
   const handleCloseAddRecipe = () => setShowAddRecipe(false);
 
-  // Update handler to close modal on add AND scroll to top
+  // Handler for adding recipe - remove scroll logic from here
   const handleAddRecipeAndClose = async (url) => {
-    await addRecipe(url); // Wait for addRecipe to potentially complete
-    handleCloseAddRecipe(); // Close modal
-    // Scroll content to top after adding, with a small delay
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }, 50); // Add a small delay (e.g., 50ms) to allow DOM update
+    await addRecipe(url); 
+    handleCloseAddRecipe(); 
+    // No scroll logic here anymore
   }
 
-  // Effect to watch for the parsing failure flag from App.jsx
+  // Effect to watch for parsing failure flag
   useEffect(() => {
     if (lastRecipeParseFailed) {
       setShowParseFailedMsg(true);
       // Optionally reset the flag in App.jsx if needed, but Snackbar autoclose is enough
     }
-  }, [lastRecipeParseFailed, recipes]); // Depend on flag and recipes (to trigger on add)
+  }, [lastRecipeParseFailed, recipes]); 
+
+  // Effect to scroll to top when recipes length increases
+  useEffect(() => {
+    if (recipes.length > prevRecipesLength) {
+       console.log("[RecipesPage] Recipe added, scrolling to top.");
+      // Scroll content to top after length increases
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+    // Update previous length state *after* checking
+    setPrevRecipesLength(recipes.length);
+  }, [recipes.length, prevRecipesLength]); // Depend on recipes.length
 
   const handleCloseSnackbar = (event, reason) => {
      if (reason === 'clickaway') {

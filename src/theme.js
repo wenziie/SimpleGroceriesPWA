@@ -81,6 +81,25 @@ const lightTheme = createTheme({
             }
         }
     },
+    MuiBottomNavigationAction: {
+       defaultProps: {
+         disableRipple: true, // Disable ripple effect on click/tap
+       },
+       styleOverrides: {
+         root: {
+            // Remove default focus outline
+           '&.Mui-focusVisible': { 
+             outline: 'none', 
+             backgroundColor: 'action.hover' // Optional: subtle background on focus
+           },
+           // Ensure selected state doesn't add an outline either
+           '&.Mui-selected.Mui-focusVisible': { 
+             outline: 'none', 
+             backgroundColor: 'action.hover' // Optional: subtle background on focus
+           }
+         }
+       }
+    },
     MuiListItem: {
        styleOverrides: {
          root: {
