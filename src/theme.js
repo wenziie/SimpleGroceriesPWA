@@ -79,8 +79,6 @@ const lightTheme = createTheme({
         styleOverrides: {
             root: {
                 backgroundColor: 'background.paper', // Use paper color
-                borderTop: '1px solid', 
-                borderColor: 'divider' // Use theme divider color
             }
         }
     },
@@ -96,7 +94,9 @@ const lightTheme = createTheme({
     MuiCheckbox: {
         styleOverrides: {
             root: {
-                color: 'primary.main' // Use primary color for checkbox
+                color: 'primary.main', // Use primary color for checkbox
+                // Increase size - adjust value as needed
+                transform: 'scale(1.2)', 
             }
         }
     }

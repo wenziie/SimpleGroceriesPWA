@@ -9,6 +9,9 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close'; // Icon for closing modal
 import Snackbar from '@mui/material/Snackbar'; // For showing messages
 import Alert from '@mui/material/Alert'; // For styling Snackbar messages
+import AppBar from '@mui/material/AppBar'; // Import AppBar
+import Toolbar from '@mui/material/Toolbar'; // Import Toolbar
+import Typography from '@mui/material/Typography'; // Import Typography
 
 // Basic style for modal content box (can share or redefine)
 const modalStyle = {
@@ -64,26 +67,30 @@ function RecipesPage({
 
   return (
     <div>
-      {/* Header Actions - Update onClick to open modal */}
-      <div 
-        style={{
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          width: '100%',
-          maxWidth: '600px',
-          margin: '0 auto',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          padding: '1rem 0 0.5rem 0'
-        }}
+      {/* Refactor Header using AppBar */}
+      <AppBar 
+        position="sticky" 
+        color="inherit" // Use theme background, not primary/secondary color
+        elevation={1} // Subtle elevation
+        sx={{ 
+            // Apply max-width and centering similar to the Container in Layout
+            // This keeps the AppBar content aligned with the page content
+             maxWidth: 'calc(600px + 3rem)', // Match container width (600px) + padding (1.5rem * 2)
+             left: 'auto', // Allow margin auto to work
+             right: 'auto', 
+             mx: 'auto', // Center the AppBar itself
+             bgcolor: 'background.paper' // Ensure paper background
+           }}
       >
-        <h2>Recept</h2>
-        <IconButton onClick={handleOpenAddRecipe} title="Add Recipe">
-          <AddIcon />
-        </IconButton>
-      </div>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+           <Typography variant="h6" component="h2" sx={{ color: 'text.primary' }}>
+             Recept
+           </Typography>
+          <IconButton onClick={handleOpenAddRecipe} title="Add Recipe" color="primary">
+            <AddIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
       {/* Add Recipe Modal */}
        <Modal

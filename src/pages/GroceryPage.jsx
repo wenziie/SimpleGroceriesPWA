@@ -99,20 +99,20 @@ function GroceryPage({
             title="Add Item"
             style={{ backgroundColor: '#43CB37', borderRadius: '50%', marginRight: '0.5rem' }}
           >
-            <AddIcon style={{ color: 'var(--primary-button-icon-color)' }} />
+            <AddIcon style={{ color: '#ffffff' }} />
           </IconButton>
           <IconButton 
             onClick={handleOpenVoiceInput} 
             title="Add by Voice"
             style={{ backgroundColor: '#43CB37', borderRadius: '50%', marginRight: '0.5rem' }}
           >
-            <MicIcon style={{ color: 'var(--primary-button-icon-color)' }} />
+            <MicIcon style={{ color: '#ffffff' }} />
           </IconButton>
           <IconButton 
             onClick={handleOpenReminders} 
             title="Set Reminder"
             disabled={items.length === 0} 
-            style={{ color: items.length > 0 ? 'var(--primary-color)' : 'grey' }}
+            color={items.length > 0 ? 'primary' : 'inherit'}
           >
             <NotificationsIcon />
           </IconButton>
