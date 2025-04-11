@@ -149,6 +149,18 @@ def scrape_ingredients_fallback(html_content, url):
                 print(f"Arla Scraper: Found {len(ingredients)} potential ingredients.", flush=True)
                 scraped_successfully = len(ingredients) > 0
 
+        elif 'coop.se' in hostname:
+            # Coop: Uses <div class="IngredientList-content"> containing <ul class="List List--section"> with <li class="u-paddingHxsm u-textNormal u-colorBase"> items
+            ingredient_content = soup.find('div', class_='IngredientList-content')
+            if ingredient_content:
+                # Find all relevant li elements within the content div
+                items = ingredient_content.find_all('li', class_='u-paddingHxsm u-textNormal u-colorBase')
+                ingredients = [clean_ingredient_text(item.get_text()) for item in items if item.get_text(strip=True)]
+                print(f"Coop Scraper: Found {len(ingredients)} potential ingredients.", flush=True)
+                scraped_successfully = len(ingredients) > 0
+            else:
+                print("Coop Scraper: Could not find 'IngredientList-content' div.", flush=True)
+
         # --- Generic Blog Fallback (if specific checks failed) ---
         if not scraped_successfully:
             print("Specific site scraping failed or N/A, trying generic fallback...", flush=True)
