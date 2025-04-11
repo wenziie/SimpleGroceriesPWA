@@ -9,14 +9,14 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '80%',
+  width: { xs: 'calc(100% - 32px)', sm: 400 },
   maxWidth: 400,
-  bgcolor: 'var(--background-color, white)',
-  border: '1px solid #ccc',
+  bgcolor: 'background.paper',
   boxShadow: 24,
   p: 3,
-  borderRadius: '8px',
-  textAlign: 'center'
+  borderRadius: 2,
+  textAlign: 'center',
+  outline: 'none',
 };
 
 function ConfirmationModal({

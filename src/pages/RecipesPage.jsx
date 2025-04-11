@@ -127,9 +127,12 @@ function RecipesPage({
            open={showAddRecipe}
            onClose={handleCloseAddRecipe}
            aria-labelledby="add-recipe-dialog-title"
-           // Let Dialog handle width/styling based on content
-           // fullWidth 
-           // maxWidth="sm" 
+           PaperProps={{ // Target the inner Paper component
+             sx: {
+               mx: { xs: 2, sm: 'auto' }, 
+               width: { xs: 'calc(100% - 32px)', sm: 'auto' }, 
+             }
+           }}
          >
            <DialogTitle id="add-recipe-dialog-title">
              Lägg till recept

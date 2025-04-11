@@ -156,6 +156,14 @@ function GroceryPage({
            open={showAddItem}
            onClose={handleCloseAddItem}
            aria-labelledby="add-item-dialog-title"
+           PaperProps={{ // Target the inner Paper component
+             sx: {
+               // Add horizontal margin on mobile, auto margin on larger screens
+               mx: { xs: 2, sm: 'auto' }, 
+               // Ensure width fits within margins on mobile
+               width: { xs: 'calc(100% - 32px)', sm: 'auto' }, 
+             }
+           }}
          >
            <DialogTitle id="add-item-dialog-title">
              Lägg till artikel
@@ -177,6 +185,12 @@ function GroceryPage({
            open={showVoiceInput}
            onClose={handleCloseVoiceInput}
            aria-labelledby="voice-input-dialog-title"
+           PaperProps={{ // Target the inner Paper component
+             sx: {
+               mx: { xs: 2, sm: 'auto' }, 
+               width: { xs: 'calc(100% - 32px)', sm: 'auto' }, 
+             }
+           }}
          >
             <DialogTitle id="voice-input-dialog-title">
              Lägg till med röst
@@ -198,6 +212,12 @@ function GroceryPage({
            open={showReminders}
            onClose={handleCloseReminders}
            aria-labelledby="reminder-dialog-title"
+           PaperProps={{ // Target the inner Paper component
+             sx: {
+               mx: { xs: 2, sm: 'auto' }, 
+               width: { xs: 'calc(100% - 32px)', sm: 'auto' }, 
+             }
+           }}
          >
            <DialogTitle id="reminder-dialog-title">
              Set Reminder
