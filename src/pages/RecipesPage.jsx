@@ -57,26 +57,27 @@ function RecipesPage({
     }
   }, [lastRecipeParseFailed, recipes]); 
 
-  // Effect to scroll to bottom when recipes length increases - USE useLayoutEffect
+  // Effect to scroll towards bottom when recipes length increases
   useLayoutEffect(() => {
     if (recipes.length > prevRecipesLength) {
-      console.log(`[RecipesPage Debug] Condition met (useLayoutEffect): recipes.length (${recipes.length}) > prevRecipesLength (${prevRecipesLength})`);
-      
-      // Introduce a timeout to allow DOM update before scrolling (keep as precaution)
-      setTimeout(() => {
-        console.log('[RecipesPage Debug] Inside setTimeout (useLayoutEffect)');
-        console.log('[RecipesPage Debug] scrollRef.current:', scrollRef.current);
-        if (scrollRef.current) {
-          const targetScrollTop = scrollRef.current.scrollHeight;
-          console.log(`[RecipesPage Debug] Attempting to scroll INSTANTLY to: ${targetScrollTop} after 150ms delay`);
-          // Try instant scroll instead of smooth
-          scrollRef.current.scrollTo({ top: targetScrollTop /*, behavior: 'smooth' */ }); 
-          console.log('[RecipesPage Debug] scrollTo called (useLayoutEffect - instant - 150ms delay).');
-        } else {
-          console.warn('[RecipesPage Debug] scrollRef.current was null or undefined within setTimeout (useLayoutEffect - 150ms delay).');
-        }
-      }, 150); // Increased delay to 150ms to allow for keyboard dismissal/reflow
+      // No timeout needed now, useLayoutEffect should be sufficient
+      if (scrollRef.current) {
+        // Calculate scroll position to leave space below fixed AppBar
+        const appBarHeight = 64; // Approximate height of the AppBar
+        const padding = 8; // Add a little extra padding
+        const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight + padding; 
 
+        // Alternative calculation: scroll to bottom minus appbar height
+        // const targetScrollTop = scrollRef.current.scrollHeight - appBarHeight - padding;
+
+        // Ensure we don't scroll to a negative value if content is short
+        const finalScrollTop = Math.max(0, targetScrollTop);
+
+        console.log(`[RecipesPage] New recipe added. Attempting to scroll towards bottom (adjusting for AppBar). Target: ${finalScrollTop}`);
+        scrollRef.current.scrollTo({ top: finalScrollTop }); // Instant scroll
+      } else {
+        console.warn('[RecipesPage] scrollRef.current was null or undefined when trying to scroll.');
+      }
     }
     // Update previous length state *after* checking
     setPrevRecipesLength(recipes.length);
