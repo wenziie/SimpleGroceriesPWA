@@ -128,10 +128,10 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
           ) : (
             <ListItemText 
               primary={item.name}
-              onClick={handleTextClick} // Use dedicated handler
+              onClick={handleToggleClick} // CHANGE: Call toggle handler, not edit handler
               sx={{ 
                  textDecoration: item.completed ? 'line-through' : 'none',
-                 cursor: item.completed ? 'default' : 'pointer', // Only pointer if not completed
+                 cursor: 'pointer', // Always pointer for toggle
                }}
             />
           )}
@@ -147,7 +147,7 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                  disabled={item.completed} // Disable edit if completed
                  sx={{ mr: 0.5 }} 
                >
-                 <EditIcon fontSize="small" color={item.completed ? 'disabled' : 'action'} />
+                 <EditIcon fontSize="small" color={item.completed ? 'disabled' : 'primary'} />
                </IconButton>
                <IconButton 
                  edge="end"
