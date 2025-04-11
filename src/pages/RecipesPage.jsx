@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { useOutletContext } from 'react-router-dom'; // Import useOutletContext
+// Remove useOutletContext if no longer needed
+// import { useOutletContext } from 'react-router-dom'; 
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 // MUI Imports
@@ -30,8 +31,8 @@ function RecipesPage({
   addIngredientsFromRecipe,
   lastRecipeParseFailed
 }) {
-  // Get the scroll container ref from the Layout context
-  const { scrollContainerRef } = useOutletContext();
+  // Remove context usage
+  // const { scrollContainerRef } = useOutletContext(); 
 
   // State controls modal visibility for adding recipes
   const [showAddRecipe, setShowAddRecipe] = useState(false);
@@ -39,6 +40,8 @@ function RecipesPage({
   const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
   // State to track previous recipes length for scroll effect
   const [prevRecipesLength, setPrevRecipesLength] = useState(recipes.length);
+  // Create a ref for the last item
+  const lastItemRef = useRef(null);
 
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
@@ -58,24 +61,20 @@ function RecipesPage({
     }
   }, [lastRecipeParseFailed, recipes]); 
 
-  // Effect to scroll towards bottom using the correct ref
+  // Effect to scroll the last item into view
   useLayoutEffect(() => {
     if (recipes.length > prevRecipesLength) {
-      if (scrollContainerRef.current) { // Use the ref from context
-        // Scroll to bring the bottom of content to the bottom of the view
-        const targetScrollTop = scrollContainerRef.current.scrollHeight - scrollContainerRef.current.clientHeight;
-        
-        // Ensure we don't scroll to a negative value
-        const finalScrollTop = Math.max(0, targetScrollTop);
-
-        console.log(`[RecipesPage] New recipe. Scrolling container to: ${finalScrollTop}`);
-        scrollContainerRef.current.scrollTo({ top: finalScrollTop }); // Instant scroll
+      if (lastItemRef.current) { 
+        console.log('[RecipesPage] New recipe. Scrolling last item into view.');
+        // Scroll the last item element into the nearest edge of the scrollable ancestor
+        lastItemRef.current.scrollIntoView({ behavior: 'auto', block: 'nearest' }); 
       } else {
-        console.warn('[RecipesPage] scrollContainerRef.current was null or undefined.');
+        console.warn('[RecipesPage] lastItemRef.current was null or undefined.');
       }
     }
     setPrevRecipesLength(recipes.length);
-  }, [recipes.length, prevRecipesLength, scrollContainerRef]); // Add scrollContainerRef to dependencies
+    // Remove scrollContainerRef from dependencies
+  }, [recipes.length, prevRecipesLength]); 
 
   const handleCloseSnackbar = (event, reason) => {
      if (reason === 'clickaway') {
@@ -156,11 +155,12 @@ function RecipesPage({
            {/* No DialogActions needed as submit is inside the form */}
          </Dialog>
 
-         {/* Recipe List - remove onOpenVoiceModal */}
+         {/* Recipe List - Pass the lastItemRef */}
          <RecipeList 
            recipes={recipes} 
            onDeleteRecipe={deleteRecipe} 
            onAddIngredients={addIngredientsFromRecipe} 
+           lastItemRef={lastItemRef} // Pass the ref here
          />
 
          {/* Snackbar for Parsing Failure Message */}

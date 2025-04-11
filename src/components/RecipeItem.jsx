@@ -14,7 +14,7 @@ import Link from '@mui/material/Link'; // For clickable URL
 import Paper from '@mui/material/Paper'; // To wrap item
 import Box from '@mui/material/Box'; // For layout
 
-function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
+function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients, itemRef }) {
   const [ingredientsAdded, setIngredientsAdded] = useState(false);
 
   const handleAddIngredients = () => {
@@ -35,8 +35,8 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
 
   return (
-    // Wrap in Paper for structure and elevation - Add padding back
-    <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper', p: 1 /* Use p:1 for 8px padding */ }}> 
+    // Attach the ref to the Paper element
+    <Paper ref={itemRef} sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper', p: 1 /* Use p:1 for 8px padding */ }}> 
       <ListItem alignItems="center" disablePadding /* Add disablePadding back */ >
         {/* Avatar for Image */}
         {recipe.imageUrl && (
