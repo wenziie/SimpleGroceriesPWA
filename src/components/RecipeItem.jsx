@@ -35,17 +35,12 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
   const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
 
   return (
-    // Wrap in Paper for structure and elevation - REMOVE PADDING
-    <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper' /* Remove p: 1.5 */ }}> 
-      <ListItem 
-         alignItems="center" 
-         // Apply explicit padding to ListItem
-         sx={{ py: 1, px: 2 }} 
-       >
+    // Wrap in Paper for structure and elevation - Add padding back
+    <Paper sx={{ mb: 1.5, overflow: 'hidden', bgcolor: 'background.paper', p: 1 /* Use p:1 for 8px padding */ }}> 
+      <ListItem alignItems="center" disablePadding /* Add disablePadding back */ >
         {/* Avatar for Image */}
         {recipe.imageUrl && (
-          // Remove margin from Avatar container, rely on ListItem padding
-          <ListItemAvatar sx={{ /* mr: 1.5 */ }}> 
+          <ListItemAvatar sx={{ mr: 1 /* Keep small margin right */ }}>
             <Avatar 
               variant="rounded" // Square corners
               src={recipe.imageUrl} 
@@ -94,11 +89,10 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
                {recipe.url}
             </Link>
           }
-          // Remove margin from Text container, rely on ListItem padding
-          sx={{ my: 0, mr: 1 /* Keep some right margin before buttons */ }} 
+          sx={{ my: 0, mr: 1 /* Remove vertical margin, keep small right margin */ }}
         />
         {/* Action Buttons - Adjust layout */}
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0 /* Remove vertical margin */ /* mr: 0 REMOVE */ }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0 /* Remove vertical margin */ }}>
            {/* Replace Button with IconButton */}
            <IconButton 
              color="primary" 

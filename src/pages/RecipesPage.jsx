@@ -34,7 +34,7 @@ function RecipesPage({
   // State for showing the parsing failure message
   const [showParseFailedMsg, setShowParseFailedMsg] = useState(false);
   // Ref for the scrollable content area
-  const scrollableContentRef = useRef(null);
+  const scrollRef = useRef(null);
 
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
@@ -42,12 +42,11 @@ function RecipesPage({
 
   // Update handler to close modal on add AND scroll to top
   const handleAddRecipeAndClose = async (url) => {
-    // Use await here if addRecipe is async (it is)
-    await addRecipe(url); 
-    handleCloseAddRecipe(); // Close modal after adding
-    // Scroll content area to top
-    if (scrollableContentRef.current) {
-      scrollableContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    await addRecipe(url); // Wait for addRecipe to potentially complete
+    handleCloseAddRecipe(); // Close modal
+    // Scroll content to top after adding
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -99,19 +98,14 @@ function RecipesPage({
         </Toolbar>
       </AppBar>
 
-      {/* Add Padding Top + Add Ref to scrollable Box */}
+      {/* Add Padding Top to account for the fixed AppBar */}
       <Box 
-        ref={scrollableContentRef} // Add ref here
-        sx={{ 
-           // Approx 64px. Use theme calculation if possible
-           pt: '64px', // Keep top padding
-           px: 2, // Keep horizontal padding
-           // Ensure the box itself can scroll if needed (should match layout)
-           flexGrow: 1, 
-           overflowY: 'auto', 
-           // pb required to avoid overlap with fixed bottom nav
-           pb: `calc(56px + env(safe-area-inset-bottom, 0px))`
-         }}> 
+         ref={scrollRef} // Attach the ref here
+         sx={{ 
+         // Approx 64px. Use theme calculation if possible
+         pt: '64px', // Keep top padding
+         px: 2 // RE-ADD horizontal padding (theme spacing unit * 2)
+        }}>
 
          {/* Add Recipe Dialog (replaces Modal) */}
          <Dialog 
