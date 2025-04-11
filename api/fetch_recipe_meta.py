@@ -9,7 +9,7 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         start_time = time.time()
-        print("--- Function Start ---")
+        print("--- Function Start ---", flush=True)
         
         content_length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(content_length)
@@ -17,9 +17,9 @@ class handler(BaseHTTPRequestHandler):
         try:
             data = json.loads(body)
             url = data.get('url')
-            print(f"Received URL: {url}")
+            print(f"Received URL: {url}", flush=True)
         except json.JSONDecodeError:
-            print("ERROR: Invalid JSON received")
+            print("ERROR: Invalid JSON received", flush=True)
             self.send_response(400)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
@@ -27,7 +27,7 @@ class handler(BaseHTTPRequestHandler):
             return
 
         if not url or not self.is_valid_url(url):
-            print(f"ERROR: Invalid or missing URL: {url}")
+            print(f"ERROR: Invalid or missing URL: {url}", flush=True)
             self.send_response(400)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
@@ -39,18 +39,18 @@ class handler(BaseHTTPRequestHandler):
         }
 
         try:
-            print(f"Fetching URL: {url}")
+            print(f"Fetching URL: {url}", flush=True)
             fetch_start = time.time()
             response = requests.get(url, headers=headers, timeout=10)
             fetch_end = time.time()
-            print(f"Fetched URL in {fetch_end - fetch_start:.2f} seconds. Status: {response.status_code}")
+            print(f"Fetched URL in {fetch_end - fetch_start:.2f} seconds. Status: {response.status_code}", flush=True)
             response.raise_for_status()
 
-            print("Parsing HTML...")
+            print("Parsing HTML...", flush=True)
             parse_start = time.time()
             soup = BeautifulSoup(response.content, 'lxml')
             parse_end = time.time()
-            print(f"Parsed HTML in {parse_end - parse_start:.2f} seconds")
+            print(f"Parsed HTML in {parse_end - parse_start:.2f} seconds", flush=True)
 
             # Try fetching Open Graph title first
             og_title = soup.find('meta', property='og:title')
@@ -75,35 +75,35 @@ class handler(BaseHTTPRequestHandler):
              # Make image URL absolute if it's relative
             if image_url:
                  image_url = urllib.parse.urljoin(url, image_url)
-                 print(f"Found image URL: {image_url}")
+                 print(f"Found image URL: {image_url}", flush=True)
             else:
-                 print("No image URL found")
+                 print("No image URL found", flush=True)
 
             # If still no title, use the original URL as fallback
             if not title:
                 title = url
-                print(f"No title found, using URL as title")
+                print(f"No title found, using URL as title", flush=True)
             else:
-                 print(f"Found title: {title}")
+                 print(f"Found title: {title}", flush=True)
                 
             result = {'title': title, 'imageUrl': image_url}
-            print(f"Sending success response: {result}")
+            print(f"Sending success response: {result}", flush=True)
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(result).encode('utf-8'))
 
         except requests.exceptions.RequestException as e:
-            print(f"ERROR fetching URL {url}: {e}")
+            print(f"ERROR fetching URL {url}: {e}", flush=True)
             result = {'title': url, 'imageUrl': None}
-            print(f"Sending fallback response due to fetch error: {result}")
+            print(f"Sending fallback response due to fetch error: {result}", flush=True)
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(result).encode('utf-8'))
         except Exception as e:
-             print(f"ERROR processing URL {url}: {e}")
-             print(f"Sending 500 response due to unexpected error")
+             print(f"ERROR processing URL {url}: {e}", flush=True)
+             print(f"Sending 500 response due to unexpected error", flush=True)
              self.send_response(500)
              self.send_header('Content-type', 'application/json')
              self.end_headers()
@@ -111,7 +111,7 @@ class handler(BaseHTTPRequestHandler):
              
         finally:
              end_time = time.time()
-             print(f"--- Function End. Total Time: {end_time - start_time:.2f} seconds ---")
+             print(f"--- Function End. Total Time: {end_time - start_time:.2f} seconds ---", flush=True)
              
     def is_valid_url(self, url):
         try:
