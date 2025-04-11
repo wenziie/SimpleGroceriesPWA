@@ -26,8 +26,8 @@ function Layout() {
   };
 
   return (
-    // Use Box for overall flex container, height 100vh
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', bgcolor: 'background.default' }}>
+    // Use Box for overall flex container, revert to minHeight
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
       
       {/* Main Content Area - Make this independently scrollable */}
       <Box component="main" sx={{ flexGrow: 1, overflowY: 'auto', pb: 7 /* Add padding-bottom for BottomNav height */ }}>
