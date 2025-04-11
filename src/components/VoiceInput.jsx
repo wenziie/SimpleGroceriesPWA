@@ -138,8 +138,18 @@ function VoiceInput({ onAddItem }) {
       setTimeout(() => {
          // Check if the component might have been unmounted during the delay
          // AND check if a recognition session isn't already active (ref is null)
-         if (document.contains(document.getElementById('voice-input-container')) && !recognitionRef.current) { 
+         const container = document.getElementById('voice-input-container');
+         const shouldRestart = container && document.contains(container) && !recognitionRef.current;
+         console.log('[VoiceInput] setTimeout Check:', { 
+             isMounted: container && document.contains(container), 
+             isRefNull: !recognitionRef.current, 
+             shouldRestart 
+         });
+         if (shouldRestart) { 
+            console.log('[VoiceInput] setTimeout: Condition passed, calling startListening...');
             startListening();
+         } else {
+            console.log('[VoiceInput] setTimeout: Condition failed, not restarting.');
          }
       }, 250); // 250ms delay, adjust if needed
 
