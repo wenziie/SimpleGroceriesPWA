@@ -68,14 +68,14 @@ function RecipesPage({
         console.log('[RecipesPage Debug] scrollRef.current:', scrollRef.current);
         if (scrollRef.current) {
           const targetScrollTop = scrollRef.current.scrollHeight;
-          console.log(`[RecipesPage Debug] Attempting to scroll INSTANTLY to: ${targetScrollTop}`);
+          console.log(`[RecipesPage Debug] Attempting to scroll INSTANTLY to: ${targetScrollTop} after 150ms delay`);
           // Try instant scroll instead of smooth
           scrollRef.current.scrollTo({ top: targetScrollTop /*, behavior: 'smooth' */ }); 
-          console.log('[RecipesPage Debug] scrollTo called (useLayoutEffect - instant).');
+          console.log('[RecipesPage Debug] scrollTo called (useLayoutEffect - instant - 150ms delay).');
         } else {
-          console.warn('[RecipesPage Debug] scrollRef.current was null or undefined within setTimeout (useLayoutEffect).');
+          console.warn('[RecipesPage Debug] scrollRef.current was null or undefined within setTimeout (useLayoutEffect - 150ms delay).');
         }
-      }, 0); // 0ms delay pushes execution after current event loop task
+      }, 150); // Increased delay to 150ms to allow for keyboard dismissal/reflow
 
     }
     // Update previous length state *after* checking
