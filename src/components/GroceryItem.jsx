@@ -74,7 +74,7 @@ function GroceryItem({
   };
 
   const handleToggleClick = () => {
-    if (!isEditing) { 
+    if (!isEditing) {
       onToggleComplete(item.id);
     }
   };
@@ -132,6 +132,7 @@ function GroceryItem({
               readOnly: !isEditing,
               disableUnderline: !isEditing,
             }} 
+            onClick={handleToggleClick} 
           />
           
            <Box sx={{ display: 'flex', flexShrink: 0, gap: theme.spacing(1) }}>
