@@ -126,6 +126,10 @@ function GroceryItem({
                   border: 'none', 
                   outline: 'none',
                   boxShadow: 'none',
+                  whiteSpace: isEditing ? 'nowrap' : 'normal',
+                  overflowWrap: isEditing ? 'normal' : 'break-word',
+                  wordWrap: isEditing ? 'normal' : 'break-word',
+                  height: 'auto',
                },
             }}
             InputProps={{ 
