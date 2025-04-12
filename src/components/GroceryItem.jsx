@@ -34,9 +34,7 @@ function GroceryItem({
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
-       setTimeout(() => {
-          inputRef.current?.focus();
-       }, 50);
+       setTimeout(() => inputRef.current?.focus(), 0);
     }
   }, [isEditing]); 
 
@@ -103,13 +101,11 @@ function GroceryItem({
               onChange={(e) => setEditText(e.target.value)}
               onBlur={handleSave} 
               onKeyDown={handleKeyDown}
-              variant="standard"
+              variant="outlined"
+              size="small"
               fullWidth
               sx={{ 
                  mr: 1, 
-                 '& .MuiInput-underline:before': { borderBottom: 'none' }, 
-                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
-                 '& .MuiInput-underline:after': { borderBottomColor: theme.palette.primary.main },
               }}
             />
           ) : (
