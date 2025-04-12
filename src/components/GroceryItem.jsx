@@ -15,7 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper'; // To wrap the item
-import { useTheme, alpha } from '@mui/material/styles'; // Import useTheme and alpha for color manipulation
+import { useTheme } from '@mui/material/styles'; // Removed alpha
 
 // Remove the old modalStyle definition
 // const modalStyle = { ... };
@@ -33,13 +33,9 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
 
   // Updated handleEdit to focus directly after state update
   const handleEdit = () => {
+    if (isEditing || item.completed) return; // Do nothing if already editing or item completed
     setIsEditing(true);
-    // Use rAF to wait for next frame after state update/re-render
-    requestAnimationFrame(() => {
-       if (inputRef.current) {
-          inputRef.current.focus();
-       }
-    });
+    setTimeout(() => inputRef.current?.focus(), 0); 
   };
 
   const handleSave = () => {
@@ -66,7 +62,10 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
 
 
   // --- Delete Confirmation Handlers (remain the same) ---
-  const handleOpenDeleteConfirm = () => setShowDeleteConfirm(true);
+  const handleOpenDeleteConfirm = () => {
+    // if (isEditing) return; // REMOVED: Allow delete even when editing
+    setShowDeleteConfirm(true);
+  };
   const handleCloseDeleteConfirm = () => setShowDeleteConfirm(false);
 
   const handleDeleteConfirm = () => {
@@ -137,11 +136,10 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
           ) : (
             <ListItemText 
               primary={item.name}
-              // onClick={handleEdit} // REMOVED: Only pen icon should trigger edit
+              onClick={handleToggleClick} // RESTORED: Click text toggles completion
               sx={{ 
                  textDecoration: item.completed ? 'line-through' : 'none',
-                 // cursor: item.completed ? 'default' : 'pointer', // REMOVED: No longer clickable
-                 cursor: 'default' // Set cursor to default
+                 cursor: 'pointer', // RESTORED: Pointer cursor for toggle
                }}
             />
           )}
@@ -153,13 +151,7 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                size="medium"
                onClick={handleEdit} 
                title="Redigera artikel"
-               disabled={isEditing || item.completed} 
-               // Keep color primary, let disabled handle pointer-events
-               sx={{ 
-                  color: theme.palette.primary.main,
-                  // Reduce opacity slightly if disabled, but keep color
-                  opacity: (isEditing || item.completed) ? 0.5 : 1 
-               }}
+               color={item.completed ? 'disabled' : 'primary'} // Color only based on completed
              >
                <EditIcon fontSize="inherit" />
              </IconButton>
@@ -168,13 +160,7 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                size="medium"
                onClick={handleOpenDeleteConfirm} 
                title="Ta bort artikel"
-               disabled={isEditing} 
-               // Keep color error, let disabled handle pointer-events
-               sx={{ 
-                 color: theme.palette.error.main,
-                 // Reduce opacity slightly if disabled, but keep color
-                 opacity: isEditing ? 0.5 : 1 
-                }}
+               color="error" 
              >
                <DeleteIcon fontSize="inherit" />
              </IconButton>
