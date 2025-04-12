@@ -1,3 +1,5 @@
 requests
 beautifulsoup4
-extruct 
+extruct
+pywebpush
+redis 
