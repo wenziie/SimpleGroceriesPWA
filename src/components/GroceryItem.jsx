@@ -34,7 +34,7 @@ function GroceryItem({
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
-       setTimeout(() => inputRef.current?.focus(), 100);
+       inputRef.current.focus(); 
     }
   }, [isEditing]); 
 
@@ -132,7 +132,6 @@ function GroceryItem({
               readOnly: !isEditing,
               disableUnderline: !isEditing,
             }} 
-            onClick={() => { if (!isEditing && !item.completed) handleEdit(); }}
           />
           
            <Box sx={{ display: 'flex', flexShrink: 0, gap: theme.spacing(1) }}>
