@@ -28,14 +28,19 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Keep state for delete modal visibility
   const theme = useTheme(); // Get theme for spacing
 
-  // REMOVED useEffect for focus
-  // useEffect(() => { ... }, [isEditing]);
+  // RE-ADDED useEffect specifically for focusing when editing starts
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+       // Wrap in setTimeout to ensure focus occurs after render
+       setTimeout(() => inputRef.current?.focus(), 0);
+    }
+    // Dependency array ensures this runs only when isEditing changes
+  }, [isEditing]); 
 
-  // Updated handleEdit to focus directly after state update
   const handleEdit = () => {
-    if (isEditing || item.completed) return; // Do nothing if already editing or item completed
+    if (isEditing || item.completed) return; 
     setIsEditing(true);
-    setTimeout(() => inputRef.current?.focus(), 0); 
+    // REMOVED focus logic from here
   };
 
   const handleSave = () => {
@@ -91,8 +96,8 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
       <Paper sx={{ mb: 1, overflow: 'hidden' /* Prevent content overflow */ }}>
         <ListItem 
           sx={{ 
-            // Removed bgcolor change on edit
-            // bgcolor: isEditing ? 'action.hover' : 'transparent'
+            // Align items centrally to help with jump
+            alignItems: 'center' 
             }}
         >
           {/* Checkbox - Keep enabled but don't trigger toggle when editing */}
@@ -119,19 +124,17 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
               fullWidth
               sx={{ 
                  mr: 1, 
-                 // Hide the default underline always
-                 '& .MuiInput-underline:before': { 
-                    borderBottom: 'none' 
-                 }, 
-                 // Hide the underline on hover too
-                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { 
-                    borderBottom: 'none' 
-                 },
-                 // Style the focused underline with primary color
-                 '& .MuiInput-underline:after': {
-                    borderBottomColor: theme.palette.primary.main, 
-                 },
+                 // Attempt to match ListItemText vertical position
+                 py: '6px', // Adjust padding to match ListItemText roughly
+                 mt: '-3px', // Try slight negative margin to pull up
+                 mb: '-4px',
+                 // Underline styles
+                 '& .MuiInput-underline:before': { borderBottom: 'none' }, 
+                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
+                 '& .MuiInput-underline:after': { borderBottomColor: theme.palette.primary.main },
               }}
+              // Make input text look like list item text
+              InputProps={{ disableUnderline: false, sx: { typography: 'body1' } }} 
             />
           ) : (
             <ListItemText 
@@ -140,6 +143,8 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
               sx={{ 
                  textDecoration: item.completed ? 'line-through' : 'none',
                  cursor: 'pointer', // RESTORED: Pointer cursor for toggle
+                 // Add consistent padding to match TextField attempt
+                 py: '6px' 
                }}
             />
           )}
