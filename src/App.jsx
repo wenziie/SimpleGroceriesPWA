@@ -28,8 +28,6 @@ function App() {
       ingredients: r.ingredients || [] // Add ingredients field
     })) : [];
   });
-  // Add state to track if the *last* added recipe failed parsing
-  const [lastRecipeParseFailed, setLastRecipeParseFailed] = useState(false);
 
   // Load items from localStorage on initial render
   useEffect(() => {
@@ -116,9 +114,6 @@ function App() {
     const trimmedUrl = url.trim()
     if (!trimmedUrl) return
     
-    // Reset parsing failure flag on new attempt
-    setLastRecipeParseFailed(false);
-
     try {
       new URL(trimmedUrl) // Basic validation
     } catch (_) {
@@ -158,16 +153,10 @@ function App() {
         title = data.title || trimmedUrl; // Use fetched title or fallback to URL
         imageUrl = data.imageUrl; // Use fetched image URL (can be null)
         ingredients = data.ingredients || []; // Use fetched ingredients or empty list
-        // Check if ingredients are empty after a successful fetch
-        if (response.ok && ingredients.length === 0) {
-          console.log("API call successful, but no ingredients were parsed.");
-          setLastRecipeParseFailed(true); // Signal parsing failure
-        }
       }
     } catch (error) {
       // Handle network errors during fetch
       console.error('Network error fetching recipe metadata:', error);
-      setLastRecipeParseFailed(true); // Also signal failure on fetch error
     }
 
     const newRecipe = {
@@ -186,11 +175,14 @@ function App() {
     setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== id))
   }
 
-  // Function to add multiple ingredients (from recipe parsing)
+  // Updated function to return the count of newly added items
   const addIngredientsFromRecipe = (ingredientNames) => {
+    const currentItemNamesLower = items.map(item => item.name.toLowerCase());
+    
     const newItems = ingredientNames
-      .map(name => name.trim())
-      .filter(name => name !== '' && !items.some(item => item.name.toLowerCase() === name.toLowerCase()))
+      .map(name => name.trim()) // Trim whitespace
+      .filter(name => name !== '') // Remove empty strings
+      .filter(name => !currentItemNamesLower.includes(name.toLowerCase())) // Filter out existing names (case-insensitive)
       .map(name => ({ 
         id: crypto.randomUUID(),
         name: name,
@@ -200,6 +192,9 @@ function App() {
     if (newItems.length > 0) {
       setItems(prevItems => [...prevItems, ...newItems]);
     }
+    
+    // Return the count of items actually added
+    return { addedCount: newItems.length }; 
   };
 
   return (
@@ -223,7 +218,6 @@ function App() {
             addRecipe={addRecipe}
             deleteRecipe={deleteRecipe}
             addIngredientsFromRecipe={addIngredientsFromRecipe}
-            lastRecipeParseFailed={lastRecipeParseFailed} // Pass down the flag
           />
         } />
       </Route>

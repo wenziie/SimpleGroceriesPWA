@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 import ConfirmationModal from '../components/ConfirmationModal'; // Import confirmation modal
@@ -28,7 +28,6 @@ function RecipesPage({
   addRecipe, 
   deleteRecipe, 
   addIngredientsFromRecipe,
-  lastRecipeParseFailed
 }) {
   // Remove scrollContainerRef usage
   // const { scrollContainerRef } = useOutletContext(); 
@@ -46,6 +45,9 @@ function RecipesPage({
   // Add state for delete confirmation
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [recipeToDelete, setRecipeToDelete] = useState(null); // Store the whole recipe object now
+
+  // Snackbar state
+  const [snackbarInfo, setSnackbarInfo] = useState({ open: false, message: '', severity: 'info' });
 
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
@@ -78,13 +80,28 @@ function RecipesPage({
     handleCloseAddRecipe(); 
   }
 
-  // Effect to watch for parsing failure flag
-  useEffect(() => {
-    if (lastRecipeParseFailed) {
-      setShowParseFailedMsg(true);
-      // Optionally reset the flag in App.jsx if needed, but Snackbar autoclose is enough
-    }
-  }, [lastRecipeParseFailed, recipes]); 
+  // Snackbar handler
+  const handleCloseSnackbar = (event, reason) => {
+     if (reason === 'clickaway') {
+       return;
+     }
+     setSnackbarInfo(prev => ({ ...prev, open: false }));
+  };
+
+  // Wrapper for adding ingredients that shows snackbar
+  const handleAddIngredientsWithFeedback = (ingredientNames) => {
+     const result = addIngredientsFromRecipe(ingredientNames); // Call original
+     if (result.addedCount > 0) {
+        setSnackbarInfo({ open: true, message: `${result.addedCount} nya varor tillagda`, severity: 'success' });
+     } else {
+        setSnackbarInfo({ open: true, message: 'Alla varor finns redan', severity: 'warning' });
+     }
+  };
+
+  // Handler to show parsing failure snackbar
+  const handleShowParsingFailure = () => {
+     setSnackbarInfo({ open: true, message: 'Ingredienser kunde inte läggas till automatiskt. Kontrollera receptet på webben.', severity: 'error' });
+  };
 
   // Effect to scroll the bottom anchor into view
   useLayoutEffect(() => {
@@ -99,13 +116,6 @@ function RecipesPage({
     }
     setPrevRecipesLength(recipes.length);
   }, [recipes.length, prevRecipesLength]); 
-
-  const handleCloseSnackbar = (event, reason) => {
-     if (reason === 'clickaway') {
-       return;
-     }
-     setShowParseFailedMsg(false);
-  };
 
   // Generate dynamic message for confirmation modal
   const deleteMessage = recipeToDelete
@@ -191,7 +201,8 @@ function RecipesPage({
          <RecipeList 
            recipes={recipes} 
            onRequestDeleteRecipe={handleRequestDelete}
-           onAddIngredients={addIngredientsFromRecipe} 
+           onAddIngredients={handleAddIngredientsWithFeedback} 
+           onShowParsingFailure={handleShowParsingFailure}
            bottomAnchorRef={bottomAnchorRef}
          />
 
@@ -207,15 +218,16 @@ function RecipesPage({
            confirmColor="error" 
          />
 
-         {/* Snackbar for Parsing Failure Message */}
+         {/* Snackbar for Feedback */}
          <Snackbar 
-           open={showParseFailedMsg} 
-           autoHideDuration={6000} // Hide after 6 seconds
+           open={snackbarInfo.open} 
+           autoHideDuration={4000} // Slightly shorter duration?
            onClose={handleCloseSnackbar}
-           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Position
+           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
          >
-           <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
-              Ingredients could not be auto added. This can be due to the website's formatting. You can try to add the ingredients manually instead.
+           {/* Alert severity now comes from state */}
+           <Alert onClose={handleCloseSnackbar} severity={snackbarInfo.severity} sx={{ width: '100%' }}>
+              {snackbarInfo.message}
            </Alert>
          </Snackbar>
 

@@ -14,25 +14,24 @@ import Link from '@mui/material/Link'; // For clickable URL
 import Paper from '@mui/material/Paper'; // To wrap item
 import Box from '@mui/material/Box'; // For layout
 
-function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
-  const [ingredientsAdded, setIngredientsAdded] = useState(false);
-
-  const handleAddIngredients = () => {
-    // Use the ingredients already stored in the recipe object
-    if (recipe.ingredients && recipe.ingredients.length > 0) {
-      onAddIngredients(recipe.ingredients); // Call the function passed from App.jsx
-      setIngredientsAdded(true); // Set state to show confirmation
-      // Optionally reset after a delay
-      setTimeout(() => setIngredientsAdded(false), 3000); 
-    } else {
-      // Optional: Show a message if there are no ingredients to add
-      // (though the button might be disabled in this case)
-      console.log("No ingredients found in recipe data to add.");
-    }
-  };
-
-  // Determine if the button should be disabled
+function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients, onShowParsingFailure }) {
+  // Removed internal ingredientsAdded state
+  // const [ingredientsAdded, setIngredientsAdded] = useState(false);
+  
+  // Determine if the button should be disabled based on ingredients existence
   const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
+
+  // Combined click handler for the cart button
+  const handleCartClick = () => {
+     if (!hasIngredients) {
+       // If no ingredients were parsed, show the failure snackbar
+       onShowParsingFailure();
+     } else {
+       // Otherwise, call the add ingredients handler (which shows success/warning snackbar)
+       onAddIngredients(recipe.ingredients);
+       // We no longer manage the checkmark state here, parent shows snackbar
+     }
+  };
 
   return (
     // Remove the ref from the Paper element
@@ -92,16 +91,18 @@ function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
           sx={{ my: 0, mr: 1 /* Remove vertical margin, keep small right margin */ }}
         />
         {/* Action Buttons - Removed gap, re-added margin */}
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0, gap: theme.spacing(1) }}>
            <IconButton 
              color="primary" 
              size="medium" 
-             onClick={handleAddIngredients} 
-             sx={{ mr: 0.5 }} // Re-added small margin right
-             disabled={!hasIngredients || ingredientsAdded}
-             title={!hasIngredients ? "Ingredienser hittades inte" : (ingredientsAdded ? "Tillagd" : "Lägg till varor")}
+             onClick={handleCartClick} // Use combined handler
+             // Keep button enabled visually, logic inside handler determines action
+             // disabled={!hasIngredients} // Removed simple disabled check
+             title={!hasIngredients ? "Ingredienser kunde inte läsas in" : "Lägg till varor"}
            >
-             {ingredientsAdded ? <CheckIcon fontSize="inherit" /> : <AddShoppingCartIcon fontSize="inherit"/>}
+             {/* Always show cart icon now */}
+             <AddShoppingCartIcon fontSize="inherit"/>
+             {/* Removed conditional CheckIcon */}
            </IconButton>
           <IconButton 
             onClick={() => onRequestDeleteRecipe(recipe.id)} 
