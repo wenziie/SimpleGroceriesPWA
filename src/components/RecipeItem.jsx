@@ -97,16 +97,13 @@ function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients, onShowPar
         {/* Action Buttons - Removed gap, re-added margin */}
         <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0, gap: theme.spacing(1) }}>
            <IconButton 
-             color="primary" 
+             // Set color conditionally based on hasIngredients
+             color={hasIngredients ? "primary" : "disabled"} 
              size="medium" 
-             onClick={handleCartClick} // Use combined handler
-             // Keep button enabled visually, logic inside handler determines action
-             // disabled={!hasIngredients} // Removed simple disabled check
+             onClick={handleCartClick}
              title={!hasIngredients ? "Ingredienser kunde inte läsas in" : "Lägg till varor"}
            >
-             {/* Always show cart icon now */}
              <AddShoppingCartIcon fontSize="inherit"/>
-             {/* Removed conditional CheckIcon */}
            </IconButton>
           <IconButton 
             onClick={() => onRequestDeleteRecipe(recipe.id)} 

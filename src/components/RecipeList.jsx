@@ -4,7 +4,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-function RecipeList({ recipes, onRequestDeleteRecipe, onAddIngredients, bottomAnchorRef }) {
+function RecipeList({ recipes, onRequestDeleteRecipe, onAddIngredients, bottomAnchorRef, onShowParsingFailure }) {
   return (
     <Box>
       {/* Title removed as it's now in RecipesPage header */}
@@ -26,6 +26,7 @@ function RecipeList({ recipes, onRequestDeleteRecipe, onAddIngredients, bottomAn
               recipe={recipe}
               onRequestDeleteRecipe={onRequestDeleteRecipe}
               onAddIngredients={onAddIngredients}
+              onShowParsingFailure={onShowParsingFailure}
             />
           ))}
         </List>
