@@ -14,6 +14,14 @@ import RecipesPage from './pages/RecipesPage'
 const LOCAL_STORAGE_KEY_ITEMS = 'simple-groceries-pwa.items'
 const LOCAL_STORAGE_KEY_RECIPES = 'simple-groceries-pwa.recipes'
 
+// Helper function to decode HTML entities
+function decodeHtmlEntities(text) {
+  // Use a temporary element to leverage the browser's decoding
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+}
+
 function App() {
   // State for grocery items
   const [items, setItems] = useState([])
@@ -175,17 +183,21 @@ function App() {
     setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== id))
   }
 
-  // Updated function to return the count of newly added items
+  // Updated function to decode ingredients before adding
   const addIngredientsFromRecipe = (ingredientNames) => {
     const currentItemNamesLower = items.map(item => item.name.toLowerCase());
     
-    const newItems = ingredientNames
-      .map(name => name.trim()) // Trim whitespace
-      .filter(name => name !== '') // Remove empty strings
-      .filter(name => !currentItemNamesLower.includes(name.toLowerCase())) // Filter out existing names (case-insensitive)
+    // Decode names first
+    const decodedNames = ingredientNames.map(decodeHtmlEntities);
+
+    const newItems = decodedNames
+      .map(name => name.trim()) 
+      .filter(name => name !== '') 
+      .filter(name => !currentItemNamesLower.includes(name.toLowerCase())) 
       .map(name => ({ 
         id: crypto.randomUUID(),
-        name: name,
+        // Use the already decoded name here
+        name: name, 
         completed: false
       }));
 
@@ -193,7 +205,6 @@ function App() {
       setItems(prevItems => [...prevItems, ...newItems]);
     }
     
-    // Return the count of items actually added
     return { addedCount: newItems.length }; 
   };
 
