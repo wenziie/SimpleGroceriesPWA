@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import GroceryList from '../components/GroceryList';
 import AddItemForm from '../components/AddItemForm';
 import VoiceInput from '../components/VoiceInput';
@@ -53,9 +53,13 @@ function GroceryPage({
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Add state to track which item ID is being edited
-  const [editTargetId, setEditTargetId] = useState(null); 
+  const [editTargetId, setEditTargetId] = useState(null);
 
   const theme = useTheme(); // Get theme for spacing
+
+  // Add state and ref for scroll-to-bottom
+  const [prevItemsLength, setPrevItemsLength] = useState(items.length);
+  const bottomListAnchorRef = useRef(null);
 
   // Handlers to open modals
   const handleOpenAddItem = () => { setEditTargetId(null); setShowAddItem(true); };
@@ -95,6 +99,16 @@ function GroceryPage({
   const handleCancelEdit = () => {
     setEditTargetId(null); // Exit editing mode without saving
   };
+
+  // Effect to scroll the bottom anchor into view when items are added
+  useLayoutEffect(() => {
+    if (items.length > prevItemsLength) {
+      if (bottomListAnchorRef.current) { 
+        bottomListAnchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' }); 
+      }
+    }
+    setPrevItemsLength(items.length);
+  }, [items.length, prevItemsLength]); 
 
   return (
     <Box> { /* Wrap page content in Box */ }
@@ -235,6 +249,7 @@ function GroceryPage({
            onEditRequest={handleEditRequest} // Pass down the request handler
            onSaveEdit={handleSaveEdit}       // Pass down the save handler
            onCancelEdit={handleCancelEdit}   // Pass down the cancel handler
+           bottomListAnchorRef={bottomListAnchorRef} // Pass down the ref
          />
       </Box> { /* Close content Box */ }
     </Box>

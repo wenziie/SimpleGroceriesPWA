@@ -102,6 +102,7 @@ function GroceryItem({
             onKeyDown={handleKeyDown}
             variant="standard"
             fullWidth
+            multiline
             sx={{ 
                mr: 1, 
                cursor: !isEditing && !item.completed ? 'pointer' : 'default',
@@ -109,17 +110,11 @@ function GroceryItem({
                  padding: 0,
                  marginTop: '3px',
                  marginBottom: '4px',
-                 height: isEditing ? undefined : 'auto'
+                 height: 'auto'
                },
-               '& .MuiInput-underline:before': { 
-                  borderBottom: isEditing ? undefined : 'none' 
-               }, 
-               '& .MuiInput-underline:hover:not(.Mui-disabled):before': { 
-                  borderBottom: isEditing ? undefined : 'none'
-               },
-               '& .MuiInput-underline:after': {
-                  borderBottomColor: isEditing ? theme.palette.primary.main : 'transparent',
-               },
+               '& .MuiInput-underline:before': { borderBottom: 'none' }, 
+               '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
+               '& .MuiInput-underline:after': { borderBottomColor: isEditing ? theme.palette.primary.main : 'transparent' },
                '& .MuiInputBase-input': {
                   textDecoration: item.completed && !isEditing ? 'line-through' : 'none',
                   ...theme.typography.body1,
@@ -127,9 +122,6 @@ function GroceryItem({
                   border: 'none', 
                   outline: 'none',
                   boxShadow: 'none',
-                  whiteSpace: isEditing ? 'nowrap' : 'normal',
-                  overflowWrap: isEditing ? 'normal' : 'break-word',
-                  wordWrap: isEditing ? 'normal' : 'break-word',
                   height: 'auto',
                   minHeight: '1.43em',
                },

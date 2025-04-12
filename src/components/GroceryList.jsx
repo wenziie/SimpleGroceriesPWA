@@ -12,7 +12,8 @@ function GroceryList({
   editTargetId, 
   onEditRequest, 
   onSaveEdit, 
-  onCancelEdit 
+  onCancelEdit, 
+  bottomListAnchorRef
 }) {
 
   // No longer need to filter into active/completed
@@ -51,6 +52,9 @@ function GroceryList({
           ))}
         </List>
       )}
+
+      {/* Add the div for the scroll anchor */}
+      <div ref={bottomListAnchorRef} style={{ height: '1px' }} />
 
       {/* Remove completed items section */}
       {/* {completedItems.length > 0 && ( ... )} */}
