@@ -7,11 +7,6 @@
       "config": { "maxLambdaSize": "15mb" }
     },
     {
-      "src": "api/push.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb" }
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -25,21 +20,11 @@
       "dest": "/api/fetch_recipe_meta.py"
     },
     {
-      "src": "/api/push/(.*)",
-      "dest": "/api/push.py"
-    },
-    {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
-    }
-  ],
-  "crons": [
-    {
-      "path": "/api/push/send_all",
-      "schedule": "* * * * *" 
     }
   ]
 } 

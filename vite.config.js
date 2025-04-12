@@ -8,10 +8,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      strategies: 'injectManifest',
-      srcDir: 'public',
-      filename: 'sw.js',
       includeAssets: ['icon.png'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        cleanupOutdatedCaches: true
+      },
       manifest: {
         name: 'Simple Groceries PWA',
         short_name: 'SimpleGroceries',
