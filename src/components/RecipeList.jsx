@@ -4,7 +4,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, bottomAnchorRef }) {
+function RecipeList({ recipes, onRequestDeleteRecipe, onAddIngredients, bottomAnchorRef }) {
   return (
     <Box>
       {/* Title removed as it's now in RecipesPage header */}
@@ -16,7 +16,7 @@ function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, bottomAnchorRef
           align="center" 
           sx={{ mt: 8, mb: 4 }}
         >
-          No recipes saved yet. Add one using the '+' button above.
+          Inga recept sparade än. Lägg till ett med knappen ovan.
         </Typography>
       ) : (
         <List>
@@ -24,7 +24,7 @@ function RecipeList({ recipes, onDeleteRecipe, onAddIngredients, bottomAnchorRef
             <RecipeItem
               key={recipe.id}
               recipe={recipe}
-              onDeleteRecipe={onDeleteRecipe}
+              onRequestDeleteRecipe={onRequestDeleteRecipe}
               onAddIngredients={onAddIngredients}
             />
           ))}

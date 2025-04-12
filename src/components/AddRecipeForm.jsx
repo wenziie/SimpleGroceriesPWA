@@ -14,7 +14,7 @@ function AddRecipeForm({ onAddRecipe }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, display: 'flex', gap: 1 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
       <TextField
         type="url" // Use type="url" for basic validation
         label="Recept-URL" // Changed label
@@ -25,13 +25,15 @@ function AddRecipeForm({ onAddRecipe }) {
         fullWidth
         variant="outlined"
         size="small" // Match other inputs potentially
+        sx={{ mb: 2 }} // Add margin below text field
       />
       <Button 
          type="submit" 
          variant="contained" 
          disabled={!url.trim()} // Disable if URL is empty
+         fullWidth // Make button full width
        >
-         Lägg till // Changed button text
+         Lägg till
        </Button>
     </Box>
   );

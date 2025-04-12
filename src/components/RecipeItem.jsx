@@ -14,7 +14,7 @@ import Link from '@mui/material/Link'; // For clickable URL
 import Paper from '@mui/material/Paper'; // To wrap item
 import Box from '@mui/material/Box'; // For layout
 
-function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
+function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
   const [ingredientsAdded, setIngredientsAdded] = useState(false);
 
   const handleAddIngredients = () => {
@@ -106,7 +106,7 @@ function RecipeItem({ recipe, onDeleteRecipe, onAddIngredients }) {
              {ingredientsAdded ? <CheckIcon fontSize="small" /> : <AddShoppingCartIcon fontSize="small"/>}
            </IconButton>
           <IconButton 
-            onClick={() => onDeleteRecipe(recipe.id)} 
+            onClick={() => onRequestDeleteRecipe(recipe.id)} 
             size="small" 
             title="Delete Recipe"
             sx={{ color: 'error.main' }} // Use theme error color

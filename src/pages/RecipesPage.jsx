@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
+import ConfirmationModal from '../components/ConfirmationModal'; // Import confirmation modal
 // MUI Imports
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box'; // For Modal content styling
@@ -42,9 +43,33 @@ function RecipesPage({
   // const lastItemRef = useRef(null);
   const bottomAnchorRef = useRef(null);
 
+  // Add state for delete confirmation
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [recipeToDelete, setRecipeToDelete] = useState(null);
+
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
   const handleCloseAddRecipe = () => setShowAddRecipe(false);
+
+  // Handler for requesting delete confirmation
+  const handleRequestDelete = (id) => {
+    setRecipeToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  // Handler for closing delete confirmation
+  const handleCloseDeleteConfirm = () => {
+    setRecipeToDelete(null);
+    setShowDeleteConfirm(false);
+  };
+
+  // Handler for confirming deletion
+  const handleConfirmDelete = () => {
+    if (recipeToDelete) {
+      deleteRecipe(recipeToDelete); // Call original delete function
+    }
+    handleCloseDeleteConfirm(); // Close modal
+  };
 
   // Handler for adding recipe - remove scroll logic from here
   const handleAddRecipeAndClose = async (url) => {
@@ -156,12 +181,24 @@ function RecipesPage({
            {/* No DialogActions needed as submit is inside the form */}
          </Dialog>
 
-         {/* Recipe List - Pass the bottomAnchorRef */}
+         {/* Recipe List - Pass handleRequestDelete instead of deleteRecipe */}
          <RecipeList 
            recipes={recipes} 
-           onDeleteRecipe={deleteRecipe} 
+           onRequestDeleteRecipe={handleRequestDelete}
            onAddIngredients={addIngredientsFromRecipe} 
-           bottomAnchorRef={bottomAnchorRef} // Pass the anchor ref
+           bottomAnchorRef={bottomAnchorRef}
+         />
+
+         {/* Delete Confirmation Modal */}
+         <ConfirmationModal
+           open={showDeleteConfirm}
+           onClose={handleCloseDeleteConfirm}
+           onConfirm={handleConfirmDelete}
+           title="Bekräfta borttagning"
+           message="Är du säker på att du vill ta bort detta recept?"
+           confirmText="Ja, ta bort"
+           cancelText="Avbryt"
+           confirmColor="error" 
          />
 
          {/* Snackbar for Parsing Failure Message */}
