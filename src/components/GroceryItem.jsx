@@ -108,7 +108,8 @@ function GroceryItem({
                '& .MuiInput-root': {
                  padding: 0,
                  marginTop: '3px',
-                 marginBottom: '4px'
+                 marginBottom: '4px',
+                 height: isEditing ? undefined : 'auto'
                },
                '& .MuiInput-underline:before': { 
                   borderBottom: isEditing ? undefined : 'none' 
@@ -130,6 +131,7 @@ function GroceryItem({
                   overflowWrap: isEditing ? 'normal' : 'break-word',
                   wordWrap: isEditing ? 'normal' : 'break-word',
                   height: 'auto',
+                  minHeight: '1.43em',
                },
             }}
             InputProps={{ 
