@@ -34,7 +34,7 @@ function GroceryItem({
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
-       setTimeout(() => inputRef.current?.focus(), 0);
+       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isEditing]); 
 
@@ -96,7 +96,6 @@ function GroceryItem({
           
           {isEditing ? (
             <TextField
-              key={`item-input-${item.id}`}
               ref={inputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
@@ -110,16 +109,17 @@ function GroceryItem({
                  '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
                  '& .MuiInput-underline:after': { borderBottomColor: theme.palette.primary.main },
               }}
+              InputProps={{ disableUnderline: false, sx: { typography: 'body1' } }}
             />
           ) : (
             <ListItemText 
-              key={`item-text-${item.id}`}
               primary={item.name}
               onClick={handleToggleClick}
               sx={{ 
                  textDecoration: item.completed ? 'line-through' : 'none',
                  cursor: 'pointer',
                }}
+              primaryTypographyProps={{ variant: 'body1' }}
             />
           )}
           
