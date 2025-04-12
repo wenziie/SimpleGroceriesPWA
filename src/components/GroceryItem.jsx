@@ -31,9 +31,8 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
   // --- Edit handlers (remain the same) ---
   useEffect(() => {
     if (isEditing && inputRef.current) {
-      // Select all text on focus
+      // Just focus, remove select
       inputRef.current.focus();
-      inputRef.current.select(); 
     }
   }, [isEditing]);
 
