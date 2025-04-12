@@ -13,8 +13,12 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link'; // For clickable URL
 import Paper from '@mui/material/Paper'; // To wrap item
 import Box from '@mui/material/Box'; // For layout
+import { useTheme } from '@mui/material/styles'; // Import useTheme
 
 function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients, onShowParsingFailure }) {
+  // Add theme hook call
+  const theme = useTheme(); 
+  
   // Removed internal ingredientsAdded state
   // const [ingredientsAdded, setIngredientsAdded] = useState(false);
   
