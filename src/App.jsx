@@ -138,9 +138,9 @@ function App() {
     // Show some loading state (optional, implement later if needed)
     console.log(`Fetching metadata for: ${trimmedUrl}`); 
 
-    let title = trimmedUrl; // Default title
-    let imageUrl = null; // Default image
-    let ingredients = []; // Default ingredients
+    let title = trimmedUrl; 
+    let imageUrl = null; 
+    let ingredients = [];
 
     try {
       const response = await fetch('/api/fetch_recipe_meta', {
@@ -158,9 +158,10 @@ function App() {
         // Keep default title/imageUrl (the URL itself)
       } else {
         const data = await response.json();
-        title = data.title || trimmedUrl; // Use fetched title or fallback to URL
-        imageUrl = data.imageUrl; // Use fetched image URL (can be null)
-        ingredients = data.ingredients || []; // Use fetched ingredients or empty list
+        // Decode the title before assigning
+        title = decodeHtmlEntities(data.title || trimmedUrl);
+        imageUrl = data.imageUrl; 
+        ingredients = data.ingredients || []; 
       }
     } catch (error) {
       // Handle network errors during fetch
@@ -170,7 +171,8 @@ function App() {
     const newRecipe = {
       id: crypto.randomUUID(),
       url: trimmedUrl,
-      title: title,
+      // Use the decoded title
+      title: title, 
       imageUrl: imageUrl,
       ingredients: ingredients
     };
