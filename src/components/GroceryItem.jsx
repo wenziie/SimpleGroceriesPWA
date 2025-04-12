@@ -112,20 +112,24 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
               ref={inputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              onBlur={handleSave} // Save on blur
+              onBlur={handleSave} 
               onKeyDown={handleKeyDown}
               variant="standard"
               fullWidth
-              // autoFocus removed because we handle focus in useEffect
               sx={{ 
                  mr: 1, 
-                 // Keep default underline before focus
-                 // '& .MuiInput-underline:before': { borderBottom: 'none' }, 
-                 // Keep default underline on hover
-                 // '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
-                 // Style the underline green when focused (after state)
+                 // Hide the default underline always
+                 '& .MuiInput-underline:before': { 
+                    borderBottom: 'none' 
+                 }, 
+                 // Hide the underline on hover too
+                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { 
+                    borderBottom: 'none' 
+                 },
+                 // Style the focused underline with primary color
                  '& .MuiInput-underline:after': {
-                    borderBottomColor: theme.palette.success.main, // Use theme's success color
+                    // Use primary theme color
+                    borderBottomColor: theme.palette.primary.main, 
                  },
               }}
             />
