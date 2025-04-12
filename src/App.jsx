@@ -6,7 +6,7 @@ import GroceryList from './components/GroceryList'
 import AddRecipeForm from './components/AddRecipeForm'
 import RecipeList from './components/RecipeList'
 import VoiceInput from './components/VoiceInput' // Re-enable import
-import ReminderSetter from './components/ReminderSetter' // Re-enable import
+// import ReminderSetter from './components/ReminderSetter' // Removed
 import Layout from './components/Layout'
 import GroceryPage from './pages/GroceryPage'
 import RecipesPage from './pages/RecipesPage'

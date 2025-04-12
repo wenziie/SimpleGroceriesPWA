@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import GroceryList from '../components/GroceryList';
 import AddItemForm from '../components/AddItemForm';
 import VoiceInput from '../components/VoiceInput';
-import ReminderSetter from '../components/ReminderSetter';
 import ConfirmationModal from '../components/ConfirmationModal';
 // MUI Imports
 import IconButton from '@mui/material/IconButton';
@@ -48,11 +47,9 @@ function GroceryPage({
   clearAllItems, 
   editItem
 }) {
-  // State remains the same - controls modal visibility
+  // State controls modal visibility
   const [showAddItem, setShowAddItem] = useState(false);
   const [showVoiceInput, setShowVoiceInput] = useState(false);
-  const [showReminders, setShowReminders] = useState(false);
-  // State for the new clear confirmation modal
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Handlers to open modals
@@ -60,22 +57,19 @@ function GroceryPage({
   const handleCloseAddItem = () => setShowAddItem(false);
   const handleOpenVoiceInput = () => setShowVoiceInput(true);
   const handleCloseVoiceInput = () => setShowVoiceInput(false);
-  const handleOpenReminders = () => setShowReminders(true);
-  const handleCloseReminders = () => setShowReminders(false);
-
-  // Handlers for the new clear confirmation modal
+  
   const handleOpenClearConfirm = () => setShowClearConfirm(true);
   const handleCloseClearConfirm = () => setShowClearConfirm(false);
   
   const handleConfirmClear = () => {
-    clearAllItems(); // Call the original clear function
-    handleCloseClearConfirm(); // Close the modal
+    clearAllItems(); 
+    handleCloseClearConfirm();
   };
 
   // Update handler to close modal on add
   const handleAddItemAndClose = (name) => {
     addItem(name);
-    handleCloseAddItem(); // Close modal after adding
+    handleCloseAddItem();
   }
 
   return (
@@ -125,14 +119,6 @@ function GroceryPage({
                }}
              >
                <MicIcon /> 
-             </IconButton>
-             <IconButton 
-               onClick={handleOpenReminders} 
-               title="Set Reminder"
-               disabled={items.length === 0} 
-               color={items.length > 0 ? 'primary' : 'default'} 
-             >
-               <NotificationsIcon />
              </IconButton>
            </Box>
         </Toolbar>
@@ -203,33 +189,6 @@ function GroceryPage({
             <DialogContent dividers>
               <VoiceInput onAddItem={addItem} /> 
             </DialogContent>
-         </Dialog>
-
-         {/* Refactor Reminder Modal to Dialog */}
-         <Dialog
-           open={showReminders}
-           onClose={handleCloseReminders}
-           aria-labelledby="reminder-dialog-title"
-           PaperProps={{
-             sx: {
-               mx: { xs: 2, sm: 'auto' }, 
-               width: { xs: 'calc(100% - 32px)', sm: 'auto' }, 
-             }
-           }}
-         >
-           <DialogTitle id="reminder-dialog-title">
-             Sätt påminnelse
-             <IconButton
-               aria-label="close"
-               onClick={handleCloseReminders}
-               sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
-             >
-               <CloseIcon />
-             </IconButton>
-           </DialogTitle>
-           <DialogContent dividers>
-             <ReminderSetter />
-           </DialogContent>
          </Dialog>
 
          {/* --- Confirmation Modals --- */}
