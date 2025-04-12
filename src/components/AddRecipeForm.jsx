@@ -17,10 +17,10 @@ function AddRecipeForm({ onAddRecipe }) {
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, display: 'flex', gap: 1 }}>
       <TextField
         type="url" // Use type="url" for basic validation
-        label="Recipe URL" // Add label
+        label="Recept-URL" // Changed label
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="Paste recipe URL here"
+        placeholder="Klistra in receptets URL här" // Changed placeholder
         required
         fullWidth
         variant="outlined"
@@ -31,7 +31,7 @@ function AddRecipeForm({ onAddRecipe }) {
          variant="contained" 
          disabled={!url.trim()} // Disable if URL is empty
        >
-         Add
+         Lägg till // Changed button text
        </Button>
     </Box>
   );
