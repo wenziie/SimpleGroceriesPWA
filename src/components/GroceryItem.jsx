@@ -34,7 +34,9 @@ function GroceryItem({
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
-       setTimeout(() => inputRef.current?.focus(), 0);
+       setTimeout(() => {
+          inputRef.current?.focus();
+       }, 50);
     }
   }, [isEditing]); 
 
@@ -128,7 +130,10 @@ function GroceryItem({
                onClick={handleEdit} 
                title="Redigera artikel"
                disabled={isEditing || item.completed}
-               color="primary"
+               sx={{ 
+                  color: item.completed ? theme.palette.action.disabled : theme.palette.primary.main,
+                  opacity: isEditing ? 0.5 : 1 
+               }}
              >
                <EditIcon fontSize="inherit" />
              </IconButton>
@@ -138,7 +143,10 @@ function GroceryItem({
                onClick={handleOpenDeleteConfirm} 
                title="Ta bort artikel"
                disabled={isEditing}
-               color="error" 
+               sx={{ 
+                 color: theme.palette.error.main,
+                 opacity: isEditing ? 0.5 : 1 
+                }}
              >
                <DeleteIcon fontSize="inherit" />
              </IconButton>
