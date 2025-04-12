@@ -96,20 +96,24 @@ function GroceryItem({
           
           {isEditing ? (
             <TextField
+              key={`item-input-${item.id}`}
               ref={inputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               onBlur={handleSave} 
               onKeyDown={handleKeyDown}
-              variant="outlined"
-              size="small"
+              variant="standard"
               fullWidth
               sx={{ 
                  mr: 1, 
+                 '& .MuiInput-underline:before': { borderBottom: 'none' }, 
+                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
+                 '& .MuiInput-underline:after': { borderBottomColor: theme.palette.primary.main },
               }}
             />
           ) : (
             <ListItemText 
+              key={`item-text-${item.id}`}
               primary={item.name}
               onClick={handleToggleClick}
               sx={{ 
@@ -126,10 +130,7 @@ function GroceryItem({
                onClick={handleEdit} 
                title="Redigera artikel"
                disabled={isEditing || item.completed}
-               sx={{ 
-                  color: item.completed ? theme.palette.action.disabled : theme.palette.primary.main,
-                  opacity: isEditing ? 0.5 : 1 
-               }}
+               color="primary"
              >
                <EditIcon fontSize="inherit" />
              </IconButton>
@@ -139,10 +140,7 @@ function GroceryItem({
                onClick={handleOpenDeleteConfirm} 
                title="Ta bort artikel"
                disabled={isEditing}
-               sx={{ 
-                 color: theme.palette.error.main,
-                 opacity: isEditing ? 0.5 : 1 
-                }}
+               color="error"
              >
                <DeleteIcon fontSize="inherit" />
              </IconButton>
