@@ -45,30 +45,31 @@ function RecipesPage({
 
   // Add state for delete confirmation
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [recipeToDelete, setRecipeToDelete] = useState(null);
+  const [recipeToDelete, setRecipeToDelete] = useState(null); // Store the whole recipe object now
 
   // Handlers to open/close add recipe modal
   const handleOpenAddRecipe = () => setShowAddRecipe(true);
   const handleCloseAddRecipe = () => setShowAddRecipe(false);
 
-  // Handler for requesting delete confirmation
-  const handleRequestDelete = (id) => {
-    setRecipeToDelete(id);
-    setShowDeleteConfirm(true);
+  // Updated handler for requesting delete confirmation
+  const handleRequestDelete = (recipeId) => {
+    const recipe = recipes.find(r => r.id === recipeId); // Find the recipe object
+    if (recipe) {
+      setRecipeToDelete(recipe);
+      setShowDeleteConfirm(true);
+    }
   };
 
-  // Handler for closing delete confirmation
   const handleCloseDeleteConfirm = () => {
     setRecipeToDelete(null);
     setShowDeleteConfirm(false);
   };
 
-  // Handler for confirming deletion
   const handleConfirmDelete = () => {
     if (recipeToDelete) {
-      deleteRecipe(recipeToDelete); // Call original delete function
+      deleteRecipe(recipeToDelete.id); // Pass the ID to the original delete function
     }
-    handleCloseDeleteConfirm(); // Close modal
+    handleCloseDeleteConfirm(); 
   };
 
   // Handler for adding recipe - remove scroll logic from here
@@ -105,6 +106,11 @@ function RecipesPage({
      }
      setShowParseFailedMsg(false);
   };
+
+  // Generate dynamic message for confirmation modal
+  const deleteMessage = recipeToDelete
+    ? `Är du säker på att du vill ta bort receptet "${recipeToDelete.title}"?`
+    : "Är du säker på att du vill ta bort detta recept?"; // Fallback
 
   return (
     <Box> { /* Wrap page content in Box */ }
@@ -189,13 +195,13 @@ function RecipesPage({
            bottomAnchorRef={bottomAnchorRef}
          />
 
-         {/* Delete Confirmation Modal */}
+         {/* Delete Confirmation Modal - Updated message */}
          <ConfirmationModal
            open={showDeleteConfirm}
            onClose={handleCloseDeleteConfirm}
            onConfirm={handleConfirmDelete}
            title="Bekräfta borttagning"
-           message="Är du säker på att du vill ta bort detta recept?"
+           message={deleteMessage} // Use dynamic message
            confirmText="Ja, ta bort"
            cancelText="Avbryt"
            confirmColor="error" 
