@@ -89,7 +89,7 @@ function GroceryPage({
            <Button 
              onClick={handleOpenClearConfirm}
              color="error" 
-             size="medium"
+             size="large"
              startIcon={<DeleteSweepIcon />} 
              disabled={items.length === 0}
              sx={{ textTransform: 'none' }}

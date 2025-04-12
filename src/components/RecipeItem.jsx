@@ -13,11 +13,9 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link'; // For clickable URL
 import Paper from '@mui/material/Paper'; // To wrap item
 import Box from '@mui/material/Box'; // For layout
-import { useTheme } from '@mui/material/styles'; // Import useTheme
 
 function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
   const [ingredientsAdded, setIngredientsAdded] = useState(false);
-  const theme = useTheme(); // Get theme for spacing
 
   const handleAddIngredients = () => {
     // Use the ingredients already stored in the recipe object
@@ -93,13 +91,13 @@ function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
           }
           sx={{ my: 0, mr: 1 /* Remove vertical margin, keep small right margin */ }}
         />
-        {/* Action Buttons - Added container with gap */}
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0, gap: theme.spacing(1) /* Approx 8px gap */ }}>
+        {/* Action Buttons - Removed gap, re-added margin */}
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0 }}>
            <IconButton 
              color="primary" 
-             size="medium" // Increased size
+             size="medium" 
              onClick={handleAddIngredients} 
-             // sx={{ mr: 0.5 }} // Removed margin, using gap on Box
+             sx={{ mr: 0.5 }} // Re-added small margin right
              disabled={!hasIngredients || ingredientsAdded}
              title={!hasIngredients ? "Ingredienser hittades inte" : (ingredientsAdded ? "Tillagd" : "Lägg till varor")}
            >
@@ -107,8 +105,8 @@ function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
            </IconButton>
           <IconButton 
             onClick={() => onRequestDeleteRecipe(recipe.id)} 
-            size="medium" // Increased size
-            title="Ta bort recept" // Translated title
+            size="medium" 
+            title="Ta bort recept" 
             sx={{ color: 'error.main' }}
           >
             <DeleteIcon fontSize="inherit" />

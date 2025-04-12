@@ -15,7 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper'; // To wrap the item
-import { useTheme } from '@mui/material/styles'; // Import useTheme
+import { useTheme, alpha } from '@mui/material/styles'; // Import useTheme and alpha for color manipulation
 
 // Remove the old modalStyle definition
 // const modalStyle = { ... };
@@ -30,8 +30,10 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
 
   // --- Edit handlers (remain the same) ---
   useEffect(() => {
-    if (isEditing) {
+    if (isEditing && inputRef.current) {
+      // Select all text on focus
       inputRef.current.focus();
+      inputRef.current.select(); 
     }
   }, [isEditing]);
 
@@ -43,11 +45,9 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
     const trimmedName = editText.trim();
     if (trimmedName) {
       onEditItem(item.id, trimmedName); // Call the edit function passed from props
-      setIsEditing(false);
-    } else {
-      // Optionally handle empty input case, e.g., revert or show error
-      handleCancel(); // Or just cancel
     }
+    // Always exit editing mode on save/blur, even if empty
+    setIsEditing(false);
   };
 
   const handleCancel = () => {
@@ -91,20 +91,19 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
       <Paper sx={{ mb: 1, overflow: 'hidden' /* Prevent content overflow */ }}>
         <ListItem 
           sx={{ 
-             opacity: !isEditing && item.completed ? 0.6 : 1,
-             bgcolor: isEditing ? 'action.hover' : 'transparent' // Subtle bg when editing
+            // Removed bgcolor change on edit
+            // bgcolor: isEditing ? 'action.hover' : 'transparent'
             }}
         >
-          {/* Checkbox */}
+          {/* Checkbox - Keep enabled but don't trigger toggle when editing */}
           <ListItemIcon sx={{ minWidth: 'auto' }}>
             <Checkbox
               edge="start"
               checked={item.completed}
-              onChange={handleToggleClick} // Use dedicated handler
-              disabled={isEditing}
+              onChange={handleToggleClick} 
+              // disabled={isEditing} // Keep enabled visually
               tabIndex={-1}
               disableRipple
-              // Size adjusted via theme
             />
           </ListItemIcon>
           
@@ -114,54 +113,57 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
               ref={inputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              onBlur={handleSave} // Save when input loses focus
+              onBlur={handleSave} // Save on blur
               onKeyDown={handleKeyDown}
-              variant="standard" // Use standard variant for inline look
+              variant="standard"
               fullWidth
-              autoFocus
+              // autoFocus removed because we handle focus in useEffect
               sx={{ 
-                 mr: 1,
-                 // Remove underline for cleaner look
-                 '& .MuiInput-underline:before': { borderBottom: 'none' },
-                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
-                 '& .MuiInput-underline:after': { borderBottom: 'none' },
+                 mr: 1, 
+                 // Keep default underline before focus
+                 // '& .MuiInput-underline:before': { borderBottom: 'none' }, 
+                 // Keep default underline on hover
+                 // '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
+                 // Style the underline green when focused (after state)
+                 '& .MuiInput-underline:after': {
+                    borderBottomColor: theme.palette.success.main, // Use theme's success color
+                 },
               }}
             />
           ) : (
             <ListItemText 
               primary={item.name}
-              onClick={handleToggleClick} // CHANGE: Call toggle handler, not edit handler
+              onClick={handleEdit} // Trigger edit on text click when not completed
               sx={{ 
                  textDecoration: item.completed ? 'line-through' : 'none',
-                 cursor: 'pointer', // Always pointer for toggle
+                 cursor: item.completed ? 'default' : 'pointer', // Only pointer if editable
                }}
             />
           )}
           
-          {/* Action Buttons - only show if not editing */}
-          {!isEditing && (
-             <Box sx={{ display: 'flex', flexShrink: 0, gap: theme.spacing(1) /* Approx 8px gap */ }}>
-               <IconButton 
-                 edge="end" 
-                 size="medium" // Increased size
-                 onClick={handleEdit} 
-                 title="Redigera artikel" // Translated title
-                 disabled={item.completed} 
-                 // sx={{ mr: 0.5 }} // Removed margin, using gap on Box
-               >
-                 <EditIcon fontSize="inherit" color={item.completed ? 'disabled' : 'primary'} />
-               </IconButton>
-               <IconButton 
-                 edge="end" 
-                 size="medium" // Increased size
-                 onClick={handleOpenDeleteConfirm} 
-                 title="Ta bort artikel" // Translated title 
-                 sx={{ color: 'error.main' }}
-               >
-                 <DeleteIcon fontSize="inherit" />
-               </IconButton>
-            </Box>
-          )}
+          {/* Action Buttons - Always show, disable when editing */}
+           <Box sx={{ display: 'flex', flexShrink: 0, gap: theme.spacing(1) }}>
+             <IconButton 
+               edge="end" 
+               size="medium"
+               onClick={handleEdit} 
+               title="Redigera artikel"
+               disabled={isEditing || item.completed} // Disable if editing OR completed
+               color={item.completed ? 'disabled' : (isEditing ? 'disabled' : 'primary')}
+             >
+               <EditIcon fontSize="inherit" />
+             </IconButton>
+             <IconButton 
+               edge="end" 
+               size="medium"
+               onClick={handleOpenDeleteConfirm} 
+               title="Ta bort artikel"
+               disabled={isEditing} // Disable if editing
+               sx={{ color: isEditing ? alpha(theme.palette.error.main, 0.3) : theme.palette.error.main }} // Fade if disabled
+             >
+               <DeleteIcon fontSize="inherit" />
+             </IconButton>
+          </Box>
         </ListItem>
       </Paper>
 
