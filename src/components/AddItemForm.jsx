@@ -5,50 +5,34 @@ import Box from '@mui/material/Box';
 
 // Receive onAddItem function as a prop
 function AddItemForm({ onAddItem }) {
-  const [inputValue, setInputValue] = useState('');
+  const [itemNames, setItemNames] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const trimmedValue = inputValue.trim();
-    if (!trimmedValue) return;
-
-    const lines = trimmedValue.split('\n')
-      .map(line => line.trim())
-      .filter(line => line !== '');
-    lines.forEach(line => onAddItem(line));
-    
-    setInputValue('');
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const namesArray = itemNames.split('\n').map(name => name.trim()).filter(name => name !== '');
+    namesArray.forEach(name => onAddItem(name));
+    setItemNames(''); // Clear the textarea
   };
 
   return (
-    // Use Box with explicit flex column layout
-    <Box 
-      component="form" 
-      onSubmit={handleSubmit} 
-      sx={{ 
-        mt: 1, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: 2 // Add gap between input and button (theme spacing unit * 2)
-      }}
-    >
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}> 
       <TextField
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        placeholder="Skriv artiklar (en per rad)"
-        multiline 
+        label="Artiklar"
+        multiline
         rows={4}
-        required
-        fullWidth 
-        variant="outlined" 
-        // Remove mb as gap is handled by the parent Box
-        // sx={{ mb: 2 }} 
+        value={itemNames}
+        onChange={(e) => setItemNames(e.target.value)}
+        placeholder="Skriv artiklar, tryck retur mellan varje artikel"
+        variant="outlined"
+        fullWidth
+        margin="normal"
       />
       <Button 
         type="submit" 
         variant="contained" 
-        fullWidth // Add fullWidth back for vertical layout
-        disabled={!inputValue.trim()}
+        fullWidth 
+        disabled={itemNames.trim() === ''}
+        sx={{ mt: 2, mb: 2 }}
       >
         Lägg till
       </Button>
