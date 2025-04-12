@@ -94,34 +94,46 @@ function GroceryItem({
             />
           </ListItemIcon>
           
-          {isEditing ? (
-            <TextField
-              ref={inputRef}
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              onBlur={handleSave} 
-              onKeyDown={handleKeyDown}
-              variant="standard"
-              fullWidth
-              sx={{ 
-                 mr: 1, 
-                 '& .MuiInput-underline:before': { borderBottom: 'none' }, 
-                 '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottom: 'none' },
-                 '& .MuiInput-underline:after': { borderBottomColor: theme.palette.primary.main },
-              }}
-              InputProps={{ disableUnderline: false, sx: { typography: 'body1' } }}
-            />
-          ) : (
-            <ListItemText 
-              primary={item.name}
-              onClick={handleToggleClick}
-              sx={{ 
-                 textDecoration: item.completed ? 'line-through' : 'none',
-                 cursor: 'pointer',
-               }}
-              primaryTypographyProps={{ variant: 'body1' }}
-            />
-          )}
+          <TextField
+            inputRef={inputRef}
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            onBlur={handleSave} 
+            onKeyDown={handleKeyDown}
+            variant="standard"
+            fullWidth
+            sx={{ 
+               mr: 1, 
+               cursor: !isEditing && !item.completed ? 'pointer' : 'default',
+               '& .MuiInput-root': {
+                 padding: 0,
+                 marginTop: '3px',
+                 marginBottom: '4px'
+               },
+               '& .MuiInput-underline:before': { 
+                  borderBottom: isEditing ? undefined : 'none' 
+               }, 
+               '& .MuiInput-underline:hover:not(.Mui-disabled):before': { 
+                  borderBottom: isEditing ? undefined : 'none'
+               },
+               '& .MuiInput-underline:after': {
+                  borderBottomColor: isEditing ? theme.palette.primary.main : 'transparent',
+               },
+               '& .MuiInputBase-input': {
+                  textDecoration: item.completed && !isEditing ? 'line-through' : 'none',
+                  ...theme.typography.body1,
+                  backgroundColor: 'transparent', 
+                  border: 'none', 
+                  outline: 'none',
+                  boxShadow: 'none',
+               },
+            }}
+            InputProps={{ 
+              readOnly: !isEditing,
+              disableUnderline: !isEditing,
+            }} 
+            onClick={() => { if (!isEditing && !item.completed) handleEdit(); }}
+          />
           
            <Box sx={{ display: 'flex', flexShrink: 0, gap: theme.spacing(1) }}>
              <IconButton 
