@@ -52,6 +52,8 @@ function GroceryPage({
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
+  const theme = useTheme(); // Get theme for spacing
+
   // Handlers to open modals
   const handleOpenAddItem = () => setShowAddItem(true);
   const handleCloseAddItem = () => setShowAddItem(false);
@@ -87,22 +89,21 @@ function GroceryPage({
            <Button 
              onClick={handleOpenClearConfirm}
              color="error" 
-             size="small"
+             size="medium"
              startIcon={<DeleteSweepIcon />} 
              disabled={items.length === 0}
-             sx={{ textTransform: 'none' }} // Keep text case
+             sx={{ textTransform: 'none' }}
            >
              Töm lista
            </Button> 
            {/* Action Icons on Right */}
-           <Box>
+           <Box sx={{ display: 'flex', gap: theme.spacing(1.5) }}>
              <IconButton 
                onClick={handleOpenAddItem} 
-               title="Add Item"
+               title="Lägg till artikel"
                sx={{ 
                  bgcolor: 'primary.main', 
                  color: 'primary.contrastText', 
-                 mr: 1, 
                  '&:hover': { bgcolor: 'primary.dark' }
                }}
              >
@@ -110,11 +111,10 @@ function GroceryPage({
              </IconButton>
              <IconButton 
                onClick={handleOpenVoiceInput} 
-               title="Add by Voice"
+               title="Lägg till med röst"
                sx={{ 
                  bgcolor: 'primary.main', 
                  color: 'primary.contrastText', 
-                 mr: 1, 
                  '&:hover': { bgcolor: 'primary.dark' }
                }}
              >

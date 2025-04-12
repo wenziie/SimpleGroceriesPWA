@@ -13,9 +13,11 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link'; // For clickable URL
 import Paper from '@mui/material/Paper'; // To wrap item
 import Box from '@mui/material/Box'; // For layout
+import { useTheme } from '@mui/material/styles'; // Import useTheme
 
 function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
   const [ingredientsAdded, setIngredientsAdded] = useState(false);
+  const theme = useTheme(); // Get theme for spacing
 
   const handleAddIngredients = () => {
     // Use the ingredients already stored in the recipe object
@@ -91,27 +93,25 @@ function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients }) {
           }
           sx={{ my: 0, mr: 1 /* Remove vertical margin, keep small right margin */ }}
         />
-        {/* Action Buttons - Adjust layout */}
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0 /* Remove vertical margin */ }}>
-           {/* Replace Button with IconButton */}
+        {/* Action Buttons - Added container with gap */}
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', my: 0, gap: theme.spacing(1) /* Approx 8px gap */ }}>
            <IconButton 
              color="primary" 
-             size="small" 
+             size="medium" // Increased size
              onClick={handleAddIngredients} 
-             sx={{ mr: 0.5 }} // Add margin between icons
+             // sx={{ mr: 0.5 }} // Removed margin, using gap on Box
              disabled={!hasIngredients || ingredientsAdded}
-             title={!hasIngredients ? "Ingredients not found" : (ingredientsAdded ? "Added" : "Add items")}
+             title={!hasIngredients ? "Ingredienser hittades inte" : (ingredientsAdded ? "Tillagd" : "Lägg till varor")}
            >
-             {/* Show checkmark when added, otherwise cart */}
-             {ingredientsAdded ? <CheckIcon fontSize="small" /> : <AddShoppingCartIcon fontSize="small"/>}
+             {ingredientsAdded ? <CheckIcon fontSize="inherit" /> : <AddShoppingCartIcon fontSize="inherit"/>}
            </IconButton>
           <IconButton 
             onClick={() => onRequestDeleteRecipe(recipe.id)} 
-            size="small" 
-            title="Delete Recipe"
-            sx={{ color: 'error.main' }} // Use theme error color
+            size="medium" // Increased size
+            title="Ta bort recept" // Translated title
+            sx={{ color: 'error.main' }}
           >
-            <DeleteIcon fontSize="small" />
+            <DeleteIcon fontSize="inherit" />
           </IconButton>
         </Box>
       </ListItem>

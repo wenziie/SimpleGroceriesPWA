@@ -15,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper'; // To wrap the item
+import { useTheme } from '@mui/material/styles'; // Import useTheme
 
 // Remove the old modalStyle definition
 // const modalStyle = { ... };
@@ -25,6 +26,7 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
   const [editText, setEditText] = useState(item.name);
   const inputRef = useRef(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Keep state for delete modal visibility
+  const theme = useTheme(); // Get theme for spacing
 
   // --- Edit handlers (remain the same) ---
   useEffect(() => {
@@ -138,25 +140,25 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
           
           {/* Action Buttons - only show if not editing */}
           {!isEditing && (
-             <Box sx={{ display: 'flex', flexShrink: 0 }}>
+             <Box sx={{ display: 'flex', flexShrink: 0, gap: theme.spacing(1) /* Approx 8px gap */ }}>
                <IconButton 
-                 edge="end"
-                 size="small" 
+                 edge="end" 
+                 size="medium" // Increased size
                  onClick={handleEdit} 
-                 title="Edit Item" 
-                 disabled={item.completed} // Disable edit if completed
-                 sx={{ mr: 0.5 }} 
+                 title="Redigera artikel" // Translated title
+                 disabled={item.completed} 
+                 // sx={{ mr: 0.5 }} // Removed margin, using gap on Box
                >
-                 <EditIcon fontSize="small" color={item.completed ? 'disabled' : 'primary'} />
+                 <EditIcon fontSize="inherit" color={item.completed ? 'disabled' : 'primary'} />
                </IconButton>
                <IconButton 
-                 edge="end"
-                 size="small" 
+                 edge="end" 
+                 size="medium" // Increased size
                  onClick={handleOpenDeleteConfirm} 
-                 title="Delete Item" 
-                 sx={{ color: 'error.main' }} // Use theme error color
+                 title="Ta bort artikel" // Translated title 
+                 sx={{ color: 'error.main' }}
                >
-                 <DeleteIcon fontSize="small" />
+                 <DeleteIcon fontSize="inherit" />
                </IconButton>
             </Box>
           )}
