@@ -28,20 +28,18 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Keep state for delete modal visibility
   const theme = useTheme(); // Get theme for spacing
 
-  // --- Edit handlers (remain the same) ---
-  useEffect(() => {
-    // Add slight delay to ensure TextField is ready for focus
-    if (isEditing && inputRef.current) {
-      setTimeout(() => {
-        if (inputRef.current) { // Check ref again inside timeout
-           inputRef.current.focus();
-        }
-      }, 0); 
-    }
-  }, [isEditing]);
+  // REMOVED useEffect for focus
+  // useEffect(() => { ... }, [isEditing]);
 
+  // Updated handleEdit to focus directly after state update
   const handleEdit = () => {
     setIsEditing(true);
+    // Use rAF to wait for next frame after state update/re-render
+    requestAnimationFrame(() => {
+       if (inputRef.current) {
+          inputRef.current.focus();
+       }
+    });
   };
 
   const handleSave = () => {
@@ -132,7 +130,6 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                  },
                  // Style the focused underline with primary color
                  '& .MuiInput-underline:after': {
-                    // Use primary theme color
                     borderBottomColor: theme.palette.primary.main, 
                  },
               }}
@@ -157,9 +154,12 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                onClick={handleEdit} 
                title="Redigera artikel"
                disabled={isEditing || item.completed} 
-               // REMOVED explicit color change for disabled state
-               // color={item.completed ? 'disabled' : (isEditing ? 'disabled' : 'primary')}
-               color={item.completed ? 'disabled' : 'primary'} // Set color based on completed only
+               // Keep color primary, let disabled handle pointer-events
+               sx={{ 
+                  color: theme.palette.primary.main,
+                  // Reduce opacity slightly if disabled, but keep color
+                  opacity: (isEditing || item.completed) ? 0.5 : 1 
+               }}
              >
                <EditIcon fontSize="inherit" />
              </IconButton>
@@ -169,9 +169,12 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                onClick={handleOpenDeleteConfirm} 
                title="Ta bort artikel"
                disabled={isEditing} 
-               // REMOVED explicit sx color change for disabled state
-               // sx={{ color: isEditing ? alpha(theme.palette.error.main, 0.3) : theme.palette.error.main }}
-               color="error" // Set base color to error
+               // Keep color error, let disabled handle pointer-events
+               sx={{ 
+                 color: theme.palette.error.main,
+                 // Reduce opacity slightly if disabled, but keep color
+                 opacity: isEditing ? 0.5 : 1 
+                }}
              >
                <DeleteIcon fontSize="inherit" />
              </IconButton>
