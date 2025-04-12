@@ -102,6 +102,10 @@ function RecipeItem({ recipe, onRequestDeleteRecipe, onAddIngredients, onShowPar
              size="medium" 
              onClick={handleCartClick}
              title={!hasIngredients ? "Ingredienser kunde inte läsas in" : "Lägg till varor"}
+             // Add sx to override disabled opacity
+             sx={{ 
+                opacity: !hasIngredients ? 0.6 : 1 // Make disabled state less faded
+             }}
            >
              <AddShoppingCartIcon fontSize="inherit"/>
            </IconButton>
