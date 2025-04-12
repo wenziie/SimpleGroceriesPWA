@@ -1,38 +1,51 @@
 import React, { useState } from 'react';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 
 // Receive onAddItem function as a prop
 function AddItemForm({ onAddItem }) {
-  const [itemNames, setItemNames] = useState('');
+  const [inputValue, setInputValue] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const namesArray = itemNames.split('\n').map(name => name.trim()).filter(name => name !== '');
-    namesArray.forEach(name => onAddItem(name));
-    setItemNames(''); // Clear the textarea
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const trimmedValue = inputValue.trim();
+    if (!trimmedValue) return;
+
+    const lines = trimmedValue.split('\n')
+      .map(line => line.trim())
+      .filter(line => line !== '');
+    lines.forEach(line => onAddItem(line));
+    
+    setInputValue('');
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}> 
+    <Box 
+      component="form" 
+      onSubmit={handleSubmit} 
+      sx={{ 
+        mt: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: 2
+      }}
+    >
       <TextField
-        label="Artiklar"
-        multiline
-        rows={4}
-        value={itemNames}
-        onChange={(e) => setItemNames(e.target.value)}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
         placeholder="Skriv artiklar, tryck retur mellan varje artikel"
+        multiline 
+        rows={4}
+        required
+        fullWidth 
         variant="outlined"
-        fullWidth
-        margin="normal"
       />
       <Button 
         type="submit" 
         variant="contained" 
-        fullWidth 
-        disabled={itemNames.trim() === ''}
-        sx={{ mt: 2, mb: 2 }}
+        fullWidth
+        disabled={!inputValue.trim()}
       >
         Lägg till
       </Button>
