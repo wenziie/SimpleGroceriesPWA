@@ -221,13 +221,15 @@ function RecipesPage({
          {/* Snackbar for Feedback */}
          <Snackbar 
            open={snackbarInfo.open} 
-           autoHideDuration={4000} // Slightly shorter duration?
+           autoHideDuration={4000}
            onClose={handleCloseSnackbar}
            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+           sx={{ 
+              mb: 'calc(56px + 8px + env(safe-area-inset-bottom, 0px))'
+           }}
          >
-           {/* Alert severity now comes from state */}
            <Alert onClose={handleCloseSnackbar} severity={snackbarInfo.severity} sx={{ width: '100%' }}>
-              {snackbarInfo.message}
+             {snackbarInfo.message}
            </Alert>
          </Snackbar>
 
