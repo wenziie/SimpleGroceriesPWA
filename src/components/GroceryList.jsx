@@ -5,7 +5,15 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 // Removed onClearCompleted prop as it's handled in the page header
-function GroceryList({ items, onToggleComplete, onDeleteItem, onEditItem }) {
+function GroceryList({ 
+  items, 
+  onToggleComplete, 
+  onDeleteItem, 
+  editTargetId, 
+  onEditRequest, 
+  onSaveEdit, 
+  onCancelEdit 
+}) {
 
   // No longer need to filter into active/completed
   // const activeItems = items.filter(item => !item.completed);
@@ -35,7 +43,10 @@ function GroceryList({ items, onToggleComplete, onDeleteItem, onEditItem }) {
               item={item}
               onToggleComplete={onToggleComplete}
               onDeleteItem={onDeleteItem}
-              onEditItem={onEditItem}
+              isEditing={editTargetId === item.id}
+              onEditRequest={onEditRequest}
+              onSaveEdit={onSaveEdit}
+              onCancelEdit={onCancelEdit}
             />
           ))}
         </List>

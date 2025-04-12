@@ -52,15 +52,18 @@ function GroceryPage({
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
+  // Add state to track which item ID is being edited
+  const [editTargetId, setEditTargetId] = useState(null); 
+
   const theme = useTheme(); // Get theme for spacing
 
   // Handlers to open modals
-  const handleOpenAddItem = () => setShowAddItem(true);
+  const handleOpenAddItem = () => { setEditTargetId(null); setShowAddItem(true); };
   const handleCloseAddItem = () => setShowAddItem(false);
-  const handleOpenVoiceInput = () => setShowVoiceInput(true);
+  const handleOpenVoiceInput = () => { setEditTargetId(null); setShowVoiceInput(true); };
   const handleCloseVoiceInput = () => setShowVoiceInput(false);
   
-  const handleOpenClearConfirm = () => setShowClearConfirm(true);
+  const handleOpenClearConfirm = () => { setEditTargetId(null); setShowClearConfirm(true); };
   const handleCloseClearConfirm = () => setShowClearConfirm(false);
   
   const handleConfirmClear = () => {
@@ -73,6 +76,25 @@ function GroceryPage({
     addItem(name);
     handleCloseAddItem();
   }
+
+  // --- Edit Handlers ---
+  const handleEditRequest = (id) => {
+    // Close other modals/inputs if any are open when starting edit
+    setShowAddItem(false);
+    setShowVoiceInput(false);
+    setShowClearConfirm(false);
+    // Set the ID of the item to be edited
+    setEditTargetId(id);
+  };
+
+  const handleSaveEdit = (id, newName) => {
+    editItem(id, newName); // Call the actual edit function from App.jsx
+    setEditTargetId(null); // Exit editing mode
+  };
+
+  const handleCancelEdit = () => {
+    setEditTargetId(null); // Exit editing mode without saving
+  };
 
   return (
     <Box> { /* Wrap page content in Box */ }
@@ -204,12 +226,15 @@ function GroceryPage({
            confirmColor="error" // Use red for destructive action
          />
 
-         {/* Grocery List */}
+         {/* Grocery List - Pass down edit state and handlers */}
          <GroceryList 
            items={items} 
            onToggleComplete={toggleComplete} 
            onDeleteItem={deleteItem} 
-           onEditItem={editItem}
+           editTargetId={editTargetId}       // Pass down the target ID
+           onEditRequest={handleEditRequest} // Pass down the request handler
+           onSaveEdit={handleSaveEdit}       // Pass down the save handler
+           onCancelEdit={handleCancelEdit}   // Pass down the cancel handler
          />
       </Box> { /* Close content Box */ }
     </Box>
