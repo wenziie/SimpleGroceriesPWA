@@ -30,9 +30,13 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
 
   // --- Edit handlers (remain the same) ---
   useEffect(() => {
+    // Add slight delay to ensure TextField is ready for focus
     if (isEditing && inputRef.current) {
-      // Just focus, remove select
-      inputRef.current.focus();
+      setTimeout(() => {
+        if (inputRef.current) { // Check ref again inside timeout
+           inputRef.current.focus();
+        }
+      }, 0); 
     }
   }, [isEditing]);
 
@@ -136,10 +140,11 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
           ) : (
             <ListItemText 
               primary={item.name}
-              onClick={handleEdit} // Trigger edit on text click when not completed
+              // onClick={handleEdit} // REMOVED: Only pen icon should trigger edit
               sx={{ 
                  textDecoration: item.completed ? 'line-through' : 'none',
-                 cursor: item.completed ? 'default' : 'pointer', // Only pointer if editable
+                 // cursor: item.completed ? 'default' : 'pointer', // REMOVED: No longer clickable
+                 cursor: 'default' // Set cursor to default
                }}
             />
           )}
@@ -151,8 +156,10 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                size="medium"
                onClick={handleEdit} 
                title="Redigera artikel"
-               disabled={isEditing || item.completed} // Disable if editing OR completed
-               color={item.completed ? 'disabled' : (isEditing ? 'disabled' : 'primary')}
+               disabled={isEditing || item.completed} 
+               // REMOVED explicit color change for disabled state
+               // color={item.completed ? 'disabled' : (isEditing ? 'disabled' : 'primary')}
+               color={item.completed ? 'disabled' : 'primary'} // Set color based on completed only
              >
                <EditIcon fontSize="inherit" />
              </IconButton>
@@ -161,8 +168,10 @@ function GroceryItem({ item, onToggleComplete, onDeleteItem, onEditItem }) {
                size="medium"
                onClick={handleOpenDeleteConfirm} 
                title="Ta bort artikel"
-               disabled={isEditing} // Disable if editing
-               sx={{ color: isEditing ? alpha(theme.palette.error.main, 0.3) : theme.palette.error.main }} // Fade if disabled
+               disabled={isEditing} 
+               // REMOVED explicit sx color change for disabled state
+               // sx={{ color: isEditing ? alpha(theme.palette.error.main, 0.3) : theme.palette.error.main }}
+               color="error" // Set base color to error
              >
                <DeleteIcon fontSize="inherit" />
              </IconButton>
