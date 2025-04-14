@@ -52,66 +52,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // --- Share Target Handling ---
-  if (event.request.method === 'POST' && url.pathname === '/share-recipe') {
-    console.log('[ServiceWorker] Intercepted share target POST request');
-    event.respondWith(
-      (async () => {
-        try {
-          const formData = await event.request.formData();
-          const sharedUrl = formData.get('url') || formData.get('text') || ''; // Get URL or text
-          const sharedTitle = formData.get('title') || ''; // Optional title
-          console.log(`[ServiceWorker] Shared URL: ${sharedUrl}, Title: ${sharedTitle}`);
-
-          if (sharedUrl) {
-            // Find the main client (browser window/tab)
-            const clientList = await self.clients.matchAll({
-              type: 'window',
-              includeUncontrolled: true
-            });
-
-            let client = null;
-            for (const c of clientList) {
-              // Check if the client URL is the main app path
-              if (c.url && new URL(c.url).pathname === '/') {
-                client = c;
-                break;
-              }
-            }
-
-            if (client) {
-              console.log('[ServiceWorker] Found client, posting message');
-              // Send the URL to the main client
-              client.postMessage({
-                type: 'RECIPE_SHARED',
-                payload: { url: sharedUrl, title: sharedTitle } // Send URL and optional title
-              });
-              // Focus the client window
-              await client.focus();
-            } else {
-              console.log('[ServiceWorker] No client found, opening new window');
-              // If no client is open, open the app with the URL as a query parameter
-              // (App.jsx needs to handle this query parameter on load)
-              const openUrl = `/?sharedUrl=${encodeURIComponent(sharedUrl)}`;
-              await self.clients.openWindow(openUrl);
-            }
-          } else {
-             console.log('[ServiceWorker] No URL found in shared data');
-          }
-          
-          // Redirect the user back to the root page after handling the share
-          return Response.redirect('/', 303); 
-
-        } catch (error) {
-          console.error('[ServiceWorker] Error handling share target:', error);
-          // Redirect on error too, maybe show an error message via query param?
-          return Response.redirect('/?shareError=true', 303);
-        }
-      })()
-    );
-    return; // Don't process this fetch request further
-  }
-  // --- End Share Target Handling ---
+  // --- Removed Share Target Handling --- 
+  // if (event.request.method === 'POST' && url.pathname === '/share-recipe') { ... }
+  // --- End Removed Share Target Handling ---
 
   // Standard Cache-First Strategy for other requests
   // Only handle GET requests for caching
