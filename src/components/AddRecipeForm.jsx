@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 function AddRecipeForm({ onAddRecipe }) {
   const [url, setUrl] = useState('');
@@ -14,28 +15,38 @@ function AddRecipeForm({ onAddRecipe }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%', display: 'block' }}>
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
       <TextField
-        type="url" // Use type="url" for basic validation
-        label="Recept-URL" // Changed label
+        label="Receptets webbaddress"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="Klistra in receptets URL här" // Changed placeholder
-        required
-        fullWidth
+        placeholder="T.ex. https://www.hemsida.se/linsbiffar/"
         variant="outlined"
-        size="small" // Match other inputs potentially
-        sx={{ mb: 2, display: 'block' }} // Ensure field is block & add margin
+        fullWidth
+        required
+        margin="normal"
+        type="url"
+        InputLabelProps={{ shrink: true }}
       />
+      <Typography variant="caption" display="block" gutterBottom sx={{ mt: 1, color: 'text.secondary' }}>
+        Instruktion:
+        <ol style={{ margin: 0, paddingLeft: '1.5em' }}>
+          <li>Öppna receptet du vill spara i Safari (webbläsaren).</li>
+          <li>Tryck på adressfältet högst upp (där det står t.ex. google.com).</li>
+          <li>Välj 'Kopiera'.</li>
+          <li>Gå tillbaka hit till appen.</li>
+          <li>Tryck och håll fingret i rutan ovanför, välj 'Klistra in'.</li>
+        </ol>
+      </Typography>
       <Button 
-         type="submit" 
-         variant="contained" 
-         disabled={!url.trim()} // Disable if URL is empty
-         fullWidth 
-         sx={{ display: 'block' }} // Ensure button is block
-       >
-         Lägg till
-       </Button>
+        type="submit" 
+        variant="contained" 
+        fullWidth 
+        disabled={!url.trim()}
+        sx={{ mt: 2, mb: 2 }}
+      >
+        Spara recept
+      </Button>
     </Box>
   );
 }
