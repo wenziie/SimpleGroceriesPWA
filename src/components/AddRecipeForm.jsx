@@ -15,7 +15,17 @@ function AddRecipeForm({ onAddRecipe }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+    <Box 
+      component="form" 
+      onSubmit={handleSubmit} 
+      noValidate 
+      sx={{ 
+        mt: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: 1.5
+      }}
+    >
       <TextField
         label="Receptets webbaddress"
         value={url}
@@ -43,7 +53,6 @@ function AddRecipeForm({ onAddRecipe }) {
         variant="contained" 
         fullWidth 
         disabled={!url.trim()}
-        sx={{ mt: 2, mb: 2 }}
       >
         Spara recept
       </Button>
