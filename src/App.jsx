@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'; // Import routing components
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'; // Import routing components and location hook
 import './App.css'
 import AddItemForm from './components/AddItemForm'
 import GroceryList from './components/GroceryList'
@@ -37,6 +37,9 @@ function App() {
     })) : [];
   });
 
+  const navigate = useNavigate(); // Get navigate function
+  const location = useLocation(); // Get location object
+
   // Load items from localStorage on initial render
   useEffect(() => {
     const storedItems = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ITEMS))
@@ -58,17 +61,49 @@ function App() {
     localStorage.setItem(LOCAL_STORAGE_KEY_RECIPES, JSON.stringify(recipes))
   }, [recipes])
 
-  // Effect to handle shared URL on load
+  // Effect to handle messages from the Service Worker
+  useEffect(() => {
+    const handleServiceWorkerMessage = (event) => {
+      if (event.data && event.data.type === 'RECIPE_SHARED') {
+        const { url } = event.data.payload;
+        console.log('[App] Received RECIPE_SHARED message with URL:', url);
+        if (url) {
+          // Navigate to recipes page first if not already there?
+          if (location.pathname !== '/recipes') {
+             navigate('/recipes'); 
+          }
+          // Call addRecipe with the shared URL
+          addRecipe(url); 
+          // Potentially show a success snackbar?
+        }
+      }
+    };
+
+    navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+
+    // Cleanup listener on component unmount
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+    };
+  }, [navigate, addRecipe, location.pathname]); // Add dependencies
+
+  // Effect to handle shared URL as query parameter on load
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const sharedUrl = queryParams.get('url');
+    const sharedUrl = queryParams.get('sharedUrl');
     if (sharedUrl) {
+      console.log('[App] Found sharedUrl query parameter:', sharedUrl);
+      // Navigate to recipes page first
+      if (location.pathname !== '/recipes') {
+         navigate('/recipes'); 
+      }
       addRecipe(sharedUrl);
       // Clear the query param from the URL after processing
       window.history.replaceState({}, document.title, window.location.pathname);
     }
     // Intentionally run only once on mount, addRecipe handles duplicates
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
+  }, []); // Run only on mount
 
   // Function to add a new item
   const addItem = (name) => {
