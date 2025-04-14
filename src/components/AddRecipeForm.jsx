@@ -38,12 +38,12 @@ function AddRecipeForm({ onAddRecipe }) {
         type="url"
         InputLabelProps={{ shrink: true }}
       />
-      <Typography variant="caption" display="block" gutterBottom sx={{ mt: 1, color: 'text.secondary' }}>
-        Instruktion:
+      <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }}>
+        Instruktioner:
         <ol style={{ margin: 0, paddingLeft: '1.5em' }}>
-          <li>Öppna receptet du vill spara i Safari (webbläsaren).</li>
-          <li>Tryck på adressfältet högst upp (där det står t.ex. google.com).</li>
-          <li>Välj 'Kopiera'.</li>
+          <li>Gå in på receptets hemsida i Safari (den blå appen med kompass).</li>
+          <li>Tryck på 'dela'-ikonen (kvadrat med en pil som pekar uppåt).</li>
+          <li>Tryck på 'Kopiera'.</li>
           <li>Gå tillbaka hit till appen.</li>
           <li>Tryck och håll fingret i rutan ovanför, välj 'Klistra in'.</li>
         </ol>
