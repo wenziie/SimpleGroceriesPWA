@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'; // Import routing components and location hook
 import './App.css'
 import AddItemForm from './components/AddItemForm'
@@ -39,6 +39,72 @@ function App() {
 
   const navigate = useNavigate(); // Get navigate function
   const location = useLocation(); // Get location object
+
+  // Wrap addRecipe in useCallback
+  const addRecipe = useCallback(async (url) => {
+    const trimmedUrl = url.trim()
+    if (!trimmedUrl) return
+    
+    try {
+      new URL(trimmedUrl) // Basic validation
+    } catch (_) {
+      alert("Please enter a valid URL.")
+      return
+    }
+    
+    // Check for duplicates using the current recipes state
+    // Need to access recipes via function argument or by including it in useCallback deps
+    // Safest is often to use the functional update form of setRecipes if possible, 
+    // but here we need to check *before* potentially setting state.
+    // So, we include recipes in the dependency array.
+    if (recipes.some(recipe => recipe.url === trimmedUrl)) {
+      alert("This recipe URL is already saved.")
+      return
+    }
+
+    console.log(`Fetching metadata for: ${trimmedUrl}`); 
+    let title = trimmedUrl; 
+    let imageUrl = null; 
+    let ingredients = [];
+
+    try {
+      const response = await fetch('/api/fetch_recipe_meta', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: trimmedUrl }),
+      });
+
+      if (!response.ok) {
+        // Handle API errors (e.g., 400, 500)
+        const errorData = await response.json().catch(() => ({})); // Try to parse error, ignore if not JSON
+        console.error(`API Error (${response.status}): ${errorData.error || response.statusText}`);
+        // Keep default title/imageUrl (the URL itself)
+      } else {
+        const data = await response.json();
+        // Decode the title before assigning
+        title = decodeHtmlEntities(data.title || trimmedUrl);
+        imageUrl = data.imageUrl; 
+        ingredients = data.ingredients || []; 
+      }
+    } catch (error) {
+      // Handle network errors during fetch
+      console.error('Network error fetching recipe metadata:', error);
+    }
+
+    const newRecipe = {
+      id: crypto.randomUUID(),
+      url: trimmedUrl,
+      // Use the decoded title
+      title: title, 
+      imageUrl: imageUrl,
+      ingredients: ingredients
+    };
+    
+    // Use functional update form for setRecipes
+    setRecipes(prevRecipes => [...prevRecipes, newRecipe]);
+  }, [recipes]);
 
   // Load items from localStorage on initial render
   useEffect(() => {
@@ -103,7 +169,7 @@ function App() {
     }
     // Intentionally run only once on mount, addRecipe handles duplicates
     // eslint-disable-next-line react-hooks/exhaustive-deps 
-  }, []); // Run only on mount
+  }, [addRecipe]); // Run only on mount, but depends on addRecipe
 
   // Function to add a new item
   const addItem = (name) => {
@@ -151,69 +217,6 @@ function App() {
   const clearAllItems = () => {
     setItems([]); // Set items to empty array
   };
-
-  // Function to add a new recipe - now asynchronous
-  const addRecipe = async (url) => {
-    const trimmedUrl = url.trim()
-    if (!trimmedUrl) return
-    
-    try {
-      new URL(trimmedUrl) // Basic validation
-    } catch (_) {
-      alert("Please enter a valid URL.")
-      return
-    }
-    
-    // Check for duplicates before fetching
-    if (recipes.some(recipe => recipe.url === trimmedUrl)) {
-      alert("This recipe URL is already saved.")
-      return
-    }
-
-    // Show some loading state (optional, implement later if needed)
-    console.log(`Fetching metadata for: ${trimmedUrl}`); 
-
-    let title = trimmedUrl; 
-    let imageUrl = null; 
-    let ingredients = [];
-
-    try {
-      const response = await fetch('/api/fetch_recipe_meta', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url: trimmedUrl }),
-      });
-
-      if (!response.ok) {
-        // Handle API errors (e.g., 400, 500)
-        const errorData = await response.json().catch(() => ({})); // Try to parse error, ignore if not JSON
-        console.error(`API Error (${response.status}): ${errorData.error || response.statusText}`);
-        // Keep default title/imageUrl (the URL itself)
-      } else {
-        const data = await response.json();
-        // Decode the title before assigning
-        title = decodeHtmlEntities(data.title || trimmedUrl);
-        imageUrl = data.imageUrl; 
-        ingredients = data.ingredients || []; 
-      }
-    } catch (error) {
-      // Handle network errors during fetch
-      console.error('Network error fetching recipe metadata:', error);
-    }
-
-    const newRecipe = {
-      id: crypto.randomUUID(),
-      url: trimmedUrl,
-      // Use the decoded title
-      title: title, 
-      imageUrl: imageUrl,
-      ingredients: ingredients
-    };
-    
-    setRecipes(prevRecipes => [...prevRecipes, newRecipe])
-  }
 
   // Function to delete a recipe
   const deleteRecipe = (id) => {
