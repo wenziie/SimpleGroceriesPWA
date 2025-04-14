@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import GroceryList from '../components/GroceryList';
 import AddItemForm from '../components/AddItemForm';
 import VoiceInput from '../components/VoiceInput';
@@ -20,6 +20,8 @@ import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
+import Snackbar from '@mui/material/Snackbar'; // Import Snackbar
+import Alert from '@mui/material/Alert';     // Import Alert
 
 // Basic style for modal content box - USE THEME VALUES
 const modalStyle = {
@@ -57,9 +59,13 @@ function GroceryPage({
 
   const theme = useTheme(); // Get theme for spacing
 
-  // Add state and ref for scroll-to-bottom
-  const [prevItemsLength, setPrevItemsLength] = useState(items.length);
+  // State for scroll-to-bottom
+  const [prevItemsLengthScroll, setPrevItemsLengthScroll] = useState(items.length);
   const bottomListAnchorRef = useRef(null);
+
+  // State for item added Snackbar
+  const [snackbarInfo, setSnackbarInfo] = useState({ open: false, message: '', severity: 'success' });
+  const [prevItemsLengthSnackbar, setPrevItemsLengthSnackbar] = useState(items.length);
 
   // Handlers to open modals
   const handleOpenAddItem = () => { setEditTargetId(null); setShowAddItem(true); };
@@ -100,15 +106,40 @@ function GroceryPage({
     setEditTargetId(null); // Exit editing mode without saving
   };
 
-  // Effect to scroll the bottom anchor into view when items are added
+  // Effect for scroll-to-bottom 
   useLayoutEffect(() => {
-    if (items.length > prevItemsLength) {
+    if (items.length > prevItemsLengthScroll) {
       if (bottomListAnchorRef.current) { 
         bottomListAnchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' }); 
       }
     }
-    setPrevItemsLength(items.length);
-  }, [items.length, prevItemsLength]); 
+    setPrevItemsLengthScroll(items.length);
+  }, [items.length, prevItemsLengthScroll]); 
+
+  // Effect for item added Snackbar
+  useEffect(() => {
+    // Only show snackbar if length actually increased
+    if (items.length > prevItemsLengthSnackbar) {
+       const addedCount = items.length - prevItemsLengthSnackbar;
+       const itemText = addedCount > 1 ? 'artiklar' : 'artikel';
+       const verbText = addedCount > 1 ? 'tillagda' : 'tillagd';
+       setSnackbarInfo({
+         open: true, 
+         message: `${addedCount} ${itemText} ${verbText}`, 
+         severity: 'success' 
+       });
+    }
+    // Always update length for next comparison, even if no snackbar shown
+    setPrevItemsLengthSnackbar(items.length);
+  }, [items.length, prevItemsLengthSnackbar]); 
+
+  // Handler to close snackbar
+  const handleCloseSnackbar = (event, reason) => {
+     if (reason === 'clickaway') {
+       return;
+     }
+     setSnackbarInfo(prev => ({ ...prev, open: false }));
+  };
 
   return (
     <Box> { /* Wrap page content in Box */ }
@@ -251,6 +282,21 @@ function GroceryPage({
            onCancelEdit={handleCancelEdit}   // Pass down the cancel handler
            bottomListAnchorRef={bottomListAnchorRef} // Pass down the ref
          />
+
+         {/* Snackbar for Item Added Feedback */}
+         <Snackbar 
+           open={snackbarInfo.open} 
+           autoHideDuration={3000} 
+           onClose={handleCloseSnackbar}
+           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+           sx={{ 
+             mb: 'calc(56px + 8px + env(safe-area-inset-bottom, 0px))'
+           }}
+         >
+           <Alert onClose={handleCloseSnackbar} severity={snackbarInfo.severity} sx={{ width: '100%' }}>
+              {snackbarInfo.message}
+           </Alert>
+         </Snackbar>
       </Box> { /* Close content Box */ }
     </Box>
   );
