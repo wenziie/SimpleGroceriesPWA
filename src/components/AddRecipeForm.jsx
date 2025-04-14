@@ -3,6 +3,15 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import IosShareIcon from '@mui/icons-material/IosShare';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
+// Helper component for inline icon styling
+const InlineIcon = ({ children }) => (
+  <Box component="span" sx={{ display: 'inline-flex', verticalAlign: 'middle', mx: 0.5 }}>
+    {children}
+  </Box>
+);
 
 function AddRecipeForm({ onAddRecipe }) {
   const [url, setUrl] = useState('');
@@ -42,8 +51,8 @@ function AddRecipeForm({ onAddRecipe }) {
         Instruktioner:
         <ol style={{ margin: 0, paddingLeft: '1.5em' }}>
           <li>Gå in på receptets hemsida i Safari (den blå appen med kompass).</li>
-          <li>Tryck på 'dela'-ikonen (kvadrat med en pil som pekar uppåt).</li>
-          <li>Tryck på 'Kopiera'.</li>
+          <li>Tryck på 'dela'-ikonen <InlineIcon><IosShareIcon fontSize="inherit" /></InlineIcon>.</li>
+          <li>Tryck på 'Kopiera' <InlineIcon><ContentCopyIcon fontSize="inherit" /></InlineIcon>.</li>
           <li>Gå tillbaka hit till appen.</li>
           <li>Tryck och håll fingret i rutan ovanför, välj 'Klistra in'.</li>
         </ol>
