@@ -40,8 +40,12 @@ function App() {
   const navigate = useNavigate(); // Get navigate function
   const location = useLocation(); // Get location object
 
+  // Add state for recipe fetch errors
+  const [recipeError, setRecipeError] = useState(null); 
+
   // Wrap addRecipe in useCallback
   const addRecipe = useCallback(async (url) => {
+    setRecipeError(null); // Reset error on new attempt
     const trimmedUrl = url.trim()
     if (!trimmedUrl) return
     
@@ -66,6 +70,7 @@ function App() {
     let title = trimmedUrl; 
     let imageUrl = null; 
     let ingredients = [];
+    let fetchSuccess = false; // Flag to track success
 
     try {
       const response = await fetch('/api/fetch_recipe_meta', {
@@ -80,30 +85,34 @@ function App() {
         // Handle API errors (e.g., 400, 500)
         const errorData = await response.json().catch(() => ({})); // Try to parse error, ignore if not JSON
         console.error(`API Error (${response.status}): ${errorData.error || response.statusText}`);
-        // Keep default title/imageUrl (the URL itself)
+        setRecipeError({ type: 'fetch' }); // Set fetch error state
       } else {
         const data = await response.json();
         // Decode the title before assigning
         title = decodeHtmlEntities(data.title || trimmedUrl);
         imageUrl = data.imageUrl; 
         ingredients = data.ingredients || []; 
+        fetchSuccess = true; // Mark as successful fetch
       }
     } catch (error) {
       // Handle network errors during fetch
       console.error('Network error fetching recipe metadata:', error);
+      setRecipeError({ type: 'network' }); // Set network error state
     }
 
-    const newRecipe = {
-      id: crypto.randomUUID(),
-      url: trimmedUrl,
-      // Use the decoded title
-      title: title, 
-      imageUrl: imageUrl,
-      ingredients: ingredients
-    };
-    
-    // Use functional update form for setRecipes
-    setRecipes(prevRecipes => [...prevRecipes, newRecipe]);
+    if (fetchSuccess) {
+      const newRecipe = {
+        id: crypto.randomUUID(),
+        url: trimmedUrl,
+        // Use the decoded title
+        title: title, 
+        imageUrl: imageUrl,
+        ingredients: ingredients
+      };
+      
+      // Use functional update form for setRecipes
+      setRecipes(prevRecipes => [...prevRecipes, newRecipe]);
+    }
   }, [recipes]);
 
   // Load items from localStorage on initial render
@@ -225,6 +234,8 @@ function App() {
             addRecipe={addRecipe}
             deleteRecipe={deleteRecipe}
             addIngredientsFromRecipe={addIngredientsFromRecipe}
+            recipeError={recipeError}
+            setRecipeError={setRecipeError}
           />
         } />
       </Route>

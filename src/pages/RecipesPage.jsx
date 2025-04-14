@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import RecipeList from '../components/RecipeList';
 import AddRecipeForm from '../components/AddRecipeForm';
 import ConfirmationModal from '../components/ConfirmationModal'; // Import confirmation modal
@@ -28,6 +28,8 @@ function RecipesPage({
   addRecipe, 
   deleteRecipe, 
   addIngredientsFromRecipe,
+  recipeError,    // New prop
+  setRecipeError  // New prop
 }) {
   // Remove scrollContainerRef usage
   // const { scrollContainerRef } = useOutletContext(); 
@@ -74,10 +76,11 @@ function RecipesPage({
     handleCloseDeleteConfirm(); 
   };
 
-  // Handler for adding recipe - remove scroll logic from here
+  // Handler for adding recipe (calls the prop from App.jsx)
   const handleAddRecipeAndClose = async (url) => {
-    await addRecipe(url); 
-    handleCloseAddRecipe(); 
+    await addRecipe(url); // Call the function passed from App
+    handleCloseAddRecipe();
+    // Feedback is now handled by the useEffect below
   }
 
   // Snackbar handler
@@ -102,6 +105,20 @@ function RecipesPage({
   const handleShowParsingFailure = () => {
      setSnackbarInfo({ open: true, message: 'Ingredienser kunde inte läggas till automatiskt. Kontrollera receptet på webben.', severity: 'error' });
   };
+
+  // Effect to watch for recipe fetch errors
+  useEffect(() => {
+    if (recipeError) {
+      let message = 'Ett okänt fel uppstod vid hämtning av recept.'; 
+      if (recipeError.type === 'network') {
+        message = 'Nätverksfel: Kunde inte hämta recept. Försök igen.';
+      } else if (recipeError.type === 'fetch') {
+        message = 'Fel: Kunde inte hämta receptinformation från sidan.';
+      }
+      setSnackbarInfo({ open: true, message: message, severity: 'error' });
+      setRecipeError(null); // Reset the error state in App.jsx
+    }
+  }, [recipeError, setRecipeError]); // Dependencies
 
   // Effect to scroll the bottom anchor into view
   useLayoutEffect(() => {
