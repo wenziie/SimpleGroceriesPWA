@@ -7,8 +7,19 @@ import IosShareIcon from '@mui/icons-material/IosShare';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 // Helper component for inline icon styling
-const InlineIcon = ({ children }) => (
-  <Box component="span" sx={{ display: 'inline-flex', verticalAlign: 'middle', mx: 0.5 }}>
+const InlineIcon = ({ children, isImage = false, src = '' }) => (
+  <Box 
+    component={isImage ? 'img' : 'span'} 
+    src={isImage ? src : undefined}
+    sx={{
+      display: 'inline-flex',
+      verticalAlign: 'middle',
+      mx: 0.5,
+      // If it's an image, set height to match text line height
+      height: isImage ? '1.2em' : undefined, 
+      width: isImage ? 'auto' : undefined,
+    }}
+  >
     {children}
   </Box>
 );
@@ -50,7 +61,7 @@ function AddRecipeForm({ onAddRecipe }) {
       <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }}>
         Instruktioner:
         <ol style={{ margin: 0, paddingLeft: '1.5em' }}>
-          <li>Gå in på receptets hemsida i Safari (den blå appen med kompass).</li>
+          <li>Gå in på receptets hemsida i Safari <InlineIcon isImage={true} src="/icons/safari-logo.png" />.</li>
           <li>Tryck på 'dela'-ikonen <InlineIcon><IosShareIcon fontSize="inherit" /></InlineIcon>.</li>
           <li>Tryck på 'Kopiera' <InlineIcon><ContentCopyIcon fontSize="inherit" /></InlineIcon>.</li>
           <li>Gå tillbaka hit till appen.</li>
